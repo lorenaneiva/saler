@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
@@ -30,5 +31,11 @@ Route::middleware('auth')->group(function (): void {
         ->parameters(['fornecedores' => 'supplier'])
         ->names('suppliers')
         ->except('show');
+    Route::post('/compras/{purchase}/confirmar', [PurchaseController::class, 'confirm'])->name('purchases.confirm');
+    Route::post('/compras/{purchase}/cancelar', [PurchaseController::class, 'cancel'])->name('purchases.cancel');
+    Route::resource('compras', PurchaseController::class)
+        ->parameters(['compras' => 'purchase'])
+        ->names('purchases')
+        ->only(['index', 'create', 'store', 'show']);
     Route::post('/sair', [SessionController::class, 'destroy'])->name('logout');
 });

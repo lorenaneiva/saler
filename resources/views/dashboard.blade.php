@@ -19,5 +19,9 @@
             <span class="text-lg font-semibold">Fornecedores</span>
             <p class="mt-1 text-sm text-slate-600">Gerencie fornecedores e seus contatos.</p>
         </a>
+        <a href="{{ route('purchases.index') }}" class="panel block p-6 hover:border-emerald-700">
+            <span class="text-lg font-semibold">Compras</span>
+            <p class="mt-1 text-sm text-slate-600">Registre compras e confirme entradas de estoque.</p>
+        </a>
     </div>
 @endsection
