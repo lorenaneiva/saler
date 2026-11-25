@@ -7,3 +7,29 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@layer components {
+    .module-link {
+        @apply rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-slate-800 hover:text-white aria-[current=page]:bg-emerald-400/15 aria-[current=page]:text-emerald-300;
+    }
+
+    .page-title {
+        @apply text-3xl font-semibold tracking-tight sm:text-4xl;
+    }
+
+    .panel {
+        @apply rounded-xl border border-slate-200 bg-white shadow-sm;
+    }
+
+    .field {
+        @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-950 focus:border-emerald-700 focus:outline-emerald-700;
+    }
+
+    .button-primary {
+        @apply inline-flex w-fit cursor-pointer items-center rounded-lg bg-emerald-800 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-900;
+    }
+
+    .button-secondary {
+        @apply inline-flex w-fit cursor-pointer items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50;
+    }
+}

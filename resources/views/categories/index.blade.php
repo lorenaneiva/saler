@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="grid max-w-2xl gap-6">
-        <h1 class="text-2xl font-semibold">Categorias</h1>
+        <h1 class="page-title">Categorias</h1>
 
         @if (session('status'))
             <p role="status" class="rounded-lg bg-green-100 px-4 py-3 text-green-900">{{ session('status') }}</p>
@@ -14,13 +14,13 @@
             <p role="alert" class="rounded-lg bg-red-100 px-4 py-3 text-red-900">{{ $message }}</p>
         @enderror
 
-        <form method="POST" action="{{ route('categories.store') }}" class="grid gap-3 rounded-lg border border-stone-200 bg-white p-4">
+        <form method="POST" action="{{ route('categories.store') }}" class="panel grid gap-3 p-5">
             @csrf
             @include('categories.name-field')
-            <button class="justify-self-start rounded-lg bg-stone-900 px-4 py-2 text-white hover:bg-stone-700">Cadastrar categoria</button>
+            <button class="button-primary">Cadastrar categoria</button>
         </form>
 
-        <ul class="divide-y divide-stone-200 rounded-lg border border-stone-200 bg-white">
+        <ul class="panel divide-y divide-slate-200">
             @forelse ($categories as $category)
                 <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                     <span class="min-w-0 break-words">{{ $category->name }}</span>
@@ -35,7 +35,7 @@
                     </div>
                 </li>
             @empty
-                <li class="px-4 py-3 text-stone-600">Nenhuma categoria cadastrada.</li>
+                <li class="px-4 py-3 text-slate-600">Nenhuma categoria cadastrada.</li>
             @endforelse
         </ul>
 
