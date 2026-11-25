@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function (): void {
@@ -25,5 +26,9 @@ Route::middleware('auth')->group(function (): void {
         ->parameters(['clientes' => 'customer'])
         ->names('customers')
         ->except('destroy');
+    Route::resource('fornecedores', SupplierController::class)
+        ->parameters(['fornecedores' => 'supplier'])
+        ->names('suppliers')
+        ->except('show');
     Route::post('/sair', [SessionController::class, 'destroy'])->name('logout');
 });

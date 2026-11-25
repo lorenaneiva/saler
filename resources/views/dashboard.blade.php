@@ -15,5 +15,9 @@
             <span class="text-lg font-semibold">Clientes</span>
             <p class="mt-1 text-sm text-slate-600">Cadastre clientes e consulte seus contatos.</p>
         </a>
+        <a href="{{ route('suppliers.index') }}" class="panel block p-6 hover:border-emerald-700">
+            <span class="text-lg font-semibold">Fornecedores</span>
+            <p class="mt-1 text-sm text-slate-600">Gerencie fornecedores e seus contatos.</p>
+        </a>
     </div>
 @endsection

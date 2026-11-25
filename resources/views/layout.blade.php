@@ -21,6 +21,8 @@
                 class="module-link">Produtos</a>
             <a href="{{ route('customers.index') }}" @if (request()->routeIs('customers.*')) aria-current="page" @endif
                 class="module-link">Clientes</a>
+            <a href="{{ route('suppliers.index') }}" @if (request()->routeIs('suppliers.*')) aria-current="page" @endif
+                class="module-link">Fornecedores</a>
         </nav>
     </aside>
     <div class="min-w-0">
