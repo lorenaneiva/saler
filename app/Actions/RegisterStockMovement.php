@@ -12,7 +12,7 @@ use Illuminate\Validation\ValidationException;
 
 class RegisterStockMovement
 {
-    /** @param array{type: string, quantity: int|numeric-string, unit_cost?: numeric-string|int|float, justification?: ?string} $data */
+    /** @param array{type: string, quantity: int|numeric-string, unit_cost?: numeric-string|int|float, justification?: ?string, reason_id?: int|numeric-string} $data */
     public function handle(Product $product, User $user, array $data): void
     {
         DB::transaction(function () use ($product, $user, $data): void {
@@ -24,7 +24,8 @@ class RegisterStockMovement
                 StockMovement::Adjustment => $quantity - $product->stock_quantity,
             };
 
-            $newQuantity = $product->stock_quantity + $delta;
+            $previousQuantity = $product->stock_quantity;
+            $newQuantity = $previousQuantity + $delta;
 
             if ($newQuantity < 0) {
                 throw ValidationException::withMessages(['quantity' => 'A quantidade de saída excede o estoque disponível.']);
@@ -50,13 +51,21 @@ class RegisterStockMovement
             $product->stock_quantity = $newQuantity;
             $product->save();
 
-            $product->stockMovements()->create([
+            $movement = $product->stockMovements()->create([
                 'user_id' => $user->id,
                 'quantity_delta' => $delta,
                 'unit_cost' => $movementCost,
                 'type' => $data['type'],
                 'justification' => $data['justification'] ?? null,
             ]);
+
+            if ($data['type'] === StockMovement::Adjustment) {
+                $movement->adjustment()->create([
+                    'reason_id' => $data['reason_id'],
+                    'previous_quantity' => $previousQuantity,
+                    'counted_quantity' => $newQuantity,
+                ]);
+            }
         }, 3);
     }
 }

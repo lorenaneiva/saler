@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\RegisterStockMovement;
 use App\Http\Requests\StockMovementRequest;
 use App\Models\Product;
+use App\Models\StockAdjustmentReason;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -21,7 +22,8 @@ class StockController extends Controller
     {
         return view('stock.show', [
             'product' => $product,
-            'movements' => $product->stockMovements()->with(['user:id,name', 'purchaseItem:id,purchase_id'])
+            'reasons' => StockAdjustmentReason::query()->orderBy('name')->get(['id', 'name']),
+            'movements' => $product->stockMovements()->with(['user:id,name', 'purchaseItem:id,purchase_id', 'adjustment.reason'])
                 ->latest()->orderByDesc('id')->paginate(20),
         ]);
     }

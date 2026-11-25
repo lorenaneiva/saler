@@ -15,7 +15,8 @@ class StockMovementRequest extends FormRequest
             'type' => ['required', Rule::in([StockMovement::ManualEntry, StockMovement::ManualExit, StockMovement::Adjustment])],
             'quantity' => ['required', 'integer', $this->input('type') === StockMovement::Adjustment ? 'min:0' : 'min:1', 'max:2147483647'],
             'unit_cost' => ['exclude_unless:type,'.StockMovement::ManualEntry, 'required', 'numeric', 'decimal:0,4', 'min:0', 'max:9999999999.9999'],
-            'justification' => ['required_if:type,'.StockMovement::Adjustment, 'nullable', 'string', 'max:500'],
+            'reason_id' => ['exclude_unless:type,'.StockMovement::Adjustment, 'required', 'integer', 'exists:motivos,id'],
+            'justification' => ['nullable', 'string', 'max:500'],
         ];
     }
 
@@ -26,7 +27,7 @@ class StockMovementRequest extends FormRequest
             'type.*' => 'Selecione um tipo de movimentação válido.',
             'quantity.*' => 'Informe uma quantidade inteira válida. Somente ajustes aceitam saldo zero.',
             'unit_cost.*' => 'Informe um custo unitário válido, com até quatro casas decimais.',
-            'justification.required_if' => 'Informe a justificativa do ajuste.',
+            'reason_id.*' => 'Selecione um motivo cadastrado para o ajuste.',
             'justification.string' => 'A justificativa deve ser um texto.',
             'justification.max' => 'A justificativa deve ter até 500 caracteres.',
         ];

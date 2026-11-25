@@ -5,6 +5,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\StockAdjustmentReasonController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +41,8 @@ Route::middleware('auth')->group(function (): void {
         ->names('purchases')
         ->only(['index', 'create', 'store', 'show']);
     Route::get('/estoque', [StockController::class, 'index'])->name('stock.index');
+    Route::get('/estoque/motivos', [StockAdjustmentReasonController::class, 'index'])->name('stock.reasons.index');
+    Route::post('/estoque/motivos', [StockAdjustmentReasonController::class, 'store'])->name('stock.reasons.store');
     Route::get('/estoque/{product}', [StockController::class, 'show'])->name('stock.show');
     Route::post('/estoque/{product}/movimentacoes', [StockController::class, 'store'])->name('stock.store');
     Route::post('/sair', [SessionController::class, 'destroy'])->name('logout');

@@ -7,6 +7,7 @@
     $quantity = old('quantity');
     $unitCost = old('unit_cost');
     $justification = old('justification');
+    $isAdjustment = old('type') === \App\Models\StockMovement::Adjustment;
 @endphp
 
 <form method="POST" action="{{ route('stock.store', $product) }}" class="panel grid gap-4 p-5 sm:grid-cols-2">
@@ -40,8 +41,21 @@
         <input id="stock-unit-cost" name="unit_cost" type="number" class="field" min="0" max="9999999999.9999" step="0.0001"
             value="{{ is_scalar($unitCost) ? $unitCost : '' }}">
     </label>
+    <div id="stock-reason-field" class="grid content-start gap-2" @if (! $isAdjustment) hidden @endif>
+        <label for="stock-reason" class="font-medium">Motivo do ajuste <x-required-mark /></label>
+        <select id="stock-reason" name="reason_id" class="field" @required($isAdjustment) @disabled(! $isAdjustment)>
+            <option value="">Selecione</option>
+            @foreach ($reasons as $reason)
+                <option value="{{ $reason->id }}" @selected(old('reason_id') == $reason->id)>{{ $reason->name }}</option>
+            @endforeach
+        </select>
+        @if ($reasons->isEmpty())
+            <p class="text-sm text-slate-600">Cadastre um motivo para registrar o ajuste.</p>
+        @endif
+        <a href="{{ route('stock.reasons.index') }}" class="w-fit text-sm text-emerald-800 underline">Motivos de ajuste</a>
+    </div>
     <label class="grid content-start gap-2 font-medium">
-        <span>Justificativa <span id="stock-justification-required" hidden><x-required-mark /></span></span>
+        <span>Observação (opcional)</span>
         <textarea id="stock-justification" name="justification" class="field" rows="2" maxlength="500">{{ is_string($justification) ? $justification : '' }}</textarea>
     </label>
 
@@ -55,8 +69,8 @@
     const adjustmentHelp = document.getElementById('stock-adjustment-help');
     const unitCost = document.getElementById('stock-unit-cost');
     const unitCostField = document.getElementById('stock-unit-cost-field');
-    const justification = document.getElementById('stock-justification');
-    const justificationRequired = document.getElementById('stock-justification-required');
+    const reasonField = document.getElementById('stock-reason-field');
+    const reason = document.getElementById('stock-reason');
 
     function updateMovementFields() {
         const isEntry = movementType.value === 'manual_entry';
@@ -67,8 +81,9 @@
         unitCostField.hidden = !isEntry;
         unitCost.disabled = !isEntry;
         unitCost.required = isEntry;
-        justificationRequired.hidden = !isAdjustment;
-        justification.required = isAdjustment;
+        reasonField.hidden = !isAdjustment;
+        reason.disabled = !isAdjustment;
+        reason.required = isAdjustment;
     }
 
     movementType.addEventListener('change', updateMovementFields);

@@ -33,7 +33,7 @@
                     <caption class="sr-only">Movimentações de {{ $product->name }}</caption>
                     <thead class="border-b border-slate-200 bg-slate-50 text-slate-700">
                         <tr>
-                            @foreach (['Data', 'Origem', 'Quantidade', 'Custo unitário', 'Responsável', 'Justificativa'] as $heading)
+                            @foreach (['Data', 'Origem', 'Quantidade', 'Custo unitário', 'Responsável', 'Motivo e observação'] as $heading)
                                 <th scope="col" class="whitespace-nowrap px-4 py-3">{{ $heading }}</th>
                             @endforeach
                         </tr>
@@ -50,10 +50,26 @@
                                         </a>
                                     @endif
                                 </td>
-                                <td class="px-4 py-4">{{ $movement->quantity_delta > 0 ? '+' : '' }}{{ $movement->quantity_delta }}</td>
+                                <td class="px-4 py-4">
+                                    {{ $movement->quantity_delta > 0 ? '+' : '' }}{{ $movement->quantity_delta }}
+                                    @if ($movement->adjustment)
+                                        <div class="whitespace-nowrap text-xs text-slate-600">
+                                            {{ $movement->adjustment->previous_quantity }} → {{ $movement->adjustment->counted_quantity }}
+                                        </div>
+                                    @endif
+                                </td>
                                 <td class="whitespace-nowrap px-4 py-4">R$ {{ number_format((float) $movement->unit_cost, 4, ',', '.') }}</td>
                                 <td class="px-4 py-4">{{ $movement->user->name }}</td>
-                                <td class="min-w-32 wrap-anywhere px-4 py-4">{{ $movement->justification ?? '—' }}</td>
+                                <td class="min-w-32 wrap-anywhere px-4 py-4">
+                                    @if ($movement->adjustment)
+                                        <div class="font-medium">{{ $movement->adjustment->reason->name }}</div>
+                                    @endif
+                                    @if ($movement->justification)
+                                        <div>{{ $movement->justification }}</div>
+                                    @elseif (! $movement->adjustment)
+                                        —
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr><td colspan="6" class="px-4 py-6 text-slate-600">Nenhuma movimentação registrada.</td></tr>

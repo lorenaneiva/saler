@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['product_id', 'purchase_item_id', 'user_id', 'quantity_delta', 'unit_cost', 'type', 'justification'])]
 class StockMovement extends Model
@@ -29,6 +30,12 @@ class StockMovement extends Model
     public function purchaseItem(): BelongsTo
     {
         return $this->belongsTo(PurchaseItem::class);
+    }
+
+    /** @return HasOne<StockAdjustment, $this> */
+    public function adjustment(): HasOne
+    {
+        return $this->hasOne(StockAdjustment::class);
     }
 
     public function typeLabel(): string

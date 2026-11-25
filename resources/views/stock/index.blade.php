@@ -4,7 +4,10 @@
 
 @section('content')
     <div class="grid gap-6">
-        <h1 class="page-title">Estoque</h1>
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <h1 class="page-title">Estoque</h1>
+            <a href="{{ route('stock.reasons.index') }}" class="button-secondary">Motivos de ajuste</a>
+        </div>
 
         <div class="panel overflow-x-auto">
             <table class="w-full text-left text-sm">
