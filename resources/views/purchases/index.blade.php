@@ -18,7 +18,6 @@
                         <th scope="col" class="px-4 py-3">Fornecedor</th>
                         <th scope="col" class="px-4 py-3">Data</th>
                         <th scope="col" class="px-4 py-3">Total</th>
-                        <th scope="col" class="px-4 py-3">Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200">
@@ -30,10 +29,9 @@
                             <td class="px-4 py-4">{{ $purchase->supplier->name }}</td>
                             <td class="whitespace-nowrap px-4 py-4">{{ $purchase->purchased_on->format('d/m/Y') }}</td>
                             <td class="whitespace-nowrap px-4 py-4">R$ {{ number_format((float) $purchase->total, 2, ',', '.') }}</td>
-                            <td class="px-4 py-4">{{ $purchase->statusLabel() }}</td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="px-4 py-6 text-slate-600">Nenhuma compra registrada.</td></tr>
+                        <tr><td colspan="4" class="px-4 py-6 text-slate-600">Nenhuma compra registrada.</td></tr>
                     @endforelse
                 </tbody>
             </table>

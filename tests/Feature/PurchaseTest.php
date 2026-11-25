@@ -61,8 +61,8 @@ class PurchaseTest extends TestCase
         $this->assertDatabaseHas('purchase_items', [
             'purchase_id' => $purchase->id, 'product_id' => $rice->id, 'unit_cost' => '20.00', 'discount' => '6.00', 'total' => '54.00',
         ]);
-        $this->get(route('purchases.index'))->assertOk()->assertSee('Distribuidora Norte');
-        $this->get(route('purchases.show', $purchase))->assertOk()->assertSee('R$ 68,50')->assertSee('Confirmada');
+        $this->get(route('purchases.index'))->assertOk()->assertSee('Distribuidora Norte')->assertDontSeeText('Status');
+        $this->get(route('purchases.show', $purchase))->assertOk()->assertSee('R$ 68,50')->assertDontSeeText('Status');
         $this->assertDatabaseHas('products', ['id' => $rice->id, 'stock_quantity' => 5, 'average_cost' => '14.8000']);
         $this->assertDatabaseHas('products', ['id' => $beans->id, 'stock_quantity' => 2, 'average_cost' => '7.2500']);
         $this->assertDatabaseHas('stock_movements', [

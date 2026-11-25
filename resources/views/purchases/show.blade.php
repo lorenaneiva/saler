@@ -16,11 +16,10 @@
             <p role="alert" class="rounded-lg bg-red-100 px-4 py-3 text-red-900">{{ $message }}</p>
         @enderror
 
-        <dl class="panel grid gap-4 p-5 sm:grid-cols-2 xl:grid-cols-4">
+        <dl class="panel grid gap-4 p-5 sm:grid-cols-2 xl:grid-cols-3">
             @foreach ([
                 'Fornecedor' => $purchase->supplier->name,
                 'Data da compra' => $purchase->purchased_on->format('d/m/Y'),
-                'Status' => $purchase->statusLabel(),
                 'Total' => 'R$ '.number_format((float) $purchase->total, 2, ',', '.'),
             ] as $label => $value)
                 <div class="grid gap-1">

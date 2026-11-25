@@ -38,13 +38,4 @@ class Purchase extends Model
     {
         return $this->hasMany(PurchaseItem::class);
     }
-
-    public function statusLabel(): string
-    {
-        return match ($this->status) {
-            self::Pending => 'Pendente',
-            self::Confirmed => 'Confirmada',
-            self::Cancelled => 'Cancelada',
-        };
-    }
 }
