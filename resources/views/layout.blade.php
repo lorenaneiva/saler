@@ -25,6 +25,8 @@
                 class="module-link">Fornecedores</a>
             <a href="{{ route('purchases.index') }}" @if (request()->routeIs('purchases.*')) aria-current="page" @endif
                 class="module-link">Compras</a>
+            <a href="{{ route('stock.index') }}" @if (request()->routeIs('stock.*')) aria-current="page" @endif
+                class="module-link">Estoque</a>
         </nav>
     </aside>
     <div class="min-w-0">

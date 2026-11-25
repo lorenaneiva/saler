@@ -5,6 +5,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,5 +39,8 @@ Route::middleware('auth')->group(function (): void {
         ->parameters(['compras' => 'purchase'])
         ->names('purchases')
         ->only(['index', 'create', 'store', 'show']);
+    Route::get('/estoque', [StockController::class, 'index'])->name('stock.index');
+    Route::get('/estoque/{product}', [StockController::class, 'show'])->name('stock.show');
+    Route::post('/estoque/{product}/movimentacoes', [StockController::class, 'store'])->name('stock.store');
     Route::post('/sair', [SessionController::class, 'destroy'])->name('logout');
 });
