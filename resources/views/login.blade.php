@@ -12,12 +12,12 @@
         <form method="POST" action="{{ route('login.store') }}" class="mt-6 grid gap-5">
             @csrf
             <div class="grid gap-2">
-                <label for="email">E-mail</label>
+                <label for="email">E-mail <x-required-mark /></label>
                 <input id="email" name="email" type="email" autocomplete="username" value="{{ old('email') }}" required class="rounded-lg border border-stone-400 p-2">
                 @error('email') <p role="alert" class="text-sm text-red-700">{{ $message }}</p> @enderror
             </div>
             <div class="grid gap-2">
-                <label for="password">Senha</label>
+                <label for="password">Senha <x-required-mark /></label>
                 <input id="password" name="password" type="password" autocomplete="current-password" required class="rounded-lg border border-stone-400 p-2">
                 @error('password') <p role="alert" class="text-sm text-red-700">{{ $message }}</p> @enderror
             </div>

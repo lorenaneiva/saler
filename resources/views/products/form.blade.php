@@ -26,7 +26,7 @@
                 ] as $field => [$label, $maxLength, $required])
                     @php($value = old($field, $product->{$field}))
                     <div class="grid content-start gap-2">
-                        <label for="{{ $field }}" class="font-medium">{{ $label }}</label>
+                        <label for="{{ $field }}" class="font-medium">{{ $label }} @if ($required)<x-required-mark />@endif</label>
                         <input id="{{ $field }}" name="{{ $field }}" class="field" type="text"
                             maxlength="{{ $maxLength }}" @required($required) value="{{ is_scalar($value) ? $value : '' }}"
                             @error($field) aria-invalid="true" aria-describedby="{{ $field }}-error" @enderror>
@@ -37,7 +37,7 @@
                 @endforeach
 
                 <div class="grid content-start gap-2">
-                    <label for="category_id" class="font-medium">Categoria</label>
+                    <label for="category_id" class="font-medium">Categoria <x-required-mark /></label>
                     <select id="category_id" name="category_id" class="field" required
                         @error('category_id') aria-invalid="true" aria-describedby="category_id-error" @enderror>
                         <option value="">Selecione</option>
@@ -71,7 +71,7 @@
 
                 @php($salePrice = old('sale_price', $product->sale_price))
                 <div class="grid content-start gap-2">
-                    <label for="sale_price" class="font-medium">Preço de venda (R$)</label>
+                    <label for="sale_price" class="font-medium">Preço de venda (R$) <x-required-mark /></label>
                     <input id="sale_price" name="sale_price" class="field" type="number" min="0"
                         max="9999999999.99" step="0.01" required value="{{ is_scalar($salePrice) ? $salePrice : '' }}"
                         @error('sale_price') aria-invalid="true" aria-describedby="sale_price-error" @enderror>

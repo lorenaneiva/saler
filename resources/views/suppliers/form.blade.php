@@ -20,7 +20,7 @@
             ] as $field => [$label, $required])
                 @php($value = old($field, $supplier->{$field}))
                 <div class="grid content-start gap-2">
-                    <label for="{{ $field }}" class="font-medium">{{ $label }}</label>
+                    <label for="{{ $field }}" class="font-medium">{{ $label }} @if ($required)<x-required-mark />@endif</label>
                     <input id="{{ $field }}" name="{{ $field }}" type="text" class="field" maxlength="255"
                         @required($required) value="{{ is_scalar($value) ? $value : '' }}"
                         @error($field) aria-invalid="true" aria-describedby="{{ $field }}-error" @enderror>

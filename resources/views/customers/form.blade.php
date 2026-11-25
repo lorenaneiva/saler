@@ -22,7 +22,7 @@
             ] as $field => [$label, $type, $maxLength, $autocomplete, $required])
                 @php($value = old($field, $customer->{$field}))
                 <div class="grid content-start gap-2">
-                    <label for="{{ $field }}" class="font-medium">{{ $label }}</label>
+                    <label for="{{ $field }}" class="font-medium">{{ $label }} @if ($required)<x-required-mark />@endif</label>
                     <input id="{{ $field }}" name="{{ $field }}" type="{{ $type }}" class="field"
                         maxlength="{{ $maxLength }}" autocomplete="{{ $autocomplete }}"
                         @required($required) value="{{ is_scalar($value) ? $value : '' }}"
