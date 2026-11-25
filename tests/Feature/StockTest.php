@@ -55,6 +55,7 @@ class StockTest extends TestCase
         $exit = [
             'type' => StockMovement::ManualExit,
             'quantity' => 2,
+            'unit_cost' => '999.00',
             'reason_id' => StockAdjustmentReason::factory()->create()->id,
         ];
 
@@ -62,12 +63,15 @@ class StockTest extends TestCase
             ->post(route('stock.store', $product), $exit)->assertRedirectToRoute('stock.show', $product);
 
         $this->from(route('stock.show', $product))
-            ->post(route('stock.store', $product), $exit)->assertSessionHasErrors([
-                'quantity' => 'A quantidade de saída excede o estoque disponível.',
-            ]);
+            ->followingRedirects()
+            ->post(route('stock.store', $product), $exit)->assertOk()
+            ->assertSee('A quantidade de saída excede o estoque disponível.')
+            ->assertSee('Custo unitário (R$)')
+            ->assertSee('data-average-cost="12.4000" value="12.4000"', false)
+            ->assertSee('readonly', false);
 
         $this->assertDatabaseHas('products', ['id' => $product->id, 'stock_quantity' => 1, 'average_cost' => '12.4000']);
-        $this->assertDatabaseHas('stock_movements', ['product_id' => $product->id, 'quantity_delta' => -2]);
+        $this->assertDatabaseHas('stock_movements', ['product_id' => $product->id, 'quantity_delta' => -2, 'unit_cost' => '12.4000']);
         $this->assertDatabaseCount('stock_movements', 1);
     }
 

@@ -35,10 +35,11 @@
         <input id="stock-quantity" name="quantity" type="number" class="field" min="1" max="2147483647" step="1"
             value="{{ is_scalar($quantity) ? $quantity : '' }}" required>
     </label>
-    <label id="stock-unit-cost-field" class="grid content-start gap-2 font-medium" @if (! $isEntry) hidden @endif>
-        <span>Custo unitário da entrada (R$) <x-required-mark /></span>
+    <label class="grid content-start gap-2 font-medium">
+        <span>Custo unitário (R$) <span id="stock-unit-cost-required" @if (! $isEntry) hidden @endif><x-required-mark /></span></span>
         <input id="stock-unit-cost" name="unit_cost" type="number" class="field" min="0" max="9999999999.9999" step="0.0001"
-            value="{{ is_scalar($unitCost) ? $unitCost : '' }}" @required($isEntry) @disabled(! $isEntry)>
+            data-average-cost="{{ $product->average_cost }}" value="{{ $isEntry ? (is_scalar($unitCost) ? $unitCost : '') : $product->average_cost }}"
+            @required($isEntry) @readonly(! $isEntry)>
     </label>
     <div class="grid content-start gap-2">
         <label for="stock-reason" class="font-medium">Motivo <x-required-mark /></label>
@@ -64,12 +65,18 @@
 <script>
     const movementType = document.getElementById('movement-type');
     const unitCost = document.getElementById('stock-unit-cost');
-    const unitCostField = document.getElementById('stock-unit-cost-field');
+    const unitCostRequired = document.getElementById('stock-unit-cost-required');
+    let entryCost = unitCost.readOnly ? '' : unitCost.value;
 
     movementType.addEventListener('change', () => {
+        if (!unitCost.readOnly) {
+            entryCost = unitCost.value;
+        }
+
         const isEntry = movementType.value === 'manual_entry';
-        unitCostField.hidden = !isEntry;
-        unitCost.disabled = !isEntry;
+        unitCost.value = isEntry ? entryCost : unitCost.dataset.averageCost;
+        unitCost.readOnly = !isEntry;
         unitCost.required = isEntry;
+        unitCostRequired.hidden = !isEntry;
     });
 </script>
