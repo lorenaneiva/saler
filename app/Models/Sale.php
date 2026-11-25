@@ -15,6 +15,8 @@ class Sale extends Model
     /** @use HasFactory<SaleFactory> */
     use HasFactory;
 
+    public const Completed = 'completed';
+
     /** @return array<string, string> */
     protected function casts(): array
     {

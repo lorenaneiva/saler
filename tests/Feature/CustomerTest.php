@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Customer;
+use App\Models\Sale;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
@@ -56,6 +57,44 @@ class CustomerTest extends TestCase
 
         $this->assertDatabaseHas('customers', ['id' => $customer->id, 'name' => 'Maria <Silva>', 'email' => null]);
         $this->get(route('customers.show', $customer))->assertOk()->assertSee('Maria &lt;Silva&gt;', false);
+    }
+
+    public function test_profile_shows_only_the_customers_purchases_and_open_balance(): void
+    {
+        $customer = Customer::factory()->create();
+        $user = User::factory()->create();
+        $firstSale = Sale::factory()->for($customer)->create([
+            'user_id' => $user->id,
+            'sold_on' => '2026-11-20', 'subtotal' => '39.50', 'discount' => '0.00', 'total' => '39.50',
+        ]);
+        $secondSale = Sale::factory()->for($customer)->create([
+            'user_id' => $user->id,
+            'sold_on' => '2026-11-24', 'subtotal' => '24.80', 'discount' => '0.00', 'total' => '24.80',
+        ]);
+        $cancelledSale = Sale::factory()->for($customer)->create([
+            'user_id' => $user->id,
+            'sold_on' => '2026-11-22', 'status' => 'cancelled',
+        ]);
+        $otherSale = Sale::factory()->create(['user_id' => $user->id]);
+
+        $this->actingAs($user)->get(route('customers.show', $customer))->assertOk()
+            ->assertSee('Saldo em aberto')
+            ->assertSee('R$ 64,30')
+            ->assertSee('Histórico de compras')
+            ->assertSeeInOrder([
+                route('sales.show', $secondSale),
+                route('sales.show', $cancelledSale),
+                route('sales.show', $firstSale),
+            ])
+            ->assertDontSee(route('sales.show', $otherSale));
+    }
+
+    public function test_profile_without_purchases_shows_zero_balance(): void
+    {
+        $customer = Customer::factory()->create();
+
+        $this->actingAs(User::factory()->create())->get(route('customers.show', $customer))->assertOk()
+            ->assertSee('R$ 0,00')->assertSee('Nenhuma compra registrada para este cliente.');
     }
 
     public function test_customer_with_missing_required_fields_or_invalid_contact_details_is_rejected(): void

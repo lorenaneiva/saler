@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CustomerRequest;
 use App\Models\Customer;
+use App\Models\Sale;
+use Brick\Math\BigDecimal;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -30,7 +32,13 @@ class CustomerController extends Controller
 
     public function show(Customer $customer): View
     {
-        return view('customers.show', compact('customer'));
+        $outstandingTotal = $customer->sales()->where('status', Sale::Completed)->sum('total');
+
+        return view('customers.show', [
+            'customer' => $customer,
+            'sales' => $customer->sales()->orderByDesc('sold_on')->orderByDesc('id')->paginate(20),
+            'outstandingTotal' => (string) BigDecimal::of($outstandingTotal)->toScale(2),
+        ]);
     }
 
     public function edit(Customer $customer): View
