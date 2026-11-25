@@ -27,5 +27,9 @@
             <span class="text-lg font-semibold">Estoque</span>
             <p class="mt-1 text-sm text-slate-600">Consulte saldos e registre movimentações.</p>
         </a>
+        <a href="{{ route('sales.index') }}" class="panel block p-6 hover:border-emerald-700">
+            <span class="text-lg font-semibold">Vendas</span>
+            <p class="mt-1 text-sm text-slate-600">Registre vendas e consulte seus itens.</p>
+        </a>
     </div>
 @endsection

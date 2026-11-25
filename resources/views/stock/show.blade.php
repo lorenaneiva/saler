@@ -49,6 +49,10 @@
                                         <a href="{{ route('purchases.show', $movement->purchaseItem->purchase_id) }}" class="text-emerald-800 underline">
                                             #{{ $movement->purchaseItem->purchase_id }}
                                         </a>
+                                    @elseif ($movement->saleItem)
+                                        <a href="{{ route('sales.show', $movement->saleItem->sale_id) }}" class="text-emerald-800 underline">
+                                            #{{ $movement->saleItem->sale_id }}
+                                        </a>
                                     @endif
                                 </td>
                                 <td class="px-4 py-4">

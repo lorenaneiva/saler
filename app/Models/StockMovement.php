@@ -9,12 +9,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['product_id', 'purchase_item_id', 'user_id', 'quantity_delta', 'unit_cost', 'type', 'justification'])]
+#[Fillable(['product_id', 'purchase_item_id', 'sale_item_id', 'user_id', 'quantity_delta', 'unit_cost', 'type', 'justification'])]
 class StockMovement extends Model
 {
     public const PurchaseEntry = 'purchase_entry';
 
     public const PurchaseReversal = 'purchase_reversal';
+
+    public const SaleExit = 'sale_exit';
 
     public const ManualEntry = 'manual_entry';
 
@@ -34,6 +36,12 @@ class StockMovement extends Model
         return $this->belongsTo(PurchaseItem::class);
     }
 
+    /** @return BelongsTo<SaleItem, $this> */
+    public function saleItem(): BelongsTo
+    {
+        return $this->belongsTo(SaleItem::class);
+    }
+
     /** @return HasOne<StockAdjustment, $this> */
     public function adjustment(): HasOne
     {
@@ -45,6 +53,7 @@ class StockMovement extends Model
         return match ($this->type) {
             self::PurchaseEntry => 'Entrada de compra',
             self::PurchaseReversal => 'Estorno de compra',
+            self::SaleExit => 'Venda',
             self::ManualEntry => 'Entrada manual',
             self::ManualExit => 'Perda de estoque',
             self::Adjustment => 'Ajuste manual',

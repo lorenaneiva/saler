@@ -23,7 +23,7 @@ class StockController extends Controller
         return view('stock.show', [
             'product' => $product,
             'reasons' => StockAdjustmentReason::query()->orderBy('name')->get(['id', 'name']),
-            'movements' => $product->stockMovements()->with(['user:id,name', 'purchaseItem:id,purchase_id', 'adjustment.reason'])
+            'movements' => $product->stockMovements()->with(['user:id,name', 'purchaseItem:id,purchase_id', 'saleItem:id,sale_id', 'adjustment.reason'])
                 ->latest()->orderByDesc('id')->paginate(20),
         ]);
     }

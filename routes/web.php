@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\StockAdjustmentReasonController;
 use App\Http\Controllers\StockController;
@@ -45,5 +46,9 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/estoque/motivos', [StockAdjustmentReasonController::class, 'store'])->name('stock.reasons.store');
     Route::get('/estoque/{product}', [StockController::class, 'show'])->name('stock.show');
     Route::post('/estoque/{product}/movimentacoes', [StockController::class, 'store'])->name('stock.store');
+    Route::resource('vendas', SaleController::class)
+        ->parameters(['vendas' => 'sale'])
+        ->names('sales')
+        ->only(['index', 'create', 'store', 'show']);
     Route::post('/sair', [SessionController::class, 'destroy'])->name('logout');
 });

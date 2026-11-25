@@ -27,6 +27,8 @@
                 class="module-link">Compras</a>
             <a href="{{ route('stock.index') }}" @if (request()->routeIs('stock.*')) aria-current="page" @endif
                 class="module-link">Estoque</a>
+            <a href="{{ route('sales.index') }}" @if (request()->routeIs('sales.*')) aria-current="page" @endif
+                class="module-link">Vendas</a>
         </nav>
     </aside>
     <div class="min-w-0">
