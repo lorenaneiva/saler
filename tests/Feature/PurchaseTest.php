@@ -22,7 +22,17 @@ class PurchaseTest extends TestCase
         $this->post(route('purchases.cancel', 1))->assertRedirectToRoute('login');
     }
 
-    public function test_registering_a_purchase_preserves_costs_and_updates_stock_only_once_on_confirmation(): void
+    public function test_purchase_form_displays_even_without_suppliers_categories_or_products(): void
+    {
+        $this->actingAs(User::factory()->create())->get(route('purchases.create'))->assertOk()
+            ->assertSee('Registrar compra')
+            ->assertSee('Cadastre ou ative um fornecedor')
+            ->assertSee('Cadastrar novo produto')
+            ->assertSee('Cadastrar categoria')
+            ->assertSee('Fornecedor <span aria-hidden="true" class="text-red-700">*</span>', false);
+    }
+
+    public function test_registering_a_purchase_preserves_costs_and_updates_stock_immediately(): void
     {
         $user = User::factory()->create();
         $supplier = Supplier::factory()->create(['name' => 'Distribuidora Norte']);
@@ -46,25 +56,21 @@ class PurchaseTest extends TestCase
 
         $response->assertRedirectToRoute('purchases.show', $purchase);
         $this->assertDatabaseHas('purchases', [
-            'id' => $purchase->id, 'status' => Purchase::Pending, 'total' => '68.50', 'user_id' => $user->id,
+            'id' => $purchase->id, 'status' => Purchase::Confirmed, 'total' => '68.50', 'user_id' => $user->id,
         ]);
         $this->assertDatabaseHas('purchase_items', [
             'purchase_id' => $purchase->id, 'product_id' => $rice->id, 'unit_cost' => '20.00', 'discount' => '6.00', 'total' => '54.00',
         ]);
-        $this->assertDatabaseHas('products', ['id' => $rice->id, 'stock_quantity' => 2]);
-        $this->assertDatabaseEmpty('stock_movements');
         $this->get(route('purchases.index'))->assertOk()->assertSee('Distribuidora Norte');
-        $this->get(route('purchases.show', $purchase))->assertOk()->assertSee('R$ 68,50')->assertSee('Pendente');
-
-        $this->post(route('purchases.confirm', $purchase))->assertRedirectToRoute('purchases.show', $purchase);
-        $this->post(route('purchases.confirm', $purchase))->assertRedirectToRoute('purchases.show', $purchase);
-
-        $this->assertDatabaseHas('purchases', ['id' => $purchase->id, 'status' => Purchase::Confirmed]);
+        $this->get(route('purchases.show', $purchase))->assertOk()->assertSee('R$ 68,50')->assertSee('Confirmada');
         $this->assertDatabaseHas('products', ['id' => $rice->id, 'stock_quantity' => 5, 'average_cost' => '14.8000']);
         $this->assertDatabaseHas('products', ['id' => $beans->id, 'stock_quantity' => 2, 'average_cost' => '7.2500']);
         $this->assertDatabaseHas('stock_movements', [
             'product_id' => $rice->id, 'quantity_delta' => 3, 'unit_cost' => '18.0000', 'user_id' => $user->id,
         ]);
+        $this->assertDatabaseCount('stock_movements', 2);
+
+        $this->post(route('purchases.confirm', $purchase))->assertRedirectToRoute('purchases.show', $purchase);
         $this->assertDatabaseCount('stock_movements', 2);
         $this->post(route('purchases.cancel', $purchase))->assertSessionHasErrors('purchase');
     }
@@ -90,7 +96,7 @@ class PurchaseTest extends TestCase
         $this->assertDatabaseEmpty('stock_movements');
     }
 
-    public function test_purchase_can_create_the_first_product_and_receive_its_stock_on_confirmation(): void
+    public function test_purchase_can_create_the_first_product_with_stock(): void
     {
         $user = User::factory()->create();
         $supplier = Supplier::factory()->create();
@@ -128,13 +134,11 @@ class PurchaseTest extends TestCase
             'supplier_id' => $supplier->id,
             'sale_price' => '12.50',
             'barcode' => '0012345',
-            'stock_quantity' => 0,
+            'stock_quantity' => 4,
+            'average_cost' => '8.0000',
         ]);
         $this->assertDatabaseHas('purchase_items', ['purchase_id' => $purchase->id, 'product_id' => $product->id]);
-
-        $this->post(route('purchases.confirm', $purchase))->assertRedirectToRoute('purchases.show', $purchase);
-
-        $this->assertDatabaseHas('products', ['id' => $product->id, 'stock_quantity' => 4]);
+        $this->assertDatabaseHas('stock_movements', ['product_id' => $product->id, 'quantity_delta' => 4]);
     }
 
     public function test_invalid_new_product_preserves_form_values_without_creating_records(): void
@@ -162,6 +166,36 @@ class PurchaseTest extends TestCase
 
         $this->assertDatabaseEmpty('purchases');
         $this->assertDatabaseEmpty('products');
+    }
+
+    public function test_stock_failure_rolls_back_the_purchase_and_its_new_product(): void
+    {
+        $supplier = Supplier::factory()->create();
+        $category = Category::factory()->create();
+        $fullProduct = Product::factory()->create(['stock_quantity' => 2147483647]);
+
+        $this->actingAs(User::factory()->create())
+            ->from(route('purchases.create'))
+            ->post(route('purchases.store'), [
+                'supplier_id' => $supplier->id,
+                'purchased_on' => '2026-11-24',
+                'items' => [
+                    [
+                        'new_product' => ['name' => 'Farinha', 'category_id' => $category->id, 'sale_price' => '12.50'],
+                        'quantity' => 4,
+                        'unit_cost' => '8.00',
+                    ],
+                    ['product_id' => $fullProduct->id, 'quantity' => 1, 'unit_cost' => '5.00'],
+                ],
+            ])
+            ->assertRedirectToRoute('purchases.create')
+            ->assertSessionHasErrors(['purchase' => 'O saldo de estoque ultrapassaria o limite permitido.']);
+
+        $this->assertDatabaseCount('products', 1);
+        $this->assertDatabaseHas('products', ['id' => $fullProduct->id, 'stock_quantity' => 2147483647]);
+        $this->assertDatabaseEmpty('purchases');
+        $this->assertDatabaseEmpty('purchase_items');
+        $this->assertDatabaseEmpty('stock_movements');
     }
 
     public function test_excessive_discounts_do_not_create_a_purchase(): void

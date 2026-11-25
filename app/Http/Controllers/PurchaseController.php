@@ -33,7 +33,7 @@ class PurchaseController extends Controller
         ]);
     }
 
-    public function store(PurchaseRequest $request): RedirectResponse
+    public function store(PurchaseRequest $request, ConfirmPurchase $confirmPurchase): RedirectResponse
     {
         $data = $request->validated();
         $total = BigDecimal::zero();
@@ -47,10 +47,12 @@ class PurchaseController extends Controller
             $total = $total->plus($itemTotal);
         }
 
-        $purchase = DB::transaction(function () use ($request, $data, $total, $items): Purchase {
+        $user = $request->user();
+
+        $purchase = DB::transaction(function () use ($user, $data, $total, $items, $confirmPurchase): Purchase {
             $purchase = Purchase::query()->create([
                 'supplier_id' => $data['supplier_id'],
-                'user_id' => $request->user()->id,
+                'user_id' => $user->id,
                 'purchased_on' => $data['purchased_on'],
                 'total' => (string) $total,
             ]);
@@ -69,10 +71,12 @@ class PurchaseController extends Controller
                 $purchase->items()->create($item);
             }
 
-            return $purchase;
-        });
+            $confirmPurchase->handle($purchase, $user);
 
-        return to_route('purchases.show', $purchase)->with('status', 'Compra registrada e aguardando confirmação.');
+            return $purchase;
+        }, 3);
+
+        return to_route('purchases.show', $purchase)->with('status', 'Compra registrada e estoque atualizado.');
     }
 
     public function show(Purchase $purchase): View
