@@ -20,6 +20,7 @@
                     <tr>
                         <th scope="col" class="px-4 py-3">Produto</th>
                         <th scope="col" class="px-4 py-3">Categoria</th>
+                        <th scope="col" class="px-4 py-3">Fornecedor</th>
                         <th scope="col" class="whitespace-nowrap px-4 py-3">Preço de venda</th>
                         <th scope="col" class="whitespace-nowrap px-4 py-3">Custo médio</th>
                         <th scope="col" class="px-4 py-3">Margem</th>
@@ -34,6 +35,7 @@
                         <tr>
                             <th scope="row" class="min-w-36 break-all px-4 py-4 font-semibold">{{ $product->name }}</th>
                             <td class="px-4 py-4">{{ $product->category->name }}</td>
+                            <td class="px-4 py-4">{{ $product->supplier?->name ?? $product->supplier_name ?? '—' }}</td>
                             <td class="whitespace-nowrap px-4 py-4">R$ {{ number_format((float) $product->sale_price, 2, ',', '.') }}</td>
                             <td class="whitespace-nowrap px-4 py-4">R$ {{ number_format((float) $product->average_cost, 4, ',', '.') }}</td>
                             <td class="whitespace-nowrap px-4 py-4">{{ $margin === null ? '—' : number_format((float) $margin, 2, ',', '.').'%' }}</td>
@@ -57,7 +59,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="8" class="px-4 py-6 text-slate-600">Nenhum produto cadastrado.</td></tr>
+                        <tr><td colspan="9" class="px-4 py-6 text-slate-600">Nenhum produto cadastrado.</td></tr>
                     @endforelse
                 </tbody>
             </table>

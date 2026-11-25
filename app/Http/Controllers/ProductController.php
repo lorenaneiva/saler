@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProductRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
@@ -16,13 +17,13 @@ class ProductController extends Controller
     public function index(): View
     {
         return view('products.index', [
-            'products' => Product::query()->with('category:id,name')->orderBy('name')->orderBy('id')->paginate(20),
+            'products' => Product::query()->with(['category:id,name', 'supplier:id,name'])->orderBy('name')->orderBy('id')->paginate(20),
         ]);
     }
 
     public function create(): View
     {
-        return view('products.form', ['product' => new Product, 'categories' => $this->categories()]);
+        return view('products.form', $this->formData(new Product));
     }
 
     public function store(ProductRequest $request): RedirectResponse
@@ -34,7 +35,7 @@ class ProductController extends Controller
                 throw $exception;
             }
 
-            throw ValidationException::withMessages(['category_id' => 'A categoria selecionada não existe.']);
+            throw ValidationException::withMessages(['category_id' => 'Verifique se a categoria e o fornecedor selecionados ainda existem.']);
         }
 
         return to_route('products.index')->with('status', 'Produto cadastrado.');
@@ -42,7 +43,7 @@ class ProductController extends Controller
 
     public function edit(Product $product): View
     {
-        return view('products.form', ['product' => $product, 'categories' => $this->categories()]);
+        return view('products.form', $this->formData($product));
     }
 
     public function update(ProductRequest $request, Product $product): RedirectResponse
@@ -54,7 +55,7 @@ class ProductController extends Controller
                 throw $exception;
             }
 
-            throw ValidationException::withMessages(['category_id' => 'A categoria selecionada não existe.']);
+            throw ValidationException::withMessages(['category_id' => 'Verifique se a categoria e o fornecedor selecionados ainda existem.']);
         }
 
         return to_route('products.index')->with('status', 'Produto atualizado.');
@@ -67,9 +68,13 @@ class ProductController extends Controller
         return to_route('products.index')->with('status', 'Produto desativado.');
     }
 
-    /** @return Collection<int, Category> */
-    private function categories(): Collection
+    /** @return array{product: Product, categories: Collection<int, Category>, suppliers: Collection<int, Supplier>} */
+    private function formData(Product $product): array
     {
-        return Category::query()->orderBy('name')->orderBy('id')->get(['id', 'name']);
+        return [
+            'product' => $product,
+            'categories' => Category::query()->orderBy('name')->orderBy('id')->get(['id', 'name']),
+            'suppliers' => Supplier::query()->orderBy('name')->orderBy('id')->get(['id', 'name', 'is_active']),
+        ];
     }
 }

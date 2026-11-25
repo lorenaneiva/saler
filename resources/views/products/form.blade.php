@@ -23,7 +23,6 @@
                 @foreach ([
                     'name' => ['Nome', 255, true],
                     'barcode' => ['Código de barras (opcional)', 64, false],
-                    'supplier_name' => ['Fornecedor (opcional)', 255, false],
                 ] as $field => [$label, $maxLength, $required])
                     @php($value = old($field, $product->{$field}))
                     <div class="grid content-start gap-2">
@@ -48,6 +47,25 @@
                     </select>
                     @error('category_id')
                         <p id="category_id-error" class="text-sm text-red-800">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="grid content-start gap-2">
+                    <label for="supplier_id" class="font-medium">Fornecedor (opcional)</label>
+                    <select id="supplier_id" name="supplier_id" class="field"
+                        @error('supplier_id') aria-invalid="true" aria-describedby="supplier_id-error" @enderror>
+                        <option value="">Sem vínculo</option>
+                        @foreach ($suppliers as $supplier)
+                            <option value="{{ $supplier->id }}" @selected(old('supplier_id', $product->supplier_id) == $supplier->id)>
+                                {{ $supplier->name }}{{ $supplier->is_active ? '' : ' (inativo)' }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @if ($product->supplier_id === null && $product->supplier_name)
+                        <p class="text-sm text-slate-600">Fornecedor informado no cadastro anterior: {{ $product->supplier_name }}</p>
+                    @endif
+                    @error('supplier_id')
+                        <p id="supplier_id-error" class="text-sm text-red-800">{{ $message }}</p>
                     @enderror
                 </div>
 

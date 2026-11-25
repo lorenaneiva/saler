@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
@@ -21,16 +22,17 @@ class ProductTest extends TestCase
     public function test_authenticated_user_can_create_and_list_products(): void
     {
         $category = Category::factory()->create(['name' => 'Mercearia']);
+        $supplier = Supplier::factory()->create(['name' => 'Distribuidora Local']);
 
         $this->actingAs(User::factory()->create())
-            ->get(route('products.create'))->assertOk()->assertSee('Mercearia');
+            ->get(route('products.create'))->assertOk()->assertSee('Mercearia')->assertSee('Distribuidora Local');
 
         $this->post(route('products.store'), [
             'name' => 'Arroz',
             'category_id' => $category->id,
             'sale_price' => '13.99',
             'barcode' => '012345',
-            'supplier_name' => 'Distribuidora Local',
+            'supplier_id' => $supplier->id,
             'stock_quantity' => 99,
             'average_cost' => 10,
             'is_active' => false,
@@ -41,7 +43,7 @@ class ProductTest extends TestCase
             'category_id' => $category->id,
             'sale_price' => '13.99',
             'barcode' => '012345',
-            'supplier_name' => 'Distribuidora Local',
+            'supplier_id' => $supplier->id,
             'stock_quantity' => 0,
             'average_cost' => 0,
             'is_active' => true,
@@ -56,10 +58,12 @@ class ProductTest extends TestCase
             ->from(route('products.create'))
             ->post(route('products.store'), [
                 'category_id' => 999,
+                'supplier_id' => 999,
                 'sale_price' => '19.999',
             ])->assertRedirectToRoute('products.create')->assertSessionHasErrors([
                 'name' => 'Informe o nome do produto.',
                 'category_id' => 'A categoria selecionada não existe.',
+                'supplier_id' => 'O fornecedor selecionado não existe.',
                 'sale_price' => 'Informe o preço com até duas casas decimais.',
             ]);
 

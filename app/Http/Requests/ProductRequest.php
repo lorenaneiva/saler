@@ -12,7 +12,7 @@ class ProductRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'category_id' => ['required', 'integer', 'exists:categories,id'],
-            'supplier_name' => ['nullable', 'string', 'max:255'],
+            'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
             'sale_price' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:9999999999.99'],
             'barcode' => ['nullable', 'string', 'max:64'],
         ];
@@ -28,8 +28,8 @@ class ProductRequest extends FormRequest
             'category_id.required' => 'Selecione uma categoria.',
             'category_id.integer' => 'Selecione uma categoria válida.',
             'category_id.exists' => 'A categoria selecionada não existe.',
-            'supplier_name.string' => 'O nome do fornecedor deve ser um texto.',
-            'supplier_name.max' => 'O nome do fornecedor deve ter até 255 caracteres.',
+            'supplier_id.integer' => 'Selecione um fornecedor válido.',
+            'supplier_id.exists' => 'O fornecedor selecionado não existe.',
             'sale_price.required' => 'Informe o preço de venda.',
             'sale_price.numeric' => 'Informe um preço de venda válido.',
             'sale_price.decimal' => 'Informe o preço com até duas casas decimais.',
