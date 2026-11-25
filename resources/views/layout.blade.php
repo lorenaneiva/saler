@@ -17,6 +17,8 @@
                 class="module-link">Painel</a>
             <a href="{{ route('categories.index') }}" @if (request()->routeIs('categories.*')) aria-current="page" @endif
                 class="module-link">Categorias</a>
+            <a href="{{ route('products.index') }}" @if (request()->routeIs('products.*')) aria-current="page" @endif
+                class="module-link">Produtos</a>
         </nav>
     </aside>
     <div class="min-w-0">

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SessionController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,5 +16,9 @@ Route::middleware('auth')->group(function (): void {
         ->parameters(['categorias' => 'category'])
         ->names('categories')
         ->except(['show', 'create']);
+    Route::resource('produtos', ProductController::class)
+        ->parameters(['produtos' => 'product'])
+        ->names('products')
+        ->except('show');
     Route::post('/sair', [SessionController::class, 'destroy'])->name('logout');
 });

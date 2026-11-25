@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
-use Illuminate\Database\ForeignKeyConstraintViolationException;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -39,8 +39,12 @@ class CategoryController extends Controller
     public function destroy(Category $category): RedirectResponse
     {
         try {
-            $category->delete();
-        } catch (ForeignKeyConstraintViolationException) {
+            $category->getConnection()->transaction(fn () => $category->delete());
+        } catch (QueryException $exception) {
+            if ($exception->getCode() !== '23503') {
+                throw $exception;
+            }
+
             return to_route('categories.index')->withErrors(['category' => 'Categorias vinculadas a produtos não podem ser excluídas.']);
         }
 

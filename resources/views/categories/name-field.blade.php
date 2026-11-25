@@ -1,6 +1,7 @@
+@php($categoryName = old('name', $category->name ?? ''))
 <label for="name" class="font-medium">Nome</label>
 <input id="name" name="name" type="text" required maxlength="255"
-    value="{{ old('name', $category->name ?? '') }}"
+    value="{{ is_scalar($categoryName) ? $categoryName : '' }}"
     @error('name') aria-invalid="true" aria-describedby="name-error" @enderror
     class="field">
 @error('name')

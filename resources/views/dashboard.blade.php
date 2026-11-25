@@ -7,5 +7,9 @@
             <span class="text-lg font-semibold">Categorias</span>
             <p class="mt-1 text-sm text-slate-600">Organize os grupos de produtos.</p>
         </a>
+        <a href="{{ route('products.index') }}" class="panel block p-6 hover:border-emerald-700">
+            <span class="text-lg font-semibold">Produtos</span>
+            <p class="mt-1 text-sm text-slate-600">Gerencie o catálogo e consulte o estoque.</p>
+        </a>
     </div>
 @endsection
