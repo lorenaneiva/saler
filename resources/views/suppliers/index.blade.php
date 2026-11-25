@@ -39,13 +39,14 @@
                             <td class="px-4 py-4">
                                 <div class="flex items-center gap-3">
                                     <a href="{{ route('suppliers.edit', $supplier) }}" aria-label="Editar {{ $supplier->name }}" class="underline">Editar</a>
-                                    @if ($supplier->is_active)
-                                        <form method="POST" action="{{ route('suppliers.destroy', $supplier) }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button aria-label="Desativar {{ $supplier->name }}" class="text-red-800 underline">Desativar</button>
-                                        </form>
-                                    @endif
+                                    <form method="POST" action="{{ $supplier->is_active ? route('suppliers.destroy', $supplier) : route('suppliers.activate', $supplier) }}">
+                                        @csrf
+                                        @method($supplier->is_active ? 'DELETE' : 'PATCH')
+                                        <button @class(['underline', 'text-red-800' => $supplier->is_active, 'text-emerald-800' => ! $supplier->is_active])
+                                            aria-label="{{ $supplier->is_active ? 'Desativar' : 'Ativar' }} {{ $supplier->name }}">
+                                            {{ $supplier->is_active ? 'Desativar' : 'Ativar' }}
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

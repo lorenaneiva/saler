@@ -17,6 +17,7 @@ class SupplierTest extends TestCase
         $this->post(route('suppliers.store'))->assertRedirectToRoute('login');
         $this->patch(route('suppliers.update', 1))->assertRedirectToRoute('login');
         $this->delete(route('suppliers.destroy', 1))->assertRedirectToRoute('login');
+        $this->patch(route('suppliers.activate', 1))->assertRedirectToRoute('login');
     }
 
     public function test_user_can_create_and_list_an_active_supplier(): void
@@ -77,7 +78,7 @@ class SupplierTest extends TestCase
         $this->assertDatabaseCount('suppliers', 0);
     }
 
-    public function test_deactivating_a_supplier_preserves_the_record(): void
+    public function test_user_can_deactivate_and_reactivate_a_supplier(): void
     {
         $supplier = Supplier::factory()->create();
 
@@ -85,6 +86,11 @@ class SupplierTest extends TestCase
             ->delete(route('suppliers.destroy', $supplier))->assertRedirectToRoute('suppliers.index');
 
         $this->assertDatabaseHas('suppliers', ['id' => $supplier->id, 'is_active' => false]);
-        $this->get(route('suppliers.index'))->assertOk()->assertSee('Inativo')->assertDontSee('Desativar');
+        $this->get(route('suppliers.index'))->assertOk()->assertSee('Inativo')->assertSee('Ativar')->assertDontSee('Desativar');
+
+        $this->patch(route('suppliers.activate', $supplier))->assertRedirectToRoute('suppliers.index');
+
+        $this->assertDatabaseHas('suppliers', ['id' => $supplier->id, 'is_active' => true]);
+        $this->get(route('suppliers.index'))->assertOk()->assertSee('Desativar');
     }
 }

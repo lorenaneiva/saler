@@ -40,6 +40,13 @@ class SupplierController extends Controller
         return to_route('suppliers.index')->with('status', 'Fornecedor atualizado.');
     }
 
+    public function activate(Supplier $supplier): RedirectResponse
+    {
+        $supplier->forceFill(['is_active' => true])->save();
+
+        return to_route('suppliers.index')->with('status', 'Fornecedor ativado.');
+    }
+
     public function destroy(Supplier $supplier): RedirectResponse
     {
         $supplier->forceFill(['is_active' => false])->save();

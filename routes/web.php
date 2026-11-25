@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function (): void {
         ->parameters(['clientes' => 'customer'])
         ->names('customers')
         ->except('destroy');
+    Route::patch('/fornecedores/{supplier}/ativar', [SupplierController::class, 'activate'])->name('suppliers.activate');
     Route::resource('fornecedores', SupplierController::class)
         ->parameters(['fornecedores' => 'supplier'])
         ->names('suppliers')
