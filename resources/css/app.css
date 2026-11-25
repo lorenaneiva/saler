@@ -1,35 +1,133 @@
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+    :root {
+        --surface: #f6f8f7;
+        --ink: #172720;
+        --muted: #4d6157;
+        --line: #dce5df;
+        --brand: #10614c;
+        --brand-hover: #0b4a39;
+        --sidebar: #142820;
+        --duration: 180ms;
+    }
+
+    body { background: var(--surface); color: var(--ink); }
+    :focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
 }
 
 @layer components {
-    .module-link {
-        @apply rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-slate-800 hover:text-white aria-[current=page]:bg-emerald-400/15 aria-[current=page]:text-emerald-300;
-    }
+    .app-shell { @apply min-h-screen antialiased lg:grid lg:grid-cols-[13.5rem_minmax(0,1fr)]; }
+    .workspace { @apply mx-auto w-full max-w-[100rem] px-4 sm:px-6 xl:px-8; }
+    .app-content { @apply grid gap-4 py-5 sm:gap-5 sm:py-6; }
+    .app-sidebar { @apply relative z-20 flex items-center justify-between gap-4 px-4 py-3 text-white lg:sticky lg:top-0 lg:h-dvh lg:flex-col lg:items-stretch lg:justify-start lg:overflow-y-auto lg:px-3 lg:py-5; background: var(--sidebar); }
+    .brand { @apply flex w-fit items-center gap-2.5 text-lg font-semibold tracking-tight lg:ml-2; }
+    .brand-mark { @apply grid size-8 shrink-0 place-items-center rounded-md bg-emerald-300 text-base font-semibold text-emerald-950; }
+    .app-sidebar :focus-visible { outline-color: #a7f3d0; }
+    .module-nav { @apply grid gap-4; }
+    .module-group { @apply grid gap-0.5; }
+    .module-group p { @apply px-2.5 pb-1 text-xs font-medium text-emerald-100/80; }
+    .module-link { @apply flex min-h-10 items-center gap-2.5 rounded-md px-2.5 text-sm font-medium text-white/85 hover:bg-white/10 hover:text-white; transition: background-color var(--duration), color var(--duration); }
+    .module-link[aria-current="page"] { @apply bg-emerald-200/15 text-emerald-100; }
+    .module-icon { @apply inline-grid size-5 shrink-0 place-items-center text-base; }
+    .desktop-navigation { @apply hidden lg:grid; }
+    .mobile-navigation { @apply lg:hidden; }
+    .mobile-navigation summary { @apply flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-md border border-white/25 px-3 text-sm; }
+    .mobile-navigation summary::-webkit-details-marker { display: none; }
+    .mobile-navigation .module-nav { @apply absolute inset-x-0 top-full gap-3 border-t border-white/15 px-4 py-4 sm:grid-cols-2; background: var(--sidebar); animation: appear var(--duration) ease-out; }
+    .app-topbar { @apply border-b bg-white; border-color: var(--line); }
+    .topbar-inner { @apply flex min-h-12 items-center justify-end gap-3 py-1.5; }
+    .topbar-account { @apply truncate text-sm font-medium; color: var(--muted); }
+    .skip-link { @apply fixed left-4 top-3 z-50 -translate-y-24 rounded-md bg-white px-3 py-2 focus:translate-y-0; }
 
-    .page-title {
-        @apply text-3xl font-semibold tracking-tight sm:text-4xl;
-    }
+    .page-header { @apply flex flex-wrap items-end justify-between gap-x-5 gap-y-3; }
+    .page-title { @apply text-2xl font-semibold tracking-tight sm:text-[1.8rem]; overflow-wrap: anywhere; }
+    .page-description { @apply mt-0.5 text-sm; color: var(--muted); }
+    .page-actions, .form-actions { @apply flex flex-wrap items-center gap-2; }
+    .form-actions { @apply mt-4; }
+    .back-link { @apply mb-1 inline-flex text-sm font-medium hover:underline; color: var(--brand); }
+    .panel { @apply rounded-lg border bg-white; border-color: var(--line); }
+    .form-panel { @apply grid gap-4 p-4 sm:p-5; }
+    .form-grid { @apply grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-3; }
+    .filter-bar { @apply grid items-end gap-3 p-3 sm:grid-cols-2 xl:grid-cols-[minmax(13rem,1.5fr)_repeat(3,minmax(7rem,1fr))_auto]; }
+    .filter-bar label { @apply grid gap-1 text-sm font-medium; }
+    .field { @apply block min-h-10 w-full min-w-0 rounded-md border bg-white px-3 py-2 text-sm placeholder:text-slate-500; border-color: #adbbb3; color: var(--ink); transition: border-color var(--duration), background-color var(--duration); }
+    .field:focus { border-color: var(--brand); }
+    .field[aria-invalid="true"] { @apply border-red-600; }
 
-    .panel {
-        @apply rounded-xl border border-slate-200 bg-white shadow-sm;
-    }
+    .button-primary, .button-secondary, .button-danger, .button-quiet, .icon-button { @apply inline-flex min-h-10 w-fit cursor-pointer items-center justify-center gap-2 rounded-md border px-3 py-1.5 text-sm font-semibold whitespace-nowrap; transition: background-color var(--duration), color var(--duration), opacity var(--duration); }
+    .button-primary { @apply border-transparent text-white; background: var(--brand); }
+    .button-primary:hover { background: var(--brand-hover); }
+    .button-secondary, .icon-button { @apply border-slate-300 bg-white hover:bg-emerald-50; }
+    .button-danger { @apply border-transparent bg-red-700 text-white hover:bg-red-800; }
+    .button-quiet { @apply border-transparent hover:bg-slate-100; color: var(--brand); }
+    .button-quiet.danger { @apply text-red-800 hover:bg-red-50; }
+    .button-small { @apply min-h-8 px-2.5 py-1; }
+    .icon-button { @apply size-10 px-0 text-xl; }
+    button:disabled { @apply cursor-not-allowed opacity-55; }
+    button[data-busy]::before { content: ''; @apply size-3.5 rounded-full border-2 border-current border-r-transparent; animation: spin 700ms linear infinite; }
 
-    .field {
-        @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-950 focus:border-emerald-700 focus:outline-emerald-700;
-    }
+    .notice { @apply rounded-md border px-3.5 py-2.5 text-sm; animation: appear var(--duration) ease-out; }
+    .notice-success { @apply border-emerald-200 bg-emerald-50 text-emerald-950; }
+    .notice-error { @apply border-red-200 bg-red-50 text-red-950; }
+    .notice-info { @apply border-slate-200 bg-slate-50 text-slate-800; }
+    .badge { @apply inline-flex w-fit items-center rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap; }
+    .badge-neutral { @apply bg-slate-100 text-slate-700; }
+    .badge-success { @apply bg-emerald-100 text-emerald-950; }
+    .badge-warning { @apply bg-amber-100 text-amber-950; }
+    .badge-danger { @apply bg-red-100 text-red-900; }
 
-    .button-primary {
-        @apply inline-flex w-fit cursor-pointer items-center rounded-lg bg-emerald-800 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-900;
-    }
+    .table-region { @apply max-w-full overflow-x-auto; }
+    .data-table { @apply w-full border-collapse text-left text-sm; }
+    .data-table thead { @apply border-b text-xs; background: #eef3ef; border-color: var(--line); color: var(--muted); }
+    .data-table :is(th, td) { @apply px-3 py-2.5 sm:px-4; }
+    .data-table tbody tr + tr { border-top: 1px solid var(--line); }
+    .data-table tbody tr:hover { background: #f8fbf9; }
+    .data-table .numeric { @apply text-right whitespace-nowrap tabular-nums; }
+    .data-table .row-actions { @apply flex items-center justify-end gap-1 whitespace-nowrap; }
+    .data-table a:not([class*="button"]) { @apply font-semibold underline decoration-transparent underline-offset-2 hover:decoration-current; color: var(--brand); }
+    .empty-state, .data-table .empty-state { @apply p-6 text-center text-sm; color: var(--muted); }
 
-    .button-secondary {
-        @apply inline-flex w-fit cursor-pointer items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50;
-    }
+    .pagination { @apply flex flex-wrap items-center justify-between gap-2 py-1 text-sm; color: var(--muted); }
+    .pagination nav { @apply flex flex-wrap items-center gap-1; }
+    .pagination nav :is(a, span) { @apply rounded-md border border-slate-200 bg-white px-2.5 py-1.5; }
+    .pagination nav a:hover { @apply border-emerald-700 text-emerald-900; }
+    .pagination [aria-disabled="true"] { @apply opacity-60; }
+    .section-tabs { @apply flex flex-wrap gap-1 border-b; border-color: var(--line); }
+    .section-tabs a { @apply rounded-t-md border-b-2 border-transparent px-3 py-2 text-sm font-semibold hover:bg-emerald-50; transition: background-color var(--duration); }
+    .section-tabs [aria-current="page"] { border-color: var(--brand); color: var(--brand); }
+    .metrics { @apply grid grid-cols-2 divide-x divide-y overflow-hidden rounded-lg border bg-white sm:grid-cols-4 sm:divide-y-0; border-color: var(--line); }
+    .metric { @apply min-w-0 border-slate-200 px-3 py-2.5 sm:px-4; }
+    .metric dt { @apply text-xs font-medium; color: var(--muted); }
+    .metric dd { @apply wrap-anywhere text-lg font-semibold tabular-nums sm:text-xl; }
+    .metric-emphasis { @apply bg-emerald-50 text-emerald-950; }
+
+    .app-dialog { @apply fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-lg border bg-white shadow-lg; border-color: var(--line); color: var(--ink); }
+    .app-dialog::backdrop { background: rgb(13 32 22 / .5); }
+    .app-dialog[open] { animation: appear var(--duration) ease-out; }
+    .app-dialog[data-closing] { animation: disappear var(--duration) ease-in forwards; }
+    .app-drawer { @apply inset-y-0 right-0 left-auto m-0 h-dvh max-h-dvh w-full max-w-lg rounded-none border-y-0 border-r-0; }
+    .app-drawer[open] { animation: draw-in var(--duration) ease-out; }
+    .app-drawer[data-closing] { animation: draw-out var(--duration) ease-in forwards; }
+    .dialog-header { @apply sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-2.5 sm:px-5; }
+    .dialog-header h2 { @apply text-lg font-semibold; }
+    .dialog-body { @apply grid gap-4 p-4 sm:p-5; }
+    .login-shell { @apply grid min-h-dvh place-items-center px-4 py-8; }
+    .login-panel { @apply grid w-full max-w-md gap-5 p-5 sm:p-7; }
+}
+
+@keyframes appear { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes disappear { to { opacity: 0; transform: translateY(5px); } }
+@keyframes draw-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes draw-out { to { transform: translateX(100%); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }

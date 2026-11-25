@@ -1,35 +1,50 @@
 @extends('layout')
 
+@section('title', 'Painel | Saler')
+
 @section('content')
-    <h1 class="page-title">Olá, {{ auth()->user()->name }}</h1>
-    <div class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <a href="{{ route('categories.index') }}" class="panel block p-6 hover:border-emerald-700">
-            <span class="text-lg font-semibold">Categorias</span>
-            <p class="mt-1 text-sm text-slate-600">Organize os grupos de produtos.</p>
-        </a>
-        <a href="{{ route('products.index') }}" class="panel block p-6 hover:border-emerald-700">
-            <span class="text-lg font-semibold">Produtos</span>
-            <p class="mt-1 text-sm text-slate-600">Gerencie o catálogo e consulte o estoque.</p>
-        </a>
-        <a href="{{ route('customers.index') }}" class="panel block p-6 hover:border-emerald-700">
-            <span class="text-lg font-semibold">Clientes</span>
-            <p class="mt-1 text-sm text-slate-600">Cadastre clientes e consulte seus contatos.</p>
-        </a>
-        <a href="{{ route('suppliers.index') }}" class="panel block p-6 hover:border-emerald-700">
-            <span class="text-lg font-semibold">Fornecedores</span>
-            <p class="mt-1 text-sm text-slate-600">Gerencie fornecedores e seus contatos.</p>
-        </a>
-        <a href="{{ route('purchases.index') }}" class="panel block p-6 hover:border-emerald-700">
-            <span class="text-lg font-semibold">Compras</span>
-            <p class="mt-1 text-sm text-slate-600">Registre compras e atualize o estoque.</p>
-        </a>
-        <a href="{{ route('stock.index') }}" class="panel block p-6 hover:border-emerald-700">
-            <span class="text-lg font-semibold">Estoque</span>
-            <p class="mt-1 text-sm text-slate-600">Consulte saldos e registre movimentações.</p>
-        </a>
-        <a href="{{ route('sales.index') }}" class="panel block p-6 hover:border-emerald-700">
-            <span class="text-lg font-semibold">Vendas</span>
-            <p class="mt-1 text-sm text-slate-600">Registre vendas e consulte seus itens.</p>
-        </a>
+    <x-ui.page-header :title="'Olá, '.auth()->user()->name" description="Acesse as principais operações do Saler." />
+
+    <section class="panel form-panel" aria-labelledby="quick-actions">
+        <h2 id="quick-actions" class="text-base font-semibold">Ações rápidas</h2>
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('sales.create') }}" class="button-primary">Nova venda</a>
+            <a href="{{ route('purchases.create') }}" class="button-secondary">Nova compra</a>
+            <a href="{{ route('customers.create') }}" class="button-secondary">Novo cliente</a>
+            <a href="{{ route('products.create') }}" class="button-secondary">Novo produto</a>
+        </div>
+    </section>
+
+    <div class="grid items-start gap-4 xl:grid-cols-2">
+    @foreach ([
+        'Operações' => [
+            ['Vendas', 'Consulte as vendas registradas.', 'sales.index'],
+            ['Compras', 'Consulte as entradas de mercadoria.', 'purchases.index'],
+            ['Estoque', 'Acompanhe saldos, movimentações e perdas.', 'stock.index'],
+        ],
+        'Cadastros' => [
+            ['Clientes', 'Acesse compras, saldos e pagamentos.', 'customers.index'],
+            ['Produtos', 'Consulte preços e disponibilidade.', 'products.index'],
+            ['Categorias', 'Organize os grupos de produtos.', 'categories.index'],
+            ['Fornecedores', 'Consulte fornecedores e contatos.', 'suppliers.index'],
+        ],
+    ] as $group => $modules)
+        <section class="grid gap-2">
+            <h2 class="text-base font-semibold">{{ $group }}</h2>
+            <ul class="panel grid divide-y divide-slate-200">
+                @foreach ($modules as [$name, $description, $route])
+                    <li>
+                        <a href="{{ route($route) }}" class="flex min-h-14 items-center justify-between gap-3 px-4 py-2 transition-colors duration-200 hover:bg-emerald-50">
+                            <span>
+                                <span class="block text-sm font-semibold">{{ $name }}</span>
+                                <span class="block text-sm text-slate-600">{{ $description }}</span>
+                            </span>
+                            <span aria-hidden="true" class="text-emerald-800">→</span>
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endforeach
     </div>
 @endsection

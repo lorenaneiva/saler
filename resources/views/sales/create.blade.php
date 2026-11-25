@@ -11,18 +11,12 @@
         $notes = old('notes');
     @endphp
 
-    <div class="grid max-w-4xl gap-6">
-        <h1 class="page-title">Nova venda</h1>
+    <x-ui.page-header title="Nova venda" description="Selecione o cliente e os produtos que serão vendidos." :back="route('sales.index')" back-label="Vendas" />
+    <div class="grid gap-4" data-line-editor>
 
-        <form method="POST" action="{{ route('sales.store') }}" class="panel grid gap-6 p-5 sm:p-6">
+        <form method="POST" action="{{ route('sales.store') }}" class="panel form-panel">
             @csrf
-            @if ($errors->any())
-                <ul role="alert" class="list-disc rounded-lg bg-red-50 py-3 pr-4 pl-9 text-sm text-red-900">
-                    @foreach (array_unique($errors->all()) as $message)
-                        <li>{{ $message }}</li>
-                    @endforeach
-                </ul>
-            @endif
+            <x-ui.errors />
 
             <div class="grid gap-4 sm:grid-cols-2">
                 <div class="grid gap-2">
@@ -49,12 +43,12 @@
                     <p class="text-sm text-slate-600">Nenhum produto ativo com saldo disponível.</p>
                     <a href="{{ route('stock.index') }}" class="w-fit text-sm text-emerald-800 underline">Consultar estoque</a>
                 @endif
-                <div id="sale-items" class="grid gap-3">
+                <div data-line-items class="grid gap-3">
                     @foreach ($rows as $index => $item)
                         @include('sales.item-fields', ['index' => $index, 'item' => is_array($item) ? $item : []])
                     @endforeach
                 </div>
-                <button type="button" id="add-sale-item" class="button-secondary disabled:opacity-50">Adicionar produto</button>
+                <button type="button" data-line-add class="button-secondary disabled:opacity-50">Adicionar produto</button>
             </fieldset>
 
             <div class="grid gap-4 sm:grid-cols-2">
@@ -68,47 +62,14 @@
                 </label>
             </div>
 
-            <div class="flex flex-wrap gap-3">
+            <div class="page-actions">
                 <button class="button-primary">Registrar venda</button>
                 <a href="{{ route('sales.index') }}" class="button-secondary">Voltar</a>
             </div>
         </form>
 
-        <template id="sale-item-template">
+        <template data-line-template>
             @include('sales.item-fields', ['index' => 0, 'item' => []])
         </template>
-        <script>
-            const items = document.getElementById('sale-items');
-            const addItem = document.getElementById('add-sale-item');
-            const template = document.getElementById('sale-item-template');
-
-            function updateRows() {
-                const rows = Array.from(items.children);
-                rows.forEach((row, index) => {
-                    row.querySelectorAll('[data-item-field]').forEach((field) => {
-                        field.name = `items[${index}][${field.dataset.itemField}]`;
-                    });
-                    row.querySelector('[data-remove-item]').disabled = rows.length === 1;
-                });
-                addItem.disabled = rows.length >= 50;
-            }
-
-            addItem.addEventListener('click', () => {
-                items.append(template.content.cloneNode(true));
-                updateRows();
-                items.lastElementChild.querySelector('select').focus();
-            });
-
-            items.addEventListener('click', (event) => {
-                const button = event.target.closest('[data-remove-item]');
-
-                if (button && items.children.length > 1) {
-                    button.closest('[data-item-row]').remove();
-                    updateRows();
-                    addItem.focus();
-                }
-            });
-            updateRows();
-        </script>
     </div>
 @endsection

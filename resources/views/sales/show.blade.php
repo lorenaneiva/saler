@@ -3,15 +3,8 @@
 @section('title', 'Detalhes da venda | Saler')
 
 @section('content')
-    <div class="grid gap-6">
-        <div class="grid gap-3">
-            <a href="{{ route('sales.index') }}" class="w-fit text-sm text-emerald-800 underline">Voltar às vendas</a>
-            <h1 class="page-title">Venda #{{ $sale->id }}</h1>
-        </div>
-
-        @if (session('status'))
-            <p role="status" class="rounded-lg bg-green-100 px-4 py-3 text-green-900">{{ session('status') }}</p>
-        @endif
+    <div class="grid gap-4">
+        <x-ui.page-header :title="'Venda #'.$sale->id" :back="route('sales.index')" back-label="Vendas" />
 
         <div class="panel grid gap-4 p-5">
             <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -33,28 +26,25 @@
             @endif
         </div>
 
-        <div class="panel overflow-x-auto">
-            <table class="w-full text-left text-sm">
-                <caption class="sr-only">Itens da venda</caption>
-                <thead class="border-b border-slate-200 bg-slate-50 text-slate-700">
+        <x-ui.table label="Itens da venda">
+                <thead>
                     <tr>
                         @foreach (['Produto', 'Quantidade', 'Preço unitário', 'Custo unitário da venda', 'Subtotal'] as $heading)
-                            <th scope="col" class="whitespace-nowrap px-4 py-3">{{ $heading }}</th>
+                            <th scope="col" @class(['whitespace-nowrap', 'numeric' => $loop->index >= 2])>{{ $heading }}</th>
                         @endforeach
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-200">
+                <tbody>
                     @foreach ($sale->items as $item)
                         <tr>
-                            <th scope="row" class="min-w-36 wrap-anywhere px-4 py-4 font-semibold">{{ $item->product->name }}</th>
-                            <td class="px-4 py-4">{{ $item->quantity }}</td>
+                            <th scope="row" class="min-w-36 wrap-anywhere font-semibold">{{ $item->product->name }}</th>
+                            <td>{{ $item->quantity }}</td>
                             @foreach ([$item->unit_price, $item->unit_cost, $item->subtotal] as $amount)
-                                <td class="whitespace-nowrap px-4 py-4">R$ {{ str_replace('.', ',', $amount) }}</td>
+                                <td class="numeric"><x-ui.money :value="$amount" /></td>
                             @endforeach
                         </tr>
                     @endforeach
                 </tbody>
-            </table>
-        </div>
+            </x-ui.table>
     </div>
 @endsection

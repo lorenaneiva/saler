@@ -4,46 +4,66 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Saler')</title>
-    @vite('resources/css/app.css')
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <noscript><style>dialog[data-inline-fallback]{display:block;position:static;max-width:none;margin:0} [data-dialog-close],[data-dialog-open]{display:none!important}</style></noscript>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-950 antialiased lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
-    <aside class="flex flex-col gap-5 bg-slate-950 px-5 py-5 text-slate-300 lg:sticky lg:top-0 lg:h-screen lg:gap-10 lg:p-6">
-        <a href="{{ route('dashboard') }}" class="flex w-fit items-center gap-3 text-xl font-semibold text-white">
-            <span aria-hidden="true" class="grid size-9 place-items-center rounded-xl bg-emerald-400 text-slate-950">S</span>
-            Saler
+<body class="app-shell">
+    <a href="#conteudo" class="skip-link">Ir para o conteúdo</a>
+    @php
+        $groups = [
+            'Operações' => [
+                ['dashboard', 'dashboard', 'Painel', '▦'],
+                ['sales.index', 'sales.*', 'Vendas', '↗'],
+                ['purchases.index', 'purchases.*', 'Compras', '↙'],
+                ['stock.index', 'stock.*', 'Estoque', '▤'],
+            ],
+            'Cadastros' => [
+                ['customers.index', 'customers.*', 'Clientes', '◉'],
+                ['products.index', 'products.*', 'Produtos', '◇'],
+                ['categories.index', 'categories.*', 'Categorias', '▥'],
+                ['suppliers.index', 'suppliers.*', 'Fornecedores', '▣'],
+            ],
+        ];
+    @endphp
+    <aside class="app-sidebar">
+        <a href="{{ route('dashboard') }}" class="brand">
+            <span aria-hidden="true" class="brand-mark">S</span>
+            <span>Saler</span>
         </a>
-        <nav aria-label="Módulos" class="flex flex-wrap gap-2 lg:flex-col">
-            <a href="{{ route('dashboard') }}" @if (request()->routeIs('dashboard')) aria-current="page" @endif
-                class="module-link">Painel</a>
-            <a href="{{ route('categories.index') }}" @if (request()->routeIs('categories.*')) aria-current="page" @endif
-                class="module-link">Categorias</a>
-            <a href="{{ route('products.index') }}" @if (request()->routeIs('products.*')) aria-current="page" @endif
-                class="module-link">Produtos</a>
-            <a href="{{ route('customers.index') }}" @if (request()->routeIs('customers.*')) aria-current="page" @endif
-                class="module-link">Clientes</a>
-            <a href="{{ route('suppliers.index') }}" @if (request()->routeIs('suppliers.*')) aria-current="page" @endif
-                class="module-link">Fornecedores</a>
-            <a href="{{ route('purchases.index') }}" @if (request()->routeIs('purchases.*')) aria-current="page" @endif
-                class="module-link">Compras</a>
-            <a href="{{ route('stock.index') }}" @if (request()->routeIs('stock.*')) aria-current="page" @endif
-                class="module-link">Estoque</a>
-            <a href="{{ route('sales.index') }}" @if (request()->routeIs('sales.*')) aria-current="page" @endif
-                class="module-link">Vendas</a>
+
+        <details class="mobile-navigation">
+            <summary>Menu <span aria-hidden="true">☰</span></summary>
+            <nav aria-label="Menu principal" class="module-nav">
+                @include('partials.module-links', ['groups' => $groups])
+            </nav>
+        </details>
+        <nav aria-label="Menu principal" class="module-nav desktop-navigation">
+            @include('partials.module-links', ['groups' => $groups])
         </nav>
     </aside>
     <div class="min-w-0">
-        <header class="border-b border-slate-200 bg-white">
-            <div class="mx-auto flex max-w-7xl items-center justify-end gap-4 px-5 py-3 sm:px-8">
-                <span class="min-w-0 truncate text-sm font-medium text-slate-700">{{ auth()->user()->name }}</span>
+        <header class="app-topbar">
+            <div class="workspace topbar-inner">
+                <span class="topbar-account">{{ auth()->user()->name }}</span>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button class="button-secondary">Sair</button>
+                    <button class="button-secondary button-small">Sair</button>
                 </form>
             </div>
         </header>
-        <main class="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:py-12">
+        <main id="conteudo" class="workspace app-content" tabindex="-1">
+            @if (session('status'))
+                <x-ui.alert>{{ session('status') }}</x-ui.alert>
+            @endif
             @yield('content')
         </main>
     </div>
+    <x-ui.dialog id="confirm-operation" title="Confirmar operação">
+        <p data-confirm-message class="text-sm text-slate-700"></p>
+        <div class="form-actions">
+            <button type="button" class="button-secondary" data-dialog-close autofocus>Cancelar</button>
+            <button type="button" class="button-danger" data-confirm-submit>Confirmar</button>
+        </div>
+    </x-ui.dialog>
 </body>
 </html>

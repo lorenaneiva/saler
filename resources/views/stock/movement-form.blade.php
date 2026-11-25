@@ -8,17 +8,9 @@
     $type = old('type', \App\Models\StockMovement::ManualEntry);
 @endphp
 
-<form method="POST" action="{{ route('stock.store', $product) }}" class="panel grid gap-4 p-5 sm:grid-cols-2">
+<form method="POST" action="{{ route('stock.store', $product) }}" class="grid gap-4 sm:grid-cols-2">
     @csrf
-    <h2 class="text-xl font-semibold sm:col-span-2">Registrar movimentação</h2>
-
-    @if ($errors->any())
-        <ul role="alert" class="list-disc rounded-lg bg-red-50 py-3 pr-4 pl-9 text-sm text-red-900 sm:col-span-2">
-            @foreach ($errors->all() as $message)
-                <li>{{ $message }}</li>
-            @endforeach
-        </ul>
-    @endif
+    <x-ui.errors class="sm:col-span-2" />
 
     <label class="grid content-start gap-2 font-medium">
         <span>Tipo <x-required-mark /></span>

@@ -6,18 +6,37 @@ use App\Http\Requests\ProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Supplier;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class ProductController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $query = $request->query('q');
+        $search = is_string($query) ? mb_substr(trim($query), 0, 100) : '';
+        $pattern = '%'.addcslashes($search, '%_\\').'%';
+        $category = filter_var($request->query('categoria'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        $supplier = filter_var($request->query('fornecedor'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        $status = $request->query('situacao');
+
         return view('products.index', [
-            'products' => Product::query()->with(['category:id,name', 'supplier:id,name'])->orderBy('name')->orderBy('id')->paginate(20),
+            'products' => Product::query()->with(['category:id,name', 'supplier:id,name'])
+                ->when($search !== '', fn (Builder $products) => $products->where(
+                    fn (Builder $matches) => $matches->whereLike('name', $pattern)->orWhereLike('barcode', $pattern),
+                ))
+                ->when($category, fn (Builder $products) => $products->where('category_id', $category))
+                ->when($supplier, fn (Builder $products) => $products->where('supplier_id', $supplier))
+                ->when(in_array($status, ['ativos', 'inativos'], true), fn (Builder $products) => $products->where('is_active', $status === 'ativos'))
+                ->orderBy('name')->orderBy('id')->paginate(20)->withQueryString(),
+            'categories' => Category::query()->orderBy('name')->get(['id', 'name']),
+            'suppliers' => Supplier::query()->orderBy('name')->get(['id', 'name']),
+            'filters' => ['search' => $search, 'category' => $category, 'supplier' => $supplier, 'status' => $status],
         ]);
     }
 

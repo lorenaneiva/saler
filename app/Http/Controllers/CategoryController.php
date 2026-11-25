@@ -6,14 +6,23 @@ use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CategoryController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $query = $request->query('q');
+        $search = is_string($query) ? mb_substr(trim($query), 0, 100) : '';
+        $pattern = '%'.addcslashes($search, '%_\\').'%';
+
         return view('categories.index', [
-            'categories' => Category::query()->orderBy('name')->orderBy('id')->paginate(20),
+            'categories' => Category::query()->withCount('products')
+                ->when($search !== '', fn ($categories) => $categories->whereLike('name', $pattern))
+                ->orderBy('name')->orderBy('id')->paginate(20)->withQueryString(),
+            'registeredCount' => Category::query()->count(),
+            'search' => $search,
         ]);
     }
 

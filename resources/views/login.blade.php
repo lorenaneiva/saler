@@ -4,24 +4,32 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Entrar no Saler</title>
-    @vite('resources/css/app.css')
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="grid min-h-screen place-items-center bg-stone-100 p-6 text-stone-950">
-    <main class="w-full max-w-sm rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
-        <h1 class="text-2xl font-semibold">Entrar no Saler</h1>
-        <form method="POST" action="{{ route('login.store') }}" class="mt-6 grid gap-5">
+<body class="login-shell">
+    <main class="panel login-panel">
+        <span class="brand-mark" aria-hidden="true">S</span>
+        <div>
+            <h1 class="page-title">Entrar no Saler</h1>
+            <p class="page-description">Entre com sua conta para acessar o sistema.</p>
+        </div>
+
+        <form method="POST" action="{{ route('login.store') }}" class="grid gap-4">
             @csrf
-            <div class="grid gap-2">
-                <label for="email">E-mail <x-required-mark /></label>
-                <input id="email" name="email" type="email" autocomplete="username" value="{{ old('email') }}" required class="rounded-lg border border-stone-400 p-2">
-                @error('email') <p role="alert" class="text-sm text-red-700">{{ $message }}</p> @enderror
+            <div class="grid gap-1.5">
+                <label for="email" class="text-sm font-medium">E-mail <x-required-mark /></label>
+                <input id="email" name="email" type="email" autocomplete="username"
+                    value="{{ is_string(old('email')) ? old('email') : '' }}" required class="field"
+                    @error('email') aria-invalid="true" aria-describedby="login-email-error" @enderror>
+                @error('email') <p id="login-email-error" role="alert" class="text-sm text-red-800">{{ $message }}</p> @enderror
             </div>
-            <div class="grid gap-2">
-                <label for="password">Senha <x-required-mark /></label>
-                <input id="password" name="password" type="password" autocomplete="current-password" required class="rounded-lg border border-stone-400 p-2">
-                @error('password') <p role="alert" class="text-sm text-red-700">{{ $message }}</p> @enderror
+            <div class="grid gap-1.5">
+                <label for="password" class="text-sm font-medium">Senha <x-required-mark /></label>
+                <input id="password" name="password" type="password" autocomplete="current-password" required class="field"
+                    @error('password') aria-invalid="true" aria-describedby="login-password-error" @enderror>
+                @error('password') <p id="login-password-error" role="alert" class="text-sm text-red-800">{{ $message }}</p> @enderror
             </div>
-            <button class="rounded-lg bg-emerald-800 px-4 py-2 font-medium text-white hover:bg-emerald-900">Entrar</button>
+            <button class="button-primary !w-full">Entrar</button>
         </form>
     </main>
 </body>

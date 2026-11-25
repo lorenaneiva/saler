@@ -3,39 +3,35 @@
 @section('title', 'Compras | Saler')
 
 @section('content')
-    <div class="grid gap-6">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-            <h1 class="page-title">Compras</h1>
+    <x-ui.page-header title="Compras" description="Consulte as entradas de mercadorias por fornecedor.">
+        <x-slot:actions>
             <a href="{{ route('purchases.create') }}" class="button-primary">Nova compra</a>
-        </div>
+        </x-slot:actions>
+    </x-ui.page-header>
 
-        <div class="panel overflow-x-auto">
-            <table class="w-full text-left text-sm">
-                <caption class="sr-only">Compras de mercadorias</caption>
-                <thead class="border-b border-slate-200 bg-slate-50 text-slate-700">
-                    <tr>
-                        <th scope="col" class="px-4 py-3">Compra</th>
-                        <th scope="col" class="px-4 py-3">Fornecedor</th>
-                        <th scope="col" class="px-4 py-3">Data</th>
-                        <th scope="col" class="px-4 py-3">Total</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-200">
-                    @forelse ($purchases as $purchase)
-                        <tr>
-                            <th scope="row" class="px-4 py-4 font-semibold">
-                                <a href="{{ route('purchases.show', $purchase) }}" class="text-emerald-800 underline">#{{ $purchase->id }}</a>
-                            </th>
-                            <td class="px-4 py-4">{{ $purchase->supplier->name }}</td>
-                            <td class="whitespace-nowrap px-4 py-4">{{ $purchase->purchased_on->format('d/m/Y') }}</td>
-                            <td class="whitespace-nowrap px-4 py-4">R$ {{ number_format((float) $purchase->total, 2, ',', '.') }}</td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="4" class="px-4 py-6 text-slate-600">Nenhuma compra registrada.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        {{ $purchases->links() }}
-    </div>
+    <x-ui.table label="Compras de mercadorias">
+        <thead>
+            <tr>
+                <th scope="col">Compra</th>
+                <th scope="col">Fornecedor</th>
+                <th scope="col">Data</th>
+                <th scope="col" class="numeric">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($purchases as $purchase)
+                <tr>
+                    <th scope="row" class="px-4 py-4 font-semibold">
+                        <a href="{{ route('purchases.show', $purchase) }}" class="text-emerald-800 underline">#{{ $purchase->id }}</a>
+                    </th>
+                    <td>{{ $purchase->supplier->name }}</td>
+                    <td class="whitespace-nowrap">{{ $purchase->purchased_on->format('d/m/Y') }}</td>
+                    <td class="numeric"><x-ui.money :value="$purchase->total" /></td>
+                </tr>
+            @empty
+                <x-ui.empty :columns="4">Nenhuma compra registrada.</x-ui.empty>
+            @endforelse
+        </tbody>
+    </x-ui.table>
+    <x-ui.pagination :paginator="$purchases" />
 @endsection
