@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Purchase;
+use App\Models\StockAdjustmentReason;
 use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Models\User;
@@ -142,7 +143,11 @@ class PurchaseTest extends TestCase
 
         $purchase = Purchase::query()->sole();
 
-        $this->post(route('stock.store', $secondProduct), ['type' => StockMovement::ManualExit, 'quantity' => 1])
+        $this->post(route('stock.store', $secondProduct), [
+            'type' => StockMovement::ManualExit,
+            'quantity' => 1,
+            'reason_id' => StockAdjustmentReason::factory()->create()->id,
+        ])
             ->assertRedirectToRoute('stock.show', $secondProduct);
         $this->from(route('purchases.show', $purchase))
             ->post(route('purchases.cancel', $purchase))

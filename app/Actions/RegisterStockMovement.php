@@ -12,7 +12,7 @@ use Illuminate\Validation\ValidationException;
 
 class RegisterStockMovement
 {
-    /** @param array{type: string, quantity: int|numeric-string, unit_cost?: numeric-string|int|float, justification?: ?string, reason_id?: int|numeric-string} $data */
+    /** @param array{type: string, quantity: int|numeric-string, unit_cost?: numeric-string|int|float, justification?: ?string, reason_id: int|numeric-string} $data */
     public function handle(Product $product, User $user, array $data): void
     {
         DB::transaction(function () use ($product, $user, $data): void {
@@ -21,7 +21,6 @@ class RegisterStockMovement
             $delta = match ($data['type']) {
                 StockMovement::ManualEntry => $quantity,
                 StockMovement::ManualExit => -$quantity,
-                StockMovement::Adjustment => $quantity - $product->stock_quantity,
             };
 
             $previousQuantity = $product->stock_quantity;
@@ -33,10 +32,6 @@ class RegisterStockMovement
 
             if ($newQuantity > 2147483647) {
                 throw ValidationException::withMessages(['quantity' => 'O saldo de estoque ultrapassaria o limite permitido.']);
-            }
-
-            if ($delta === 0) {
-                throw ValidationException::withMessages(['quantity' => 'Informe um saldo diferente do estoque atual.']);
             }
 
             $movementCost = $product->average_cost;
@@ -59,13 +54,11 @@ class RegisterStockMovement
                 'justification' => $data['justification'] ?? null,
             ]);
 
-            if ($data['type'] === StockMovement::Adjustment) {
-                $movement->adjustment()->create([
-                    'reason_id' => $data['reason_id'],
-                    'previous_quantity' => $previousQuantity,
-                    'counted_quantity' => $newQuantity,
-                ]);
-            }
+            $movement->adjustment()->create([
+                'reason_id' => $data['reason_id'],
+                'previous_quantity' => $previousQuantity,
+                'counted_quantity' => $newQuantity,
+            ]);
         }, 3);
     }
 }

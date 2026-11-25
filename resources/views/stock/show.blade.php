@@ -33,7 +33,7 @@
                     <caption class="sr-only">Movimentações de {{ $product->name }}</caption>
                     <thead class="border-b border-slate-200 bg-slate-50 text-slate-700">
                         <tr>
-                            @foreach (['Data', 'Origem', 'Quantidade', 'Custo unitário', 'Responsável', 'Motivo e observação'] as $heading)
+                            @foreach (['Data', 'Tipo', 'Origem', 'Quantidade', 'Custo unitário', 'Responsável', 'Motivo e observação'] as $heading)
                                 <th scope="col" class="whitespace-nowrap px-4 py-3">{{ $heading }}</th>
                             @endforeach
                         </tr>
@@ -42,6 +42,7 @@
                         @forelse ($movements as $movement)
                             <tr>
                                 <td class="whitespace-nowrap px-4 py-4">{{ $movement->created_at->format('d/m/Y H:i') }}</td>
+                                <td class="px-4 py-4">{{ $movement->quantity_delta > 0 ? 'Entrada' : 'Saída' }}</td>
                                 <td class="px-4 py-4">
                                     {{ $movement->typeLabel() }}
                                     @if ($movement->purchaseItem)
@@ -72,7 +73,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="6" class="px-4 py-6 text-slate-600">Nenhuma movimentação registrada.</td></tr>
+                            <tr><td colspan="7" class="px-4 py-6 text-slate-600">Nenhuma movimentação registrada.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
