@@ -4,10 +4,8 @@
         \App\Models\StockMovement::ManualExit => 'Saída',
     ];
     $quantity = old('quantity');
-    $unitCost = old('unit_cost');
     $justification = old('justification');
     $type = old('type', \App\Models\StockMovement::ManualEntry);
-    $isEntry = $type === \App\Models\StockMovement::ManualEntry;
 @endphp
 
 <form method="POST" action="{{ route('stock.store', $product) }}" class="panel grid gap-4 p-5 sm:grid-cols-2">
@@ -35,12 +33,6 @@
         <input id="stock-quantity" name="quantity" type="number" class="field" min="1" max="2147483647" step="1"
             value="{{ is_scalar($quantity) ? $quantity : '' }}" required>
     </label>
-    <label class="grid content-start gap-2 font-medium">
-        <span>Custo unitário (R$) <span id="stock-unit-cost-required" @if (! $isEntry) hidden @endif><x-required-mark /></span></span>
-        <input id="stock-unit-cost" name="unit_cost" type="number" class="field" min="0" max="9999999999.9999" step="0.0001"
-            data-average-cost="{{ $product->average_cost }}" value="{{ $isEntry ? (is_scalar($unitCost) ? $unitCost : '') : $product->average_cost }}"
-            @required($isEntry) @readonly(! $isEntry)>
-    </label>
     <div class="grid content-start gap-2">
         <label for="stock-reason" class="font-medium">Motivo <x-required-mark /></label>
         <select id="stock-reason" name="reason_id" class="field" required>
@@ -61,22 +53,3 @@
 
     <button class="button-primary sm:col-span-2">Registrar movimentação</button>
 </form>
-
-<script>
-    const movementType = document.getElementById('movement-type');
-    const unitCost = document.getElementById('stock-unit-cost');
-    const unitCostRequired = document.getElementById('stock-unit-cost-required');
-    let entryCost = unitCost.readOnly ? '' : unitCost.value;
-
-    movementType.addEventListener('change', () => {
-        if (!unitCost.readOnly) {
-            entryCost = unitCost.value;
-        }
-
-        const isEntry = movementType.value === 'manual_entry';
-        unitCost.value = isEntry ? entryCost : unitCost.dataset.averageCost;
-        unitCost.readOnly = !isEntry;
-        unitCost.required = isEntry;
-        unitCostRequired.hidden = !isEntry;
-    });
-</script>

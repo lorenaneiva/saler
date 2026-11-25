@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -44,9 +46,20 @@ class StockMovement extends Model
             self::PurchaseEntry => 'Entrada de compra',
             self::PurchaseReversal => 'Estorno de compra',
             self::ManualEntry => 'Entrada manual',
-            self::ManualExit => 'Saída manual',
+            self::ManualExit => 'Perda de estoque',
             self::Adjustment => 'Ajuste manual',
         };
+    }
+
+    public function lossValue(): ?string
+    {
+        if ($this->type !== self::ManualExit) {
+            return null;
+        }
+
+        return (string) BigDecimal::of($this->unit_cost)
+            ->multipliedBy(-$this->quantity_delta)
+            ->toScale(2, RoundingMode::HalfUp);
     }
 
     /** @return array<string, string> */

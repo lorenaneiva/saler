@@ -24,7 +24,7 @@ class StockTest extends TestCase
         $this->post(route('stock.reasons.store'))->assertRedirectToRoute('login');
     }
 
-    public function test_manual_entry_updates_stock_and_weighted_cost_and_appears_in_history(): void
+    public function test_manual_entry_uses_the_product_cost_without_changing_the_average(): void
     {
         $user = User::factory()->create(['name' => 'Joana Silva']);
         $product = Product::factory()->create(['name' => 'Café', 'stock_quantity' => 2, 'average_cost' => '10.0000']);
@@ -39,24 +39,25 @@ class StockTest extends TestCase
             'justification' => 'Saldo de abertura',
         ])->assertRedirectToRoute('stock.show', $product);
 
-        $this->assertDatabaseHas('products', ['id' => $product->id, 'stock_quantity' => 5, 'average_cost' => '16.0740']);
+        $this->assertDatabaseHas('products', ['id' => $product->id, 'stock_quantity' => 5, 'average_cost' => '10.0000']);
         $this->assertDatabaseHas('stock_movements', [
             'product_id' => $product->id, 'user_id' => $user->id, 'quantity_delta' => 3,
-            'unit_cost' => '20.1234', 'type' => StockMovement::ManualEntry, 'justification' => 'Saldo de abertura',
+            'unit_cost' => '10.0000', 'type' => StockMovement::ManualEntry, 'justification' => 'Saldo de abertura',
         ]);
         $this->get(route('stock.show', $product))->assertOk()
             ->assertSee('Histórico de movimentações')->assertSee('Entrada manual')
-            ->assertSee('Saldo de abertura')->assertSee('R$ 20,1234')->assertSee('Joana Silva');
+            ->assertSee('Saldo de abertura')->assertSee('R$ 10,0000')->assertSee('Joana Silva')
+            ->assertDontSee('name="unit_cost"', false);
     }
 
-    public function test_manual_exit_keeps_the_average_cost_and_cannot_exceed_the_balance(): void
+    public function test_manual_exit_records_a_loss_at_the_original_cost_and_respects_the_balance(): void
     {
         $product = Product::factory()->create(['stock_quantity' => 3, 'average_cost' => '12.4000']);
         $exit = [
             'type' => StockMovement::ManualExit,
             'quantity' => 2,
             'unit_cost' => '999.00',
-            'reason_id' => StockAdjustmentReason::factory()->create()->id,
+            'reason_id' => StockAdjustmentReason::factory()->create(['name' => 'Vencimento'])->id,
         ];
 
         $this->actingAs(User::factory()->create())
@@ -66,13 +67,18 @@ class StockTest extends TestCase
             ->followingRedirects()
             ->post(route('stock.store', $product), $exit)->assertOk()
             ->assertSee('A quantidade de saída excede o estoque disponível.')
-            ->assertSee('Custo unitário (R$)')
-            ->assertSee('data-average-cost="12.4000" value="12.4000"', false)
-            ->assertSee('readonly', false);
+            ->assertSee('Perda de estoque')
+            ->assertSee('R$ 24,80')
+            ->assertSee('Vencimento')
+            ->assertDontSee('name="unit_cost"', false);
 
         $this->assertDatabaseHas('products', ['id' => $product->id, 'stock_quantity' => 1, 'average_cost' => '12.4000']);
         $this->assertDatabaseHas('stock_movements', ['product_id' => $product->id, 'quantity_delta' => -2, 'unit_cost' => '12.4000']);
         $this->assertDatabaseCount('stock_movements', 1);
+
+        $product->forceFill(['average_cost' => '20.0000'])->save();
+
+        $this->get(route('stock.show', $product))->assertOk()->assertSee('R$ 24,80');
     }
 
     public function test_user_can_register_adjustment_reasons_but_cannot_repeat_a_name(): void

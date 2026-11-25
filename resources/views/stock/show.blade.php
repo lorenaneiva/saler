@@ -33,7 +33,7 @@
                     <caption class="sr-only">Movimentações de {{ $product->name }}</caption>
                     <thead class="border-b border-slate-200 bg-slate-50 text-slate-700">
                         <tr>
-                            @foreach (['Data', 'Tipo', 'Origem', 'Quantidade', 'Custo unitário', 'Responsável', 'Motivo e observação'] as $heading)
+                            @foreach (['Data', 'Tipo', 'Origem', 'Quantidade', 'Custo unitário', 'Prejuízo', 'Responsável', 'Motivo e observação'] as $heading)
                                 <th scope="col" class="whitespace-nowrap px-4 py-3">{{ $heading }}</th>
                             @endforeach
                         </tr>
@@ -60,6 +60,8 @@
                                     @endif
                                 </td>
                                 <td class="whitespace-nowrap px-4 py-4">R$ {{ number_format((float) $movement->unit_cost, 4, ',', '.') }}</td>
+                                @php($loss = $movement->lossValue())
+                                <td class="whitespace-nowrap px-4 py-4">{{ $loss === null ? '—' : 'R$ '.str_replace('.', ',', $loss) }}</td>
                                 <td class="px-4 py-4">{{ $movement->user->name }}</td>
                                 <td class="min-w-32 wrap-anywhere px-4 py-4">
                                     @if ($movement->adjustment)
@@ -73,7 +75,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="7" class="px-4 py-6 text-slate-600">Nenhuma movimentação registrada.</td></tr>
+                            <tr><td colspan="8" class="px-4 py-6 text-slate-600">Nenhuma movimentação registrada.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
