@@ -14,6 +14,12 @@ class Customer extends Model
     /** @use HasFactory<CustomerFactory> */
     use HasFactory;
 
+    /** @return HasMany<Payment, $this> */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
     /** @return HasMany<Sale, $this> */
     public function sales(): HasMany
     {

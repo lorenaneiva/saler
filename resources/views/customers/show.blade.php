@@ -30,13 +30,15 @@
             @endforeach
         </dl>
 
+        @include('customers.payment-form')
+
         <section class="grid gap-3">
             <h2 class="text-xl font-semibold">Histórico de compras</h2>
             <div class="panel overflow-x-auto">
                 <table class="w-full text-left text-sm">
                     <thead class="border-b border-slate-200 bg-slate-50 text-slate-700">
                         <tr>
-                            @foreach (['Compra', 'Data', 'Total', 'Em aberto'] as $heading)
+                            @foreach (['Compra', 'Data', 'Total', 'Pago', 'Em aberto', 'Situação'] as $heading)
                                 <th scope="col" class="whitespace-nowrap px-4 py-3">{{ $heading }}</th>
                             @endforeach
                         </tr>
@@ -49,15 +51,19 @@
                                 </th>
                                 <td class="whitespace-nowrap px-4 py-4">{{ $sale->sold_on->format('d/m/Y') }}</td>
                                 <td class="whitespace-nowrap px-4 py-4">R$ {{ str_replace('.', ',', $sale->total) }}</td>
-                                <td class="whitespace-nowrap px-4 py-4">{{ $sale->status === \App\Models\Sale::Completed ? 'R$ '.str_replace('.', ',', $sale->total) : '—' }}</td>
+                                <td class="whitespace-nowrap px-4 py-4">R$ {{ str_replace('.', ',', (string) $sale->paidAmount()) }}</td>
+                                <td class="whitespace-nowrap px-4 py-4">R$ {{ str_replace('.', ',', (string) $sale->outstandingAmount()) }}</td>
+                                <td class="whitespace-nowrap px-4 py-4">{{ $sale->paymentStatus() }}</td>
                             </tr>
                         @empty
-                            <tr><td colspan="4" class="px-4 py-6 text-slate-600">Nenhuma compra registrada para este cliente.</td></tr>
+                            <tr><td colspan="6" class="px-4 py-6 text-slate-600">Nenhuma compra registrada para este cliente.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
             {{ $sales->links() }}
         </section>
+
+        @include('customers.payment-history')
     </div>
 @endsection
