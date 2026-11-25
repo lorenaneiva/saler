@@ -53,15 +53,20 @@
             </table>
         </div>
 
-        @if ($purchase->status === \App\Models\Purchase::Pending)
+        @if ($purchase->status !== \App\Models\Purchase::Cancelled)
             <div class="flex flex-wrap gap-3">
-                <form method="POST" action="{{ route('purchases.confirm', $purchase) }}">
+                @if ($purchase->status === \App\Models\Purchase::Pending)
+                    <form method="POST" action="{{ route('purchases.confirm', $purchase) }}">
+                        @csrf
+                        <button class="button-primary">Confirmar e atualizar estoque</button>
+                    </form>
+                @endif
+                <form method="POST" action="{{ route('purchases.cancel', $purchase) }}"
+                    @if ($purchase->status === \App\Models\Purchase::Confirmed)
+                        onsubmit="return confirm('Estornar as entradas desta compra?')"
+                    @endif>
                     @csrf
-                    <button class="button-primary">Confirmar e atualizar estoque</button>
-                </form>
-                <form method="POST" action="{{ route('purchases.cancel', $purchase) }}">
-                    @csrf
-                    <button class="button-secondary">Cancelar compra</button>
+                    <button class="button-secondary">{{ $purchase->status === \App\Models\Purchase::Confirmed ? 'Estornar compra' : 'Cancelar compra' }}</button>
                 </form>
             </div>
         @endif

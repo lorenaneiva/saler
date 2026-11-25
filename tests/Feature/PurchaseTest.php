@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Purchase;
+use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -72,7 +73,6 @@ class PurchaseTest extends TestCase
 
         $this->post(route('purchases.confirm', $purchase))->assertRedirectToRoute('purchases.show', $purchase);
         $this->assertDatabaseCount('stock_movements', 2);
-        $this->post(route('purchases.cancel', $purchase))->assertSessionHasErrors('purchase');
     }
 
     public function test_cancelling_a_pending_purchase_prevents_confirmation_and_stock_entry(): void
@@ -94,6 +94,65 @@ class PurchaseTest extends TestCase
         $this->assertDatabaseHas('purchases', ['id' => $purchase->id, 'status' => Purchase::Cancelled]);
         $this->assertDatabaseHas('products', ['id' => $product->id, 'stock_quantity' => 0]);
         $this->assertDatabaseEmpty('stock_movements');
+    }
+
+    public function test_reversing_a_confirmed_purchase_records_only_one_linked_exit(): void
+    {
+        $product = Product::factory()->create(['stock_quantity' => 2, 'average_cost' => '10.0000']);
+        $supplier = Supplier::factory()->create();
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route('purchases.store'), [
+            'supplier_id' => $supplier->id,
+            'purchased_on' => '2026-11-24',
+            'items' => [['product_id' => $product->id, 'quantity' => 3, 'unit_cost' => '20.00']],
+        ])->assertRedirect();
+
+        $purchase = Purchase::query()->sole();
+        $item = $purchase->items()->sole();
+
+        $this->get(route('purchases.show', $purchase))->assertOk()->assertSee('Estornar compra');
+        $this->post(route('purchases.cancel', $purchase))->assertRedirectToRoute('purchases.show', $purchase);
+        $this->post(route('purchases.cancel', $purchase))->assertRedirectToRoute('purchases.show', $purchase);
+
+        $this->assertDatabaseHas('purchases', ['id' => $purchase->id, 'status' => Purchase::Cancelled]);
+        $this->assertDatabaseHas('products', ['id' => $product->id, 'stock_quantity' => 2, 'average_cost' => '16.0000']);
+        $this->assertDatabaseHas('stock_movements', [
+            'purchase_item_id' => $item->id, 'user_id' => $user->id, 'type' => StockMovement::PurchaseReversal,
+            'quantity_delta' => -3, 'unit_cost' => '16.0000',
+        ]);
+        $this->assertDatabaseCount('stock_movements', 2);
+        $this->get(route('stock.show', $product))->assertOk()->assertSee('Estorno de compra');
+    }
+
+    public function test_reversal_without_enough_stock_preserves_the_entire_purchase_and_all_balances(): void
+    {
+        $firstProduct = Product::factory()->create();
+        $secondProduct = Product::factory()->create(['name' => 'Feijão']);
+        $supplier = Supplier::factory()->create();
+
+        $this->actingAs(User::factory()->create())->post(route('purchases.store'), [
+            'supplier_id' => $supplier->id,
+            'purchased_on' => '2026-11-24',
+            'items' => [
+                ['product_id' => $firstProduct->id, 'quantity' => 3, 'unit_cost' => '10.00'],
+                ['product_id' => $secondProduct->id, 'quantity' => 5, 'unit_cost' => '10.00'],
+            ],
+        ])->assertRedirect();
+
+        $purchase = Purchase::query()->sole();
+
+        $this->post(route('stock.store', $secondProduct), ['type' => StockMovement::ManualExit, 'quantity' => 1])
+            ->assertRedirectToRoute('stock.show', $secondProduct);
+        $this->from(route('purchases.show', $purchase))
+            ->post(route('purchases.cancel', $purchase))
+            ->assertRedirectToRoute('purchases.show', $purchase)
+            ->assertSessionHasErrors(['purchase' => 'Estoque insuficiente para estornar o produto Feijão.']);
+
+        $this->assertDatabaseHas('purchases', ['id' => $purchase->id, 'status' => Purchase::Confirmed]);
+        $this->assertDatabaseHas('products', ['id' => $firstProduct->id, 'stock_quantity' => 3]);
+        $this->assertDatabaseHas('products', ['id' => $secondProduct->id, 'stock_quantity' => 4]);
+        $this->assertDatabaseMissing('stock_movements', ['type' => StockMovement::PurchaseReversal]);
     }
 
     public function test_purchase_can_create_the_first_product_with_stock(): void

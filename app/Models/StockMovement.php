@@ -11,6 +11,8 @@ class StockMovement extends Model
 {
     public const PurchaseEntry = 'purchase_entry';
 
+    public const PurchaseReversal = 'purchase_reversal';
+
     public const ManualEntry = 'manual_entry';
 
     public const ManualExit = 'manual_exit';
@@ -33,6 +35,7 @@ class StockMovement extends Model
     {
         return match ($this->type) {
             self::PurchaseEntry => 'Entrada de compra',
+            self::PurchaseReversal => 'Estorno de compra',
             self::ManualEntry => 'Entrada manual',
             self::ManualExit => 'Saída manual',
             self::Adjustment => 'Ajuste manual',

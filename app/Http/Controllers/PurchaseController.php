@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CancelPurchase;
 use App\Actions\ConfirmPurchase;
 use App\Http\Requests\PurchaseRequest;
 use App\Models\Category;
@@ -12,7 +13,6 @@ use Brick\Math\BigDecimal;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class PurchaseController extends Controller
@@ -91,14 +91,9 @@ class PurchaseController extends Controller
         return to_route('purchases.show', $purchase)->with('status', 'Compra confirmada e estoque atualizado.');
     }
 
-    public function cancel(Purchase $purchase): RedirectResponse
+    public function cancel(Request $request, Purchase $purchase, CancelPurchase $cancelPurchase): RedirectResponse
     {
-        $updated = Purchase::query()->whereKey($purchase->id)->where('status', Purchase::Pending)
-            ->update(['status' => Purchase::Cancelled]);
-
-        if ($updated === 0 && $purchase->refresh()->status !== Purchase::Cancelled) {
-            throw ValidationException::withMessages(['purchase' => 'Somente compras pendentes podem ser canceladas.']);
-        }
+        $cancelPurchase->handle($purchase, $request->user());
 
         return to_route('purchases.show', $purchase)->with('status', 'Compra cancelada.');
     }
