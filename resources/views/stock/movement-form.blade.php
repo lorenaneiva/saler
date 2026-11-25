@@ -7,7 +7,9 @@
     $quantity = old('quantity');
     $unitCost = old('unit_cost');
     $justification = old('justification');
-    $isAdjustment = old('type') === \App\Models\StockMovement::Adjustment;
+    $type = old('type', \App\Models\StockMovement::Adjustment);
+    $isAdjustment = $type === \App\Models\StockMovement::Adjustment;
+    $isEntry = $type === \App\Models\StockMovement::ManualEntry;
 @endphp
 
 <form method="POST" action="{{ route('stock.store', $product) }}" class="panel grid gap-4 p-5 sm:grid-cols-2">
@@ -26,20 +28,20 @@
         <span>Tipo <x-required-mark /></span>
         <select id="movement-type" name="type" class="field" required>
             @foreach ($movementTypes as $value => $label)
-                <option value="{{ $value }}" @selected(old('type', \App\Models\StockMovement::ManualEntry) === $value)>{{ $label }}</option>
+                <option value="{{ $value }}" @selected($type === $value)>{{ $label }}</option>
             @endforeach
         </select>
     </label>
     <label class="grid content-start gap-2 font-medium">
-        <span><span id="stock-quantity-label">Quantidade</span> <x-required-mark /></span>
-        <input id="stock-quantity" name="quantity" type="number" class="field" min="0" max="2147483647" step="1"
+        <span><span id="stock-quantity-label">{{ $isAdjustment ? 'Saldo final' : 'Quantidade' }}</span> <x-required-mark /></span>
+        <input id="stock-quantity" name="quantity" type="number" class="field" min="{{ $isAdjustment ? 0 : 1 }}" max="2147483647" step="1"
             value="{{ is_scalar($quantity) ? $quantity : '' }}" required>
-        <span id="stock-adjustment-help" class="text-sm font-normal text-slate-600" hidden>Informe o saldo contado, incluindo zero.</span>
+        <span id="stock-adjustment-help" class="text-sm font-normal text-slate-600" @if (! $isAdjustment) hidden @endif>Informe o saldo contado, incluindo zero.</span>
     </label>
-    <label id="stock-unit-cost-field" class="grid content-start gap-2 font-medium">
+    <label id="stock-unit-cost-field" class="grid content-start gap-2 font-medium" @if (! $isEntry) hidden @endif>
         <span>Custo unitário da entrada (R$) <x-required-mark /></span>
         <input id="stock-unit-cost" name="unit_cost" type="number" class="field" min="0" max="9999999999.9999" step="0.0001"
-            value="{{ is_scalar($unitCost) ? $unitCost : '' }}">
+            value="{{ is_scalar($unitCost) ? $unitCost : '' }}" @required($isEntry) @disabled(! $isEntry)>
     </label>
     <div id="stock-reason-field" class="grid content-start gap-2" @if (! $isAdjustment) hidden @endif>
         <label for="stock-reason" class="font-medium">Motivo do ajuste <x-required-mark /></label>

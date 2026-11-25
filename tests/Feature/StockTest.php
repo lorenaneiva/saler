@@ -85,6 +85,17 @@ class StockTest extends TestCase
         $this->assertDatabaseCount('motivos', 1);
     }
 
+    public function test_movement_form_opens_with_a_required_reason_select(): void
+    {
+        $product = Product::factory()->create();
+        $reason = StockAdjustmentReason::factory()->create(['name' => 'Contagem física']);
+
+        $this->actingAs(User::factory()->create())->get(route('stock.show', $product))->assertOk()
+            ->assertSee('<option value="adjustment" selected>', false)
+            ->assertSee('<select id="stock-reason" name="reason_id" class="field" required', false)
+            ->assertSee('<option value="'.$reason->id.'" >Contagem física</option>', false);
+    }
+
     public function test_adjustment_requires_a_registered_reason_and_records_the_counted_balance(): void
     {
         $product = Product::factory()->create(['stock_quantity' => 3]);
