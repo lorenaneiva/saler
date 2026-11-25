@@ -19,6 +19,8 @@
                 class="module-link">Categorias</a>
             <a href="{{ route('products.index') }}" @if (request()->routeIs('products.*')) aria-current="page" @endif
                 class="module-link">Produtos</a>
+            <a href="{{ route('customers.index') }}" @if (request()->routeIs('customers.*')) aria-current="page" @endif
+                class="module-link">Clientes</a>
         </nav>
     </aside>
     <div class="min-w-0">
