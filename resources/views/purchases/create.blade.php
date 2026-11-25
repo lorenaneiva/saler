@@ -6,11 +6,16 @@
     <div class="grid max-w-5xl gap-6">
         <h1 class="page-title">Nova compra</h1>
 
-        @if ($suppliers->isEmpty() || $products->isEmpty())
+        @if ($suppliers->isEmpty() || ($products->isEmpty() && $categories->isEmpty()))
             <div class="panel flex flex-wrap items-center gap-4 p-5">
-                <p class="w-full">Para registrar uma compra, cadastre pelo menos um fornecedor e um produto ativos.</p>
-                <a class="button-secondary" href="{{ route('suppliers.index') }}">Fornecedores</a>
-                <a class="button-secondary" href="{{ route('products.index') }}">Produtos</a>
+                @if ($suppliers->isEmpty())
+                    <p class="w-full">Cadastre ou ative um fornecedor para registrar a compra.</p>
+                    <a class="button-secondary" href="{{ route('suppliers.index') }}">Fornecedores</a>
+                @endif
+                @if ($products->isEmpty() && $categories->isEmpty())
+                    <p class="w-full">Cadastre uma categoria para poder criar o primeiro produto da compra.</p>
+                    <a class="button-secondary" href="{{ route('categories.index') }}">Categorias</a>
+                @endif
             </div>
         @else
             @php
@@ -73,6 +78,24 @@
                 function updateItemRows() {
                     const rows = Array.from(items.children);
                     rows.forEach((row, index) => {
+                        const productSelect = row.querySelector('[data-product-select]');
+                        const isNewProduct = productSelect.value === 'new';
+                        const productFields = row.querySelector('[data-new-product-fields]');
+
+                        if (isNewProduct) {
+                            productSelect.removeAttribute('name');
+                        } else {
+                            productSelect.name = `items[${index}][product_id]`;
+                        }
+
+                        if (productFields) {
+                            productFields.hidden = !isNewProduct;
+                            productFields.disabled = !isNewProduct;
+                            productFields.querySelectorAll('[data-new-product-field]').forEach((field) => {
+                                field.name = `items[${index}][new_product][${field.dataset.newProductField}]`;
+                            });
+                        }
+
                         row.querySelectorAll('[data-item-field]').forEach((field) => {
                             field.name = `items[${index}][${field.dataset.itemField}]`;
                         });
@@ -85,6 +108,12 @@
                     items.append(itemTemplate.content.cloneNode(true));
                     updateItemRows();
                     items.lastElementChild.querySelector('select').focus();
+                });
+
+                items.addEventListener('change', (event) => {
+                    if (event.target.matches('[data-product-select]')) {
+                        updateItemRows();
+                    }
                 });
 
                 items.addEventListener('click', (event) => {

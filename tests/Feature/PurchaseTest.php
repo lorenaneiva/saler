@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Supplier;
@@ -30,7 +31,7 @@ class PurchaseTest extends TestCase
 
         $this->actingAs($user)->get(route('purchases.create'))->assertOk()
             ->assertSee('<select name="supplier_id"', false)
-            ->assertSee('data-item-field="product_id"', false)
+            ->assertSee('data-product-select', false)
             ->assertSee('Distribuidora Norte')->assertSee('Arroz');
 
         $response = $this->post(route('purchases.store'), [
@@ -87,6 +88,80 @@ class PurchaseTest extends TestCase
         $this->assertDatabaseHas('purchases', ['id' => $purchase->id, 'status' => Purchase::Cancelled]);
         $this->assertDatabaseHas('products', ['id' => $product->id, 'stock_quantity' => 0]);
         $this->assertDatabaseEmpty('stock_movements');
+    }
+
+    public function test_purchase_can_create_the_first_product_and_receive_its_stock_on_confirmation(): void
+    {
+        $user = User::factory()->create();
+        $supplier = Supplier::factory()->create();
+        $category = Category::factory()->create(['name' => 'Mercearia']);
+
+        $this->actingAs($user)->get(route('purchases.create'))->assertOk()
+            ->assertSee('Cadastrar novo produto')
+            ->assertSee('data-new-product-field="category_id"', false)
+            ->assertSee('Mercearia');
+
+        $response = $this->post(route('purchases.store'), [
+            'supplier_id' => $supplier->id,
+            'purchased_on' => '2026-11-24',
+            'items' => [
+                [
+                    'new_product' => [
+                        'name' => 'Farinha',
+                        'category_id' => $category->id,
+                        'sale_price' => '12.50',
+                        'barcode' => '0012345',
+                    ],
+                    'quantity' => 4,
+                    'unit_cost' => '8.00',
+                ],
+            ],
+        ]);
+        $purchase = Purchase::query()->sole();
+        $product = Product::query()->sole();
+
+        $response->assertRedirectToRoute('purchases.show', $purchase);
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'name' => 'Farinha',
+            'category_id' => $category->id,
+            'supplier_id' => $supplier->id,
+            'sale_price' => '12.50',
+            'barcode' => '0012345',
+            'stock_quantity' => 0,
+        ]);
+        $this->assertDatabaseHas('purchase_items', ['purchase_id' => $purchase->id, 'product_id' => $product->id]);
+
+        $this->post(route('purchases.confirm', $purchase))->assertRedirectToRoute('purchases.show', $purchase);
+
+        $this->assertDatabaseHas('products', ['id' => $product->id, 'stock_quantity' => 4]);
+    }
+
+    public function test_invalid_new_product_preserves_form_values_without_creating_records(): void
+    {
+        $supplier = Supplier::factory()->create();
+        Category::factory()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->from(route('purchases.create'))
+            ->followingRedirects()
+            ->post(route('purchases.store'), [
+                'supplier_id' => $supplier->id,
+                'purchased_on' => '2026-11-24',
+                'items' => [
+                    [
+                        'new_product' => ['name' => 'Farinha', 'category_id' => 999],
+                        'quantity' => 4,
+                        'unit_cost' => '8.00',
+                    ],
+                ],
+            ])->assertOk()
+            ->assertSee('Selecione uma categoria válida para o novo produto.')
+            ->assertSee('Informe um preço de venda válido para o novo produto')
+            ->assertSee('value="Farinha"', false);
+
+        $this->assertDatabaseEmpty('purchases');
+        $this->assertDatabaseEmpty('products');
     }
 
     public function test_excessive_discounts_do_not_create_a_purchase(): void

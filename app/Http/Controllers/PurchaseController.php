@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\ConfirmPurchase;
 use App\Http\Requests\PurchaseRequest;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Supplier;
@@ -26,6 +27,7 @@ class PurchaseController extends Controller
     public function create(): View
     {
         return view('purchases.create', [
+            'categories' => Category::query()->orderBy('name')->orderBy('id')->get(['id', 'name']),
             'suppliers' => Supplier::query()->where('is_active', true)->orderBy('name')->orderBy('id')->get(['id', 'name']),
             'products' => Product::query()->where('is_active', true)->orderBy('name')->orderBy('id')->get(['id', 'name']),
         ]);
@@ -53,7 +55,19 @@ class PurchaseController extends Controller
                 'total' => (string) $total,
             ]);
 
-            $purchase->items()->createMany($items);
+            foreach ($items as $item) {
+                if (isset($item['new_product'])) {
+                    $product = Product::query()->create([
+                        ...$item['new_product'],
+                        'supplier_id' => $purchase->supplier_id,
+                    ]);
+
+                    $item['product_id'] = $product->id;
+                    unset($item['new_product']);
+                }
+
+                $purchase->items()->create($item);
+            }
 
             return $purchase;
         });
