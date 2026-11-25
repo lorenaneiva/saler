@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SessionController;
 use Illuminate\Support\Facades\Route;
 
@@ -10,5 +11,9 @@ Route::middleware('guest')->group(function (): void {
 
 Route::middleware('auth')->group(function (): void {
     Route::view('/', 'dashboard')->name('dashboard');
+    Route::resource('categorias', CategoryController::class)
+        ->parameters(['categorias' => 'category'])
+        ->names('categories')
+        ->except(['show', 'create']);
     Route::post('/sair', [SessionController::class, 'destroy'])->name('logout');
 });
