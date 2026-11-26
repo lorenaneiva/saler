@@ -73,7 +73,7 @@ class ProductTest extends TestCase
 
     public function test_authenticated_user_can_update_a_product_and_view_its_margin(): void
     {
-        $product = Product::factory()->create(['name' => 'Arroz', 'average_cost' => '7.5000']);
+        $product = Product::factory()->withRegisteredCost()->create(['name' => 'Arroz', 'average_cost' => '7.5000']);
 
         $this->actingAs(User::factory()->create())
             ->get(route('products.edit', $product))->assertOk()->assertSee('Arroz');

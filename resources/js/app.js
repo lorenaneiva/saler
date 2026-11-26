@@ -2,6 +2,8 @@ import { initializeProductEditor } from './product-editor';
 import { focusFormControl, initializeAutocompletes, syncAutocomplete } from './autocomplete';
 import { fetchLivePage, initializeLiveSearch, replaceLiveRegions } from './live-search';
 import { initializePaymentDistributions } from './payment-distribution';
+import { commercialSummary, normalizePlainDecimal } from './product-pricing';
+import { renderCommercialSummary } from './commercial-summary';
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const confirmations = new WeakSet();
@@ -357,12 +359,41 @@ document.querySelectorAll('[data-line-editor]').forEach((editor) => {
         }
     });
 
+    function updateNewProductSummary(row) {
+        const summary = row.querySelector('[data-new-product-fields] [data-commercial-summary]');
+        if (!summary || row.querySelector('[data-new-product-fields]').hidden) {
+            return;
+        }
+        const value = (selector) => row.querySelector(selector)?.value ?? '';
+        const quantity = value('[data-item-field="quantity"]').trim();
+        renderCommercialSummary(summary, commercialSummary({
+            salePrice: normalizePlainDecimal(value('[data-new-product-field="sale_price"]')),
+            quantity: quantity === '' ? null : quantity,
+            unitCost: normalizePlainDecimal(value('[data-item-field="unit_cost"]')),
+            discount: normalizePlainDecimal(value('[data-item-field="discount"]')),
+        }));
+    }
+
+    items.addEventListener('input', (event) => {
+        const row = event.target.closest('[data-item-row]');
+        if (row) {
+            updateNewProductSummary(row);
+        }
+    });
+    items.addEventListener('change', (event) => {
+        const row = event.target.closest('[data-item-row]');
+        if (row) {
+            updateNewProductSummary(row);
+        }
+    });
+
     items.addEventListener('click', (event) => {
         const createProduct = event.target.closest('[data-create-product]');
         if (createProduct) {
             const row = createProduct.closest('[data-item-row]');
             row.querySelector('[data-product-select]').value = 'new';
             updateRows();
+            updateNewProductSummary(row);
             row.querySelector('[data-new-product-field="name"]').focus();
             return;
         }
@@ -376,6 +407,7 @@ document.querySelectorAll('[data-line-editor]').forEach((editor) => {
     });
 
     updateRows();
+    items.querySelectorAll('[data-item-row]').forEach(updateNewProductSummary);
 });
 
 document.addEventListener('live-regions:replaced', (event) => {

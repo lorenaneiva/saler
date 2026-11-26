@@ -64,7 +64,7 @@
                         <span class="block text-xs text-slate-600">{{ $product->supplier?->name ?? $product->supplier_name ?? '—' }}</span>
                     </td>
                     <td class="money font-semibold"><x-ui.money :value="$product->sale_price" /></td>
-                    <td class="money"><x-ui.money :value="$product->average_cost" /></td>
+                    <td class="money"><x-ui.product-cost :product="$product" /></td>
                     <td class="numeric">{{ $margin === null ? '—' : number_format((float) $margin, 2, ',', '.').'%' }}</td>
                     <td class="whitespace-nowrap">
                         @if ($product->stock_quantity <= 0)

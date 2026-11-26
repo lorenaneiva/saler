@@ -49,6 +49,7 @@
     .page-description { @apply mt-0.5 text-sm; color: var(--muted); }
     .page-actions, .form-actions { @apply flex flex-wrap items-center gap-2; }
     .form-actions { @apply mt-4; }
+    .text-unknown { @apply text-sm font-normal italic; color: var(--muted); }
     .text-link { @apply underline-offset-2 hover:underline; color: var(--color-brand); }
     .back-link { @apply mb-1 inline-flex text-sm font-medium hover:underline; color: var(--color-brand); }
     .panel { @apply border bg-white; border-color: var(--line); }
@@ -225,6 +226,28 @@
     .product-readonly { @apply border border-slate-200 bg-slate-50 p-3 text-sm; }
     .product-readonly dt { @apply text-xs text-slate-600; }
     .product-readonly dd { @apply mt-1 font-semibold tabular-nums; }
+    .switch-field { @apply inline-flex w-fit cursor-pointer items-center gap-2.5 text-sm font-medium; }
+    .switch-field input { @apply sr-only; }
+    .switch-track { @apply relative inline-block h-5 w-9 shrink-0 rounded-full bg-slate-300; transition: background-color var(--duration) ease-in-out; }
+    .switch-track::after { content: ''; @apply absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm; transition: transform var(--duration) ease-in-out; }
+    .switch-field input:checked + .switch-track { background: var(--color-brand); }
+    .switch-field input:checked + .switch-track::after { transform: translateX(1rem); }
+    .switch-field input:focus-visible + .switch-track { outline: 2px solid var(--color-brand); outline-offset: 2px; }
+    .collapsible { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows var(--duration) ease-in-out, opacity var(--duration) ease-in-out; }
+    .collapsible[data-open] { grid-template-rows: 1fr; opacity: 1; }
+    .collapsible > * { @apply grid min-h-0 gap-3 overflow-hidden; }
+    .collapsible[data-open] > * { overflow: visible; }
+
+    .commercial-summary { @apply grid gap-2 border border-slate-200 bg-slate-50 p-3 text-sm; }
+    .commercial-summary-title { @apply text-sm font-semibold; }
+    .commercial-summary dl { @apply grid gap-x-4 gap-y-1.5 sm:grid-cols-2; }
+    .commercial-summary dl > div { @apply flex items-baseline justify-between gap-3 border-b border-dashed border-slate-200 pb-1.5; }
+    .commercial-summary dt { @apply text-xs text-slate-600; }
+    .commercial-summary dd { @apply text-right font-semibold whitespace-nowrap tabular-nums; }
+    .commercial-summary dd.text-unknown { @apply text-xs font-normal; }
+    .commercial-summary .is-loss { @apply text-red-800; }
+    .commercial-summary-alert { @apply border-l-2 border-red-700 bg-red-50 px-2.5 py-1.5 text-xs text-red-900; }
+
     .product-form-footer { @apply flex flex-none justify-end gap-2 border-t border-slate-200 bg-white px-4 py-3 sm:px-5; margin-top: auto; padding-bottom: max(.75rem, env(safe-area-inset-bottom)); }
     .product-feedback { @apply fixed right-4 bottom-4 z-30 max-w-sm shadow-md; max-width: calc(100vw - 2rem); }
     .login-shell { @apply grid min-h-dvh place-items-center px-4 py-8; }

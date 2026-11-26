@@ -15,7 +15,7 @@ class StockController extends Controller
     public function index(ListSearchRequest $request): View
     {
         return view('stock.index', [
-            'products' => $request->filter(Product::query(), ['name', 'barcode'])
+            'products' => $request->filter(Product::query()->withRegisteredCost(), ['name', 'barcode'])
                 ->orderBy('name')->orderBy('id')->paginate(20)->withQueryString(),
         ]);
     }

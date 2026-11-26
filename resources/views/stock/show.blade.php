@@ -17,7 +17,7 @@
             </div>
             <div>
                 <dt class="text-sm text-slate-600">Custo médio</dt>
-                <dd class="text-xl font-semibold"><x-ui.money :value="$product->average_cost" /></dd>
+                <dd class="text-xl font-semibold"><x-ui.product-cost :product="$product" class="text-base" /></dd>
             </div>
         </dl>
 

@@ -22,6 +22,7 @@
         @endphp
         <form method="POST" action="{{ route('purchases.store') }}" class="panel form-panel">
             @csrf
+            <input type="hidden" name="submission_token" value="{{ old('submission_token', (string) \Illuminate\Support\Str::uuid()) }}">
             <x-ui.errors />
             <div class="grid gap-4 sm:grid-cols-2">
                 <label class="grid gap-2 font-medium">

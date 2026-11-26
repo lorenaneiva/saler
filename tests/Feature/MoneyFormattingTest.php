@@ -16,7 +16,7 @@ class MoneyFormattingTest extends TestCase
     public function test_catalog_formats_four_decimal_average_cost_as_brazilian_currency(): void
     {
         $category = Category::factory()->create();
-        Product::factory()->for($category)->create([
+        Product::factory()->for($category)->withRegisteredCost()->create([
             'name' => 'Arroz', 'sale_price' => '1250.50', 'average_cost' => '1250.5000',
         ]);
 

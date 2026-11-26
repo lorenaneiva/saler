@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateProduct;
 use App\Http\Requests\ProductRequest;
 use App\Models\Category;
 use App\Models\Product;
@@ -12,6 +13,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -27,7 +29,7 @@ class ProductController extends Controller
         $status = $request->query('situacao');
 
         return view('products.index', [
-            'products' => Product::query()->with(['category:id,name', 'supplier:id,name'])
+            'products' => Product::query()->with(['category:id,name', 'supplier:id,name'])->withRegisteredCost()
                 ->when($search !== '', fn (Builder $products) => $products->where(
                     fn (Builder $matches) => $matches->whereLike('name', $pattern)->orWhereLike('barcode', $pattern),
                 ))
@@ -50,10 +52,12 @@ class ProductController extends Controller
         return view('products.form', $this->formData(new Product));
     }
 
-    public function store(ProductRequest $request): RedirectResponse|JsonResponse
+    public function store(ProductRequest $request, CreateProduct $createProduct): RedirectResponse|JsonResponse
     {
+        $initialPurchase = $request->initialPurchase();
+
         try {
-            Product::query()->create($request->validated());
+            $createProduct->handle($request->user(), $request->productData(), $initialPurchase);
         } catch (QueryException $exception) {
             if ($exception->getCode() !== '23503') {
                 throw $exception;
@@ -62,11 +66,13 @@ class ProductController extends Controller
             throw ValidationException::withMessages(['category_id' => 'Verifique se a categoria e o fornecedor selecionados ainda existem.']);
         }
 
+        $message = $initialPurchase ? 'Produto cadastrado e compra inicial registrada no estoque.' : 'Produto cadastrado.';
+
         if ($request->expectsJson()) {
-            return response()->json(['message' => 'Produto cadastrado.'], 201);
+            return response()->json(['message' => $message], 201);
         }
 
-        return to_route('products.index')->with('status', 'Produto cadastrado.');
+        return to_route('products.index')->with('status', $message);
     }
 
     public function edit(Request $request, Product $product): View|JsonResponse
@@ -104,11 +110,12 @@ class ProductController extends Controller
         return to_route('products.index')->with('status', 'Produto desativado.');
     }
 
-    /** @return array{product: Product, categories: Collection<int, Category>, suppliers: Collection<int, Supplier>} */
+    /** @return array{product: Product, submissionToken: string, categories: Collection<int, Category>, suppliers: Collection<int, Supplier>} */
     private function formData(Product $product): array
     {
         return [
             'product' => $product,
+            'submissionToken' => (string) Str::uuid(),
             'categories' => Category::query()
                 ->where(fn (Builder $categories) => $categories->where('is_active', true)
                     ->when($product->category_id, fn (Builder $active) => $active->orWhere('id', $product->category_id)))

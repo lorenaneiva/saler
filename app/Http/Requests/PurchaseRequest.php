@@ -13,6 +13,7 @@ class PurchaseRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'submission_token' => ['nullable', 'uuid'],
             'supplier_id' => ['required', 'integer', Rule::exists('suppliers', 'id')->where('is_active', true)],
             'purchased_on' => ['required', 'date_format:Y-m-d', 'after_or_equal:0001-01-01'],
             'items' => ['required', 'array', 'list', 'min:1', 'max:50'],
@@ -30,10 +31,30 @@ class PurchaseRequest extends FormRequest
             'items.*.new_product.category_id' => ['required_with:items.*.new_product', 'integer', Rule::exists('categories', 'id')->where('is_active', true)],
             'items.*.new_product.sale_price' => ['required_with:items.*.new_product', 'numeric', 'decimal:0,2', 'min:0', 'max:9999999999.99'],
             'items.*.new_product.barcode' => ['nullable', 'string', 'max:64'],
-            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:1000000'],
-            'items.*.unit_cost' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:999999.99'],
-            'items.*.discount' => ['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:999999999999.99'],
+            ...self::itemCostRules('items.*.'),
         ];
+    }
+
+    /**
+     * Quantity, unit cost and discount rules of a purchase item, shared with the initial purchase of a new product.
+     *
+     * @return array<string, list<string>>
+     */
+    public static function itemCostRules(string $prefix = '', bool $required = true): array
+    {
+        $presence = $required ? 'required' : 'nullable';
+
+        return [
+            $prefix.'quantity' => [$presence, 'integer', 'min:1', 'max:1000000'],
+            $prefix.'unit_cost' => [$presence, 'numeric', 'decimal:0,2', 'min:0', 'max:999999.99'],
+            $prefix.'discount' => ['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:999999999999.99'],
+        ];
+    }
+
+    /** @param array{quantity: int|numeric-string, unit_cost: numeric-string, discount?: ?numeric-string} $item */
+    public static function discountExceedsSubtotal(array $item): bool
+    {
+        return BigDecimal::of($item['unit_cost'])->multipliedBy($item['quantity'])->isLessThan($item['discount'] ?? 0);
     }
 
     /** @return list<callable(Validator): void> */
@@ -46,9 +67,7 @@ class PurchaseRequest extends FormRequest
                 }
 
                 foreach ($validator->validated()['items'] as $index => $item) {
-                    $subtotal = BigDecimal::of($item['unit_cost'])->multipliedBy($item['quantity']);
-
-                    if ($subtotal->isLessThan($item['discount'] ?? 0)) {
+                    if (self::discountExceedsSubtotal($item)) {
                         $validator->errors()->add("items.{$index}.discount", 'O desconto não pode ultrapassar o subtotal do item.');
                     }
                 }
@@ -60,6 +79,7 @@ class PurchaseRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'submission_token.*' => 'Recarregue a página antes de registrar a compra.',
             'supplier_id.*' => 'Selecione um fornecedor ativo.',
             'purchased_on.*' => 'Informe uma data de compra válida.',
             'items.required' => 'Adicione pelo menos um item.',

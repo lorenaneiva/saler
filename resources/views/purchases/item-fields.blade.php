@@ -65,5 +65,7 @@
                 <a href="{{ route('categories.index') }}" class="w-fit text-sm text-brand underline sm:col-span-2">Cadastrar categoria</a>
             @endif
         </div>
+        <x-ui.commercial-summary class="mt-3" empty-cost-text="Informe quantidade e custo" />
+        <p class="mt-2 text-xs text-slate-600">Custo calculado com a quantidade, o custo unitário e o desconto deste item. O fornecedor é o da compra.</p>
     </fieldset>
 </div>

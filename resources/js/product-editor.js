@@ -1,35 +1,99 @@
-import { formatProductPrice, parseProductPrice, productMargin } from './product-pricing';
+import { commercialSummary, formatProductPrice, parseProductPrice } from './product-pricing';
 import { focusFormControl, initializeAutocompletes } from './autocomplete';
+import { renderCommercialSummary } from './commercial-summary';
 
-function preparePricing(form) {
-    const price = form.elements.sale_price;
-    const margin = form.querySelector('[data-product-margin]');
-    const initial = price.value;
-    price.type = 'text';
-    price.inputMode = 'decimal';
-    price.value = formatProductPrice(initial);
+/** Money fields use Brazilian formatting while typing and are sent as plain decimals. */
+function prepareMoneyInput(input) {
+    const initial = input.value;
+    input.type = 'text';
+    input.inputMode = 'decimal';
+    input.autocomplete = 'off';
+    input.value = formatProductPrice(initial);
 
-    function update() {
-        const value = parseProductPrice(price.value);
-        price.setCustomValidity(value === null ? 'Informe um preço válido, como 1.234,56.' : '');
-        margin.textContent = productMargin(value, form.dataset.averageCost);
-    }
-
-    price.addEventListener('input', update);
-    price.addEventListener('blur', () => {
-        const value = parseProductPrice(price.value);
+    const validate = () => {
+        const isEmptyOptional = input.value.trim() === '' && !input.required;
+        input.setCustomValidity(isEmptyOptional || parseProductPrice(input.value) !== null ? '' : 'Informe um valor válido, como 1.234,56.');
+    };
+    input.addEventListener('input', validate);
+    input.addEventListener('blur', () => {
+        const value = parseProductPrice(input.value);
         if (value !== null) {
-            price.value = formatProductPrice(value);
+            input.value = formatProductPrice(value);
         }
     });
-    update();
+    validate();
+}
+
+function moneyValue(field) {
+    return field && !field.disabled ? parseProductPrice(field.value) : null;
+}
+
+function prepareProductForm(form) {
+    form.querySelectorAll('[data-money-input]').forEach(prepareMoneyInput);
+
+    const toggle = form.querySelector('[data-initial-purchase-toggle]');
+    const panel = form.querySelector('[data-initial-purchase-panel]');
+    const purchaseFields = form.querySelector('[data-initial-purchase-fields]');
+    const supplier = form.elements.namedItem('supplier_id');
+    const summary = form.querySelector('[data-commercial-summary]');
+    const averageCost = form.dataset.averageCost === '' ? null : form.dataset.averageCost;
+
+    function updateSummary() {
+        const withPurchase = Boolean(toggle?.checked);
+        const quantity = form.elements.namedItem('quantity');
+        renderCommercialSummary(summary, commercialSummary({
+            salePrice: moneyValue(form.elements.namedItem('sale_price')),
+            averageCost,
+            ...(withPurchase ? {
+                quantity: quantity.value.trim() === '' ? null : quantity.value.trim(),
+                unitCost: moneyValue(form.elements.namedItem('unit_cost')),
+                discount: moneyValue(form.elements.namedItem('discount')),
+            } : {}),
+        }));
+    }
+
+    function applyInitialPurchase() {
+        const enabled = toggle.checked;
+        panel.toggleAttribute('data-open', enabled);
+        purchaseFields.disabled = !enabled;
+        supplier.required = enabled;
+        form.querySelector('[data-supplier-optional]').hidden = enabled;
+        form.querySelector('[data-supplier-required]').hidden = !enabled;
+        updateSummary();
+    }
+
+    if (toggle) {
+        toggle.addEventListener('change', () => {
+            applyInitialPurchase();
+            if (toggle.checked) {
+                focusFormControl(supplier.value === '' ? supplier : form.elements.namedItem('quantity'));
+            }
+        });
+        applyInitialPurchase();
+    }
+
+    form.addEventListener('input', updateSummary);
+    form.addEventListener('change', updateSummary);
+    updateSummary();
+}
+
+/** Replaces formatted money values with plain decimals in the data that will be sent. */
+function normalizeMoney(form, body) {
+    form.querySelectorAll('[data-money-input]').forEach((field) => {
+        if (!field.disabled && body.has(field.name)) {
+            body.set(field.name, parseProductPrice(field.value) ?? field.value);
+        }
+    });
+    return body;
 }
 
 export function initializeProductEditor(closeDialog) {
     document.querySelectorAll('[data-product-form]').forEach((form) => {
-        preparePricing(form);
+        prepareProductForm(form);
         form.addEventListener('submit', () => {
-            form.elements.sale_price.value = parseProductPrice(form.elements.sale_price.value);
+            form.querySelectorAll('[data-money-input]').forEach((field) => {
+                field.value = parseProductPrice(field.value) ?? field.value;
+            });
         });
     });
 
@@ -55,10 +119,8 @@ export function initializeProductEditor(closeDialog) {
             return '';
         }
 
-        return JSON.stringify(['name', 'barcode', 'category_id', 'supplier_id', 'sale_price'].map((key) => {
-            const value = form.elements.namedItem(key).value;
-            return key === 'sale_price' ? (parseProductPrice(value) ?? value) : value;
-        }));
+        return JSON.stringify([...normalizeMoney(form, new FormData(form)).entries()]
+            .filter(([key]) => !['_token', '_method', 'submission_token'].includes(key)));
     }
 
     const dirty = () => form && values() !== original;
@@ -132,8 +194,7 @@ export function initializeProductEditor(closeDialog) {
         form.querySelector('[data-product-error]').hidden = true;
         form.querySelectorAll('[aria-invalid]').forEach((field) => field.removeAttribute('aria-invalid'));
         form.querySelectorAll('[data-product-field-error]').forEach((error) => { error.hidden = true; });
-        const body = new FormData(form);
-        body.set('sale_price', parseProductPrice(form.elements.sale_price.value));
+        const body = normalizeMoney(form, new FormData(form));
         saving = true;
         form.setAttribute('aria-busy', 'true');
         const controls = [...form.querySelectorAll('input, select, button')];
@@ -212,7 +273,7 @@ export function initializeProductEditor(closeDialog) {
             initializeAutocompletes(content);
             form = content.querySelector('[data-product-form]');
             if (form) {
-                preparePricing(form);
+                prepareProductForm(form);
                 original = values();
                 form.addEventListener('submit', submit);
                 form.querySelector('[data-product-cancel]').addEventListener('click', (cancelEvent) => {

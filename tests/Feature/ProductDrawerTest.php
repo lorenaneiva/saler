@@ -14,7 +14,7 @@ class ProductDrawerTest extends TestCase
 
     public function test_edit_drawer_loads_current_product_values_and_readonly_availability(): void
     {
-        $product = Product::factory()->create([
+        $product = Product::factory()->withRegisteredCost()->create([
             'name' => 'Arroz <Integral>', 'sale_price' => '12.00', 'average_cost' => '7.5000', 'stock_quantity' => 8,
         ]);
 

@@ -37,7 +37,7 @@
                             {{ $product->stock_quantity }}
                         @endif
                     </td>
-                    <td class="money"><x-ui.money :value="$product->average_cost" /></td>
+                    <td class="money"><x-ui.product-cost :product="$product" /></td>
                 </tr>
             @empty
                 <x-ui.empty :columns="3">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhum produto cadastrado.' }}</x-ui.empty>
