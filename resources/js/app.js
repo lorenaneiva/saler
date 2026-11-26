@@ -1,10 +1,12 @@
 import { initializeProductEditor } from './product-editor';
 import { focusFormControl, initializeAutocompletes, syncAutocomplete } from './autocomplete';
+import { initializeLiveSearch } from './live-search';
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const confirmations = new WeakSet();
 
 initializeAutocompletes();
+initializeLiveSearch();
 
 document.querySelectorAll('[data-inline-editor]').forEach((editor) => {
     const form = editor.querySelector('[data-inline-form]');

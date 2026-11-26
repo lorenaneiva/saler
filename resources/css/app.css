@@ -58,6 +58,7 @@
     .field { @apply rounded-none block min-h-10 w-full min-w-0 border bg-white px-3 py-2 text-sm placeholder:text-slate-500; border-color: #94a3b8; color: var(--ink); box-shadow: 0 0 4px 1px rgb(75 85 99 / 0); transition: border-color var(--duration) ease-in-out, background-color var(--duration) ease-in-out, box-shadow var(--duration) ease-in-out; }
     .field:focus { outline: none; outline-offset: 0; border-color: #64748b; box-shadow: 0 0 4px 1px rgb(75 85 99 / .16); }
     .field[aria-invalid="true"] { @apply border-red-600; }
+    .field:disabled { @apply cursor-not-allowed bg-slate-50 text-slate-500; }
 
     .autocomplete { position: relative; display: block; min-width: 0; width: 100%; }
     [data-autocomplete-source] { display: none !important; }
@@ -131,6 +132,38 @@
     .section-tabs { @apply flex flex-wrap gap-1 border-b; border-color: var(--line); }
     .section-tabs a { @apply border-b-2 border-transparent px-3 py-2 text-sm font-semibold hover:bg-blue-50; transition: background-color var(--duration); }
     .section-tabs [aria-current="page"] { border-color: var(--color-brand); color: var(--color-brand); }
+    .table-section { @apply grid min-w-0; }
+    .table-section-header { @apply flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b px-3 py-2.5 sm:px-4; border-color: var(--line); }
+    .table-section-title { @apply text-base font-semibold; }
+    .table-section-meta { @apply text-xs tabular-nums; color: var(--muted); }
+    .table-section .table-results { transition: opacity var(--duration) ease-in-out; }
+    .table-section:has([aria-busy="true"]) .table-results { opacity: .6; }
+    .table-section .pagination { @apply border-t px-3 py-2 sm:px-4; border-color: var(--line); }
+    .table-search { @apply flex w-full items-center gap-1 sm:w-auto; }
+    .table-search-field { @apply relative block min-w-0 flex-1 sm:w-72 sm:flex-none; }
+    .table-search-field svg { @apply pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2; color: var(--muted); }
+    .table-search-field .field { @apply pl-8; }
+    .table-search-field .field::-webkit-search-cancel-button { display: none; }
+    .data-table .table-totals { @apply border-t text-sm; border-color: var(--line); }
+    .data-table .table-totals :is(th, td) { @apply py-1.5; }
+    .data-table .table-totals tr:first-child :is(th, td) { @apply pt-2.5; }
+    .data-table .table-totals th { @apply text-right font-medium; color: var(--muted); }
+    .data-table .table-totals .table-grand-total { @apply border-t bg-slate-50 text-base; border-color: var(--line); }
+    .data-table .table-totals .table-grand-total :is(th, td) { @apply py-2.5 font-semibold; color: var(--ink); }
+
+    .sale-summary { @apply grid; }
+    .sale-summary-main { @apply flex flex-wrap items-end justify-between gap-x-8 gap-y-3 px-4 py-4 sm:px-5; }
+    .sale-facts { @apply flex min-w-0 flex-wrap gap-x-8 gap-y-3; }
+    .sale-facts dt, .sale-total dt, .sale-status dt { @apply text-xs font-medium; color: var(--muted); }
+    .sale-facts dd { @apply font-semibold; }
+    .sale-total { @apply sm:text-right; }
+    .sale-total dd { @apply text-2xl font-semibold tracking-tight tabular-nums sm:text-[1.75rem]; }
+    .sale-status { @apply grid grid-cols-2 gap-x-6 gap-y-3 border-t px-4 py-3 sm:flex sm:flex-wrap sm:items-start sm:gap-x-10 sm:px-5; border-color: var(--line); background: #f8fafd; }
+    .sale-status dd { @apply mt-0.5 text-sm font-semibold; }
+    .sale-outstanding dt { @apply text-red-800; }
+    .sale-outstanding dd { @apply text-base text-red-800; }
+    .sale-notes { @apply border-t px-4 py-3 text-sm whitespace-pre-wrap wrap-anywhere text-slate-700 sm:px-5; border-color: var(--line); }
+
     .metrics { @apply grid grid-cols-2 divide-x divide-y overflow-hidden border bg-white sm:grid-cols-4 sm:divide-y-0; border-color: var(--line); }
     .metric { @apply min-w-0 border-slate-200 px-3 py-2.5 sm:px-4; }
     .metric dt { @apply text-xs font-medium; color: var(--muted); }

@@ -49,7 +49,7 @@ class SaleController extends Controller
             'customer:id,name',
             'items' => fn ($items) => $request->filter($items, ['product.name', 'product.barcode'], 'q_itens')
                 ->with('product:id,name'),
-        ])->loadSum('paymentAllocations as paid_total', 'amount');
+        ])->loadCount(['items', 'payments'])->loadSum('paymentAllocations as paid_total', 'amount');
 
         return view('sales.show', [
             'sale' => $sale,
