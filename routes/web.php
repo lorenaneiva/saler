@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AutocompleteController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPaymentController;
@@ -18,6 +19,7 @@ Route::middleware('guest')->group(function (): void {
 });
 
 Route::middleware('auth')->group(function (): void {
+    Route::get('/opcoes/{source}', AutocompleteController::class)->name('autocomplete.options');
     Route::view('/', 'dashboard')->name('dashboard');
     Route::resource('categorias', CategoryController::class)
         ->parameters(['categorias' => 'category'])

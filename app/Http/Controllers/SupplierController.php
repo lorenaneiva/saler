@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ListSearchRequest;
 use App\Http\Requests\SupplierRequest;
 use App\Models\Supplier;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -35,9 +36,15 @@ class SupplierController extends Controller
         return view('suppliers.form', compact('supplier'));
     }
 
-    public function update(SupplierRequest $request, Supplier $supplier): RedirectResponse
+    public function update(SupplierRequest $request, Supplier $supplier): RedirectResponse|JsonResponse
     {
         $supplier->update($request->validated());
+
+        if ($request->expectsJson()) {
+            $request->session()->flash('status', 'Fornecedor atualizado.');
+
+            return response()->json(['message' => 'Fornecedor atualizado.']);
+        }
 
         return to_route('suppliers.index')->with('status', 'Fornecedor atualizado.');
     }

@@ -18,6 +18,7 @@
         --duration: 180ms;
     }
 
+    html { scrollbar-gutter: stable; }
     body { background: var(--surface); color: var(--ink); }
     :focus-visible { outline: 2px solid var(--color-brand); outline-offset: 3px; }
 }
@@ -54,9 +55,29 @@
     .form-grid { @apply grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-3; }
     .filter-bar { @apply grid items-end gap-3 p-3 sm:grid-cols-2 xl:grid-cols-[minmax(13rem,1.5fr)_repeat(3,minmax(7rem,1fr))_auto]; }
     .filter-bar label { @apply grid gap-1 text-sm font-medium; }
-    .field { @apply rounded-none block min-h-10 w-full min-w-0 border bg-white px-3 py-2 text-sm placeholder:text-slate-500; border-color: #94a3b8; color: var(--ink); transition: border-color var(--duration), background-color var(--duration); }
-    .field:focus { border-color: var(--color-brand); }
+    .field { @apply rounded-none block min-h-10 w-full min-w-0 border bg-white px-3 py-2 text-sm placeholder:text-slate-500; border-color: #94a3b8; color: var(--ink); box-shadow: 0 0 4px 1px rgb(75 85 99 / 0); transition: border-color var(--duration) ease-in-out, background-color var(--duration) ease-in-out, box-shadow var(--duration) ease-in-out; }
+    .field:focus { outline: none; outline-offset: 0; border-color: #64748b; box-shadow: 0 0 4px 1px rgb(75 85 99 / .16); }
     .field[aria-invalid="true"] { @apply border-red-600; }
+
+    .autocomplete { position: relative; display: block; min-width: 0; width: 100%; }
+    [data-autocomplete-source] { display: none !important; }
+    .autocomplete-input { padding-right: 2.5rem; text-overflow: ellipsis; }
+    .autocomplete.has-clear .autocomplete-input { padding-right: 4.5rem; }
+    .autocomplete-input:disabled { @apply cursor-not-allowed bg-slate-50 text-slate-500; }
+    .autocomplete-toggle, .autocomplete-clear { @apply absolute top-0 flex h-10 w-9 items-center justify-center border-0 bg-transparent text-slate-500; cursor: pointer; }
+    .autocomplete-toggle { right: 0; }
+    .data-table .autocomplete :is(.autocomplete-toggle, .autocomplete-clear) { position: absolute; }
+    .autocomplete-clear { @apply text-lg hover:text-slate-900; right: 2rem; }
+    .autocomplete-toggle svg { width: 1rem; height: 1rem; transition: transform var(--duration) ease-in-out; }
+    .autocomplete[data-open] .autocomplete-toggle svg { transform: rotate(180deg); }
+    .autocomplete-popup { position: fixed; inset: auto; z-index: 100; margin: 0; padding: .25rem; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--line); border-radius: 0; background: white; color: var(--ink); box-shadow: 0 4px 14px rgb(75 85 99 / .14); animation: autocomplete-in var(--duration) ease-in-out; }
+    .autocomplete-popup[data-closing] { pointer-events: none; animation: autocomplete-out var(--duration) ease-in-out forwards; }
+    .autocomplete-option { @apply flex min-h-10 cursor-pointer items-center px-3 py-2 text-left text-sm font-normal; overflow-wrap: anywhere; }
+    .autocomplete-option[aria-selected="true"] { @apply bg-slate-100 font-semibold text-brand; }
+    .autocomplete-option[aria-selected="true"]::after { content: '✓'; margin-left: auto; padding-left: .75rem; }
+    .autocomplete-option[data-active] { @apply bg-blue-50; box-shadow: inset 2px 0 var(--color-brand); }
+    .autocomplete-message { @apply px-3 py-3 text-sm font-normal text-slate-600; }
+    .autocomplete-more { @apply min-h-10 w-full px-3 py-2 text-left text-sm font-medium text-brand hover:bg-slate-50; }
 
     .button-primary, .button-secondary, .button-danger, .button-quiet, .icon-button { @apply rounded-none inline-flex min-h-10 w-fit cursor-pointer items-center justify-center gap-2 border px-3 py-1.5 text-sm font-semibold whitespace-nowrap; transition: background-color var(--duration), color var(--duration), opacity var(--duration); }
     .button-primary { @apply border-transparent text-white; background: var(--color-brand); }
@@ -118,6 +139,22 @@
     .dialog-header { @apply sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-2.5 sm:px-5; }
     .dialog-header h2 { @apply text-lg font-semibold; }
     .dialog-body { @apply grid gap-4 p-4 sm:p-5; }
+    .product-editor { width: min(100%, 460px); overflow: hidden; }
+    .product-editor::backdrop { background: rgb(15 29 52 / .25); }
+    .product-editor .dialog-content { display: flex; height: 100%; flex-direction: column; }
+    .product-editor .dialog-header { flex: none; }
+    .product-editor .dialog-body { display: flex; flex: 1; min-height: 0; padding: 0; }
+    .product-editor [data-product-editor-content] { display: flex; flex: 1; min-width: 0; min-height: 0; flex-direction: column; overflow-y: auto; }
+    .product-form { display: flex; flex: 1; min-height: 0; flex-direction: column; }
+    .product-form-fields { @apply grid gap-5 p-4 sm:p-5; overflow-y: auto; overscroll-behavior: contain; }
+    .product-field-group { @apply grid min-w-0 gap-3; }
+    .product-field-group legend { @apply mb-2 text-sm font-semibold; }
+    .product-field-group label { @apply text-sm font-medium; }
+    .product-readonly { @apply border border-slate-200 bg-slate-50 p-3 text-sm; }
+    .product-readonly dt { @apply text-xs text-slate-600; }
+    .product-readonly dd { @apply mt-1 font-semibold tabular-nums; }
+    .product-form-footer { @apply flex flex-none justify-end gap-2 border-t border-slate-200 bg-white px-4 py-3 sm:px-5; margin-top: auto; padding-bottom: max(.75rem, env(safe-area-inset-bottom)); }
+    .product-feedback { @apply fixed right-4 bottom-4 z-30 max-w-sm shadow-md; max-width: calc(100vw - 2rem); }
     .login-shell { @apply grid min-h-dvh place-items-center px-4 py-8; }
     .login-panel { @apply grid w-full max-w-md gap-5 p-5 sm:p-7; }
 }
@@ -127,7 +164,14 @@
 @keyframes draw-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
 @keyframes draw-out { to { transform: translateX(100%); } }
 @keyframes spin { to { transform: rotate(360deg); } }
+@keyframes autocomplete-in { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes autocomplete-out { to { opacity: 0; transform: translateY(-3px); } }
 
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+
+@media (forced-colors: active) {
+    .field:focus { outline: 2px solid Highlight; outline-offset: 0; }
+    .autocomplete-option[data-active] { outline: 1px solid Highlight; outline-offset: -1px; }
 }

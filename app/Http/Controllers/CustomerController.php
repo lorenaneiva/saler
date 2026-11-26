@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\PaymentAllocation;
 use App\Models\Sale;
 use Brick\Math\BigDecimal;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -82,9 +83,15 @@ class CustomerController extends Controller
         return view('customers.form', compact('customer'));
     }
 
-    public function update(CustomerRequest $request, Customer $customer): RedirectResponse
+    public function update(CustomerRequest $request, Customer $customer): RedirectResponse|JsonResponse
     {
         $customer->update($request->validated());
+
+        if ($request->expectsJson()) {
+            $request->session()->flash('status', 'Cliente atualizado.');
+
+            return response()->json(['message' => 'Cliente atualizado.']);
+        }
 
         return to_route('customers.show', $customer)->with('status', 'Cliente atualizado.');
     }

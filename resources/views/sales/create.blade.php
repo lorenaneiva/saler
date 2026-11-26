@@ -21,7 +21,7 @@
             <div class="grid gap-4 sm:grid-cols-2">
                 <div class="grid gap-2">
                     <label for="sale-customer" class="font-medium">Cliente <x-required-mark /></label>
-                    <select id="sale-customer" name="customer_id" class="field" required>
+                    <select id="sale-customer" name="customer_id" class="field" required data-autocomplete-url="{{ route('autocomplete.options', 'customers') }}">
                         <option value="">Selecione</option>
                         @foreach ($customers as $customer)
                             <option value="{{ $customer->id }}" @selected(old('customer_id') == $customer->id)>{{ $customer->name }}</option>

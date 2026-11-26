@@ -3,7 +3,7 @@
 <div data-item-row class="grid gap-3 border border-slate-200 p-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto] sm:items-end">
     <label class="grid gap-2 text-sm font-medium">
         <span>Produto <x-required-mark /></span>
-        <select name="items[{{ $index }}][product_id]" data-item-field="product_id" class="field" required>
+        <select name="items[{{ $index }}][product_id]" data-item-field="product_id" class="field" required data-autocomplete-url="{{ route('autocomplete.options', 'sale-products') }}">
             <option value="">Selecione</option>
             @foreach ($products as $product)
                 <option value="{{ $product->id }}" @selected(($item['product_id'] ?? null) == $product->id)>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\CancelPurchase;
 use App\Actions\ConfirmPurchase;
+use App\Actions\LoadAutocompleteOptions;
 use App\Http\Requests\ListSearchRequest;
 use App\Http\Requests\PurchaseRequest;
 use App\Models\Category;
@@ -26,12 +27,15 @@ class PurchaseController extends Controller
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request, LoadAutocompleteOptions $options): View
     {
+        $previousItems = $request->old('items', []);
+        $productIds = is_array($previousItems) ? collect($previousItems)->pluck('product_id')->all() : [];
+
         return view('purchases.create', [
             'categories' => Category::query()->orderBy('name')->orderBy('id')->get(['id', 'name']),
             'suppliers' => Supplier::query()->where('is_active', true)->orderBy('name')->orderBy('id')->get(['id', 'name']),
-            'products' => Product::query()->where('is_active', true)->orderBy('name')->orderBy('id')->get(['id', 'name']),
+            'products' => $options->handle(Product::query()->where('is_active', true), $productIds, ['id', 'name']),
         ]);
     }
 

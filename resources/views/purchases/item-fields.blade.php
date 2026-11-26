@@ -8,12 +8,12 @@
     <div class="flex flex-wrap items-end gap-2">
         <label class="grid min-w-0 flex-1 gap-2 text-sm font-medium">
             <span>Produto <x-required-mark /></span>
-            <select @if (! $creatingProduct) name="items[{{ $index }}][product_id]" @endif data-product-select class="field" required>
+            <select @if (! $creatingProduct) name="items[{{ $index }}][product_id]" @endif data-product-select class="field" required data-autocomplete-url="{{ route('autocomplete.options', 'purchase-products') }}">
                 <option value="">Selecione</option>
                 @foreach ($products as $product)
                     <option value="{{ $product->id }}" @selected(! $creatingProduct && ($item['product_id'] ?? null) == $product->id)>{{ $product->name }}</option>
                 @endforeach
-                <option value="new" @selected($creatingProduct)>Cadastrar novo produto</option>
+                <option value="new" data-autocomplete-pinned @selected($creatingProduct)>Cadastrar novo produto</option>
             </select>
         </label>
         <button type="button" data-create-product class="button-secondary" @if ($creatingProduct) hidden @endif>

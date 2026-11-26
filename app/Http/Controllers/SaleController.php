@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\LoadAutocompleteOptions;
 use App\Actions\RegisterSale;
 use App\Http\Requests\ListSearchRequest;
 use App\Http\Requests\SaleRequest;
@@ -10,6 +11,7 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Sale;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class SaleController extends Controller
@@ -22,12 +24,15 @@ class SaleController extends Controller
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request, LoadAutocompleteOptions $options): View
     {
+        $previousItems = $request->old('items', []);
+        $productIds = is_array($previousItems) ? collect($previousItems)->pluck('product_id')->all() : [];
+
         return view('sales.create', [
-            'customers' => Customer::query()->orderBy('name')->orderBy('id')->get(['id', 'name']),
-            'products' => Product::query()->where('is_active', true)->where('stock_quantity', '>', 0)
-                ->orderBy('name')->orderBy('id')->get(['id', 'name', 'sale_price', 'stock_quantity']),
+            'customers' => $options->handle(Customer::query(), [$request->old('customer_id')], ['id', 'name']),
+            'products' => $options->handle(Product::query()->where('is_active', true)->where('stock_quantity', '>', 0),
+                $productIds, ['id', 'name', 'sale_price', 'stock_quantity']),
         ]);
     }
 

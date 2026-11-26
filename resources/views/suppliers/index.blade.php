@@ -23,17 +23,24 @@
         </thead>
         <tbody>
             @forelse ($suppliers as $supplier)
-                <tr>
-                    <th scope="row" class="min-w-36 wrap-anywhere font-semibold">{{ $supplier->name }}</th>
-                    <td class="min-w-32 wrap-anywhere">{{ $supplier->contact }}</td>
-                    <td class="min-w-32 wrap-anywhere">{{ $supplier->representative ?? '—' }}</td>
+                @php($editForm = 'supplier-'.$supplier->id)
+                <tr data-inline-editor>
+                    <th scope="row" class="min-w-36 wrap-anywhere font-semibold">
+                        <x-ui.inline-field :form="$editForm" name="name" label="Nome" :value="$supplier->name" required maxlength="255" />
+                    </th>
+                    <td class="min-w-32 wrap-anywhere">
+                        <x-ui.inline-field :form="$editForm" name="contact" label="Contato" :value="$supplier->contact" required maxlength="255" />
+                    </td>
+                    <td class="min-w-32 wrap-anywhere">
+                        <x-ui.inline-field :form="$editForm" name="representative" label="Representante (opcional)" :value="$supplier->representative" maxlength="255" />
+                    </td>
                     <td>
                         <x-ui.badge :tone="$supplier->is_active ? 'success' : 'neutral'">{{ $supplier->is_active ? 'Ativo' : 'Inativo' }}</x-ui.badge>
                     </td>
                     <td>
                         <div class="row-actions">
-                            <a data-row-link href="{{ route('suppliers.edit', $supplier) }}" aria-label="Editar {{ $supplier->name }}" class="button-quiet button-small">Editar</a>
-                            <form method="POST" action="{{ $supplier->is_active ? route('suppliers.destroy', $supplier) : route('suppliers.activate', $supplier) }}"
+                            <x-ui.inline-actions :id="$editForm" :action="route('suppliers.update', $supplier)" :label="'Editar '.$supplier->name" />
+                            <form data-inline-display method="POST" action="{{ $supplier->is_active ? route('suppliers.destroy', $supplier) : route('suppliers.activate', $supplier) }}"
                                 @if ($supplier->is_active) data-confirm="Desativar o fornecedor {{ $supplier->name }}?" @endif>
                                 @csrf
                                 @method($supplier->is_active ? 'DELETE' : 'PATCH')

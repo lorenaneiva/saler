@@ -1,8 +1,110 @@
+import { initializeProductEditor } from './product-editor';
+import { focusFormControl, initializeAutocompletes, syncAutocomplete } from './autocomplete';
+
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const confirmations = new WeakSet();
 
+initializeAutocompletes();
+
+document.querySelectorAll('[data-inline-editor]').forEach((editor) => {
+    const form = editor.querySelector('[data-inline-form]');
+    const start = editor.querySelector('[data-inline-start]');
+    const cancel = editor.querySelector('[data-inline-cancel]');
+    const status = editor.querySelector('[data-inline-status]');
+    const fields = Array.from(form.elements).filter((field) => field.matches('input:not([type="hidden"]), select, textarea'));
+    let saving = false;
+
+    function clearErrors() {
+        status.hidden = true;
+        status.textContent = '';
+        fields.forEach((field) => field.removeAttribute('aria-invalid'));
+        editor.querySelectorAll('[data-inline-error]').forEach((error) => {
+            error.textContent = '';
+            error.hidden = true;
+        });
+    }
+
+    function toggleEditing(editing) {
+        editor.querySelectorAll('[data-inline-display]').forEach((element) => { element.hidden = editing; });
+        editor.querySelectorAll('[data-inline-input]').forEach((element) => { element.hidden = !editing; });
+        fields.forEach((field) => { field.disabled = !editing; });
+        document.querySelectorAll('[data-inline-start]').forEach((button) => { button.disabled = editing; });
+        clearErrors();
+        if (editing) {
+            focusFormControl(fields[0]);
+        } else {
+            start.focus();
+        }
+    }
+
+    start.addEventListener('click', () => toggleEditing(true));
+    cancel.addEventListener('click', () => {
+        if (!saving) {
+            form.reset();
+            toggleEditing(false);
+        }
+    });
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (saving) {
+            return;
+        }
+
+        clearErrors();
+        const body = new FormData(form);
+        saving = true;
+        form.setAttribute('aria-busy', 'true');
+        form.querySelectorAll('button').forEach((button) => { button.disabled = true; });
+        fields.forEach((field) => { field.disabled = true; });
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body,
+                headers: { Accept: 'application/json' },
+            });
+            if (response.ok) {
+                window.location.reload();
+                return;
+            }
+
+            if (response.status === 422) {
+                const result = await response.json();
+                editor.querySelectorAll('[data-inline-error]').forEach((error) => {
+                    const messages = result.errors?.[error.dataset.inlineError];
+                    if (messages?.length) {
+                        error.textContent = messages.join(' ');
+                        error.hidden = false;
+                        form.elements.namedItem(error.dataset.inlineError)?.setAttribute('aria-invalid', 'true');
+                    }
+                });
+                status.textContent = 'Revise os campos indicados antes de salvar.';
+            } else if (response.status === 401 || response.status === 419) {
+                status.textContent = 'Sua sessão expirou. Abra o sistema em outra aba, entre novamente e tente salvar.';
+            } else {
+                status.textContent = 'Não foi possível salvar. Seus dados foram mantidos; tente novamente.';
+            }
+        } catch {
+            status.textContent = 'Não foi possível confirmar o salvamento. Verifique sua conexão e tente novamente.';
+        } finally {
+            saving = false;
+            form.removeAttribute('aria-busy');
+            form.querySelectorAll('button').forEach((button) => { button.disabled = false; });
+            fields.forEach((field) => { field.disabled = false; });
+        }
+
+        status.hidden = false;
+        focusFormControl(fields.find((field) => field.hasAttribute('aria-invalid')) ?? status);
+    });
+});
+
 function closeDialog(dialog) {
     if (dialog.hasAttribute('data-closing')) {
+        return;
+    }
+
+    if (!dialog.dispatchEvent(new CustomEvent('dialog:before-close', { cancelable: true }))) {
         return;
     }
 
@@ -21,6 +123,8 @@ function closeDialog(dialog) {
 
     Promise.allSettled(dialog.getAnimations().map((animation) => animation.finished)).then(finish);
 }
+
+initializeProductEditor(closeDialog);
 
 document.querySelectorAll('dialog').forEach((dialog) => {
     dialog.addEventListener('cancel', (event) => {
@@ -184,6 +288,7 @@ document.querySelectorAll('[data-line-editor]').forEach((editor) => {
                 productFields.querySelectorAll('[data-new-product-field]').forEach((field) => {
                     field.name = `items[${index}][new_product][${field.dataset.newProductField}]`;
                 });
+                syncAutocomplete(productSelect);
             }
 
             row.querySelector('[data-remove-item]').disabled = rows.length === 1;
@@ -194,8 +299,9 @@ document.querySelectorAll('[data-line-editor]').forEach((editor) => {
 
     addItem.addEventListener('click', () => {
         items.append(template.content.cloneNode(true));
+        initializeAutocompletes(items.lastElementChild);
         updateRows();
-        items.lastElementChild.querySelector('select').focus();
+        focusFormControl(items.lastElementChild.querySelector('select'));
     });
 
     items.addEventListener('change', (event) => {

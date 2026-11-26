@@ -9,6 +9,7 @@ use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -40,12 +41,16 @@ class ProductController extends Controller
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request): View|JsonResponse
     {
+        if ($request->expectsJson()) {
+            return response()->json(['html' => view('products.editor', $this->formData(new Product))->render()]);
+        }
+
         return view('products.form', $this->formData(new Product));
     }
 
-    public function store(ProductRequest $request): RedirectResponse
+    public function store(ProductRequest $request): RedirectResponse|JsonResponse
     {
         try {
             Product::query()->create($request->validated());
@@ -57,15 +62,23 @@ class ProductController extends Controller
             throw ValidationException::withMessages(['category_id' => 'Verifique se a categoria e o fornecedor selecionados ainda existem.']);
         }
 
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Produto cadastrado.'], 201);
+        }
+
         return to_route('products.index')->with('status', 'Produto cadastrado.');
     }
 
-    public function edit(Product $product): View
+    public function edit(Request $request, Product $product): View|JsonResponse
     {
+        if ($request->expectsJson()) {
+            return response()->json(['html' => view('products.editor', $this->formData($product))->render()]);
+        }
+
         return view('products.form', $this->formData($product));
     }
 
-    public function update(ProductRequest $request, Product $product): RedirectResponse
+    public function update(ProductRequest $request, Product $product): RedirectResponse|JsonResponse
     {
         try {
             $product->update($request->validated());
@@ -75,6 +88,10 @@ class ProductController extends Controller
             }
 
             throw ValidationException::withMessages(['category_id' => 'Verifique se a categoria e o fornecedor selecionados ainda existem.']);
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Produto atualizado.']);
         }
 
         return to_route('products.index')->with('status', 'Produto atualizado.');

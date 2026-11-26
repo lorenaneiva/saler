@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -38,9 +39,15 @@ class CategoryController extends Controller
         return view('categories.edit', compact('category'));
     }
 
-    public function update(CategoryRequest $request, Category $category): RedirectResponse
+    public function update(CategoryRequest $request, Category $category): RedirectResponse|JsonResponse
     {
         $category->update($request->validated());
+
+        if ($request->expectsJson()) {
+            $request->session()->flash('status', 'Categoria atualizada.');
+
+            return response()->json(['message' => 'Categoria atualizada.']);
+        }
 
         return to_route('categories.index')->with('status', 'Categoria atualizada.');
     }

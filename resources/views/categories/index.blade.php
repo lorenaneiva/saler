@@ -21,8 +21,11 @@
         </thead>
         <tbody>
             @forelse ($categories as $category)
-                <tr>
-                    <th scope="row" class="wrap-anywhere font-semibold">{{ $category->name }}</th>
+                @php($editForm = 'category-'.$category->id)
+                <tr data-inline-editor>
+                    <th scope="row" class="wrap-anywhere font-semibold">
+                        <x-ui.inline-field :form="$editForm" name="name" label="Categoria" :value="$category->name" required maxlength="255" />
+                    </th>
                     <td class="numeric">
                         @if ($category->products_count)
                             <a href="{{ route('products.index', ['categoria' => $category->id]) }}">{{ $category->products_count }}</a>
@@ -32,10 +35,9 @@
                     </td>
                     <td>
                         <div class="row-actions">
-                            <a data-row-link href="{{ route('categories.edit', $category) }}" class="button-quiet button-small"
-                                aria-label="Editar {{ $category->name }}">Editar</a>
+                            <x-ui.inline-actions :id="$editForm" :action="route('categories.update', $category)" :label="'Editar '.$category->name" />
                             @if ($category->products_count === 0)
-                                <form method="POST" action="{{ route('categories.destroy', $category) }}"
+                                <form data-inline-display method="POST" action="{{ route('categories.destroy', $category) }}"
                                     data-confirm="Excluir a categoria {{ $category->name }}?">
                                     @csrf
                                     @method('DELETE')
