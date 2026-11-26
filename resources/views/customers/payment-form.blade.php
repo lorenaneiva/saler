@@ -39,10 +39,22 @@
             <span>Observação (opcional)</span>
             <textarea name="notes" maxlength="2000" rows="2" class="field">{{ is_string($notes) ? $notes : '' }}</textarea>
         </label>
-        <div class="grid gap-1 text-sm">
-            <output class="font-semibold" data-payment-preview="{{ $outstandingTotal }}" aria-live="polite"></output>
-            <p class="text-slate-600">{{ $allocationHint ?? 'O pagamento abate primeiro a compra mais antiga.' }}</p>
-        </div>
+        @isset($distributionPreviewUrl)
+            <section class="payment-distribution" aria-labelledby="payment-distribution-title">
+                <div>
+                    <h3 id="payment-distribution-title" class="text-sm font-semibold">Distribuição do pagamento</h3>
+                    <p class="text-xs text-slate-600">O pagamento será distribuído automaticamente, priorizando a quitação das compras com menor saldo em aberto.</p>
+                </div>
+                <div class="payment-distribution-content" data-payment-distribution="{{ $distributionPreviewUrl }}" aria-live="polite">
+                    @include('customers.payment-distribution', ['distribution' => null])
+                </div>
+            </section>
+        @else
+            <div class="grid gap-1 text-sm">
+                <output class="font-semibold" data-payment-preview="{{ $outstandingTotal }}" aria-live="polite"></output>
+                <p class="text-slate-600">{{ $allocationHint }}</p>
+            </div>
+        @endisset
         <div class="page-actions">
             <button class="button-primary">Registrar pagamento</button>
             <button type="button" class="button-secondary" data-dialog-close>Cancelar</button>

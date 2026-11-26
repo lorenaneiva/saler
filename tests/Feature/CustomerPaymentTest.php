@@ -19,7 +19,7 @@ class CustomerPaymentTest extends TestCase
         $this->post(route('customers.payments.store', 1))->assertRedirectToRoute('login');
     }
 
-    public function test_single_payment_settles_the_oldest_purchase_then_partly_pays_the_next(): void
+    public function test_single_payment_settles_the_smallest_balance_first_then_partly_pays_the_next(): void
     {
         $customer = Customer::factory()->create();
         $user = User::factory()->create();
@@ -39,8 +39,8 @@ class CustomerPaymentTest extends TestCase
             'id' => $payment->id, 'customer_id' => $customer->id, 'user_id' => $user->id,
             'amount' => '600.00', 'method' => 'pix', 'notes' => 'Pix recebido no balcão',
         ]);
-        $this->assertDatabaseHas('payment_allocations', ['payment_id' => $payment->id, 'sale_id' => $olderSale->id, 'amount' => '500.00']);
-        $this->assertDatabaseHas('payment_allocations', ['payment_id' => $payment->id, 'sale_id' => $newerSale->id, 'amount' => '100.00']);
+        $this->assertDatabaseHas('payment_allocations', ['payment_id' => $payment->id, 'sale_id' => $newerSale->id, 'amount' => '200.00']);
+        $this->assertDatabaseHas('payment_allocations', ['payment_id' => $payment->id, 'sale_id' => $olderSale->id, 'amount' => '400.00']);
         $this->assertDatabaseCount('payment_allocations', 2);
 
         $this->get(route('customers.show', $customer))->assertOk()
@@ -50,20 +50,19 @@ class CustomerPaymentTest extends TestCase
         $this->get(route('customers.show', [$customer, 'secao' => 'pagamentos']))->assertOk()
             ->assertSee('Histórico de pagamentos')->assertSee('Pix recebido no balcão');
 
-        $this->get(route('sales.show', $olderSale))->assertOk()
-            ->assertSeeTextInOrder(['Quitada', 'Valor pago', 'R$ 500,00', 'Saldo em aberto', 'R$ 0,00'])
-            ->assertSeeTextInOrder(['Valor abatido nesta venda', (string) $payment->id, '24/11/2026', 'Pix', 'R$ 500,00'])
+        $this->get(route('sales.show', $newerSale))->assertOk()
+            ->assertSeeTextInOrder(['Quitada', 'Valor pago', 'R$ 200,00', 'Saldo em aberto', 'R$ 0,00'])
+            ->assertSeeTextInOrder(['Valor abatido nesta venda', (string) $payment->id, '24/11/2026', 'Pix', 'R$ 200,00'])
             ->assertDontSeeText('R$ 600,00');
 
-        $this->get(route('sales.show', $newerSale))->assertOk()
-            ->assertSeeTextInOrder(['Parcialmente paga', 'Valor pago', 'R$ 100,00', 'Saldo em aberto', 'R$ 100,00'])
-            ->assertSeeTextInOrder(['Valor abatido nesta venda', (string) $payment->id, 'Pix', 'R$ 100,00'])
-            ->assertDontSeeText('R$ 500,00');
+        $this->get(route('sales.show', $olderSale))->assertOk()
+            ->assertSeeTextInOrder(['Parcialmente paga', 'Valor pago', 'R$ 400,00', 'Saldo em aberto', 'R$ 100,00'])
+            ->assertSeeTextInOrder(['Valor abatido nesta venda', (string) $payment->id, 'Pix', 'R$ 400,00']);
 
         $this->get(route('sales.index'))->assertOk()->assertSeeText('Quitada')->assertSeeText('Parcialmente paga');
     }
 
-    public function test_repeated_submission_is_recorded_once_and_only_reduces_the_oldest_debt(): void
+    public function test_repeated_submission_is_recorded_once_and_only_reduces_the_smallest_debt(): void
     {
         $customer = Customer::factory()->create();
         $olderSale = Sale::factory()->for($customer)->create(['sold_on' => '2026-11-10', 'subtotal' => '500.00', 'total' => '500.00']);
@@ -76,8 +75,8 @@ class CustomerPaymentTest extends TestCase
 
         $this->assertDatabaseCount('payments', 1);
         $this->assertDatabaseCount('payment_allocations', 1);
-        $this->assertDatabaseHas('payment_allocations', ['sale_id' => $olderSale->id, 'amount' => '100.00']);
-        $this->assertDatabaseMissing('payment_allocations', ['sale_id' => $newerSale->id]);
+        $this->assertDatabaseHas('payment_allocations', ['sale_id' => $newerSale->id, 'amount' => '100.00']);
+        $this->assertDatabaseMissing('payment_allocations', ['sale_id' => $olderSale->id]);
         $this->get(route('customers.show', $customer))->assertOk()->assertSeeTextInOrder(['Saldo em aberto', 'R$ 600,00']);
     }
 

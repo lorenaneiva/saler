@@ -76,7 +76,7 @@
 
     @if ($outstandingTotal !== '0.00' || $errors->any())
         <x-ui.dialog id="customer-payment" title="Registrar pagamento" :auto-open="$errors->any()" drawer inline-fallback>
-            @include('customers.payment-form', ['action' => route('customers.payments.store', $customer)])
+            @include('customers.payment-form', ['action' => route('customers.payments.store', $customer), 'distributionPreviewUrl' => route('customers.payments.preview', $customer)])
         </x-ui.dialog>
     @endif
 @endsection

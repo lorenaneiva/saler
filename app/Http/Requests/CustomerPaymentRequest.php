@@ -17,6 +17,7 @@ class CustomerPaymentRequest extends FormRequest
             'paid_on' => ['required', 'date_format:Y-m-d', 'after_or_equal:0001-01-01', 'before_or_equal:today'],
             'method' => ['required', Rule::in(array_keys(Payment::Methods))],
             'notes' => ['nullable', 'string', 'max:2000'],
+            'distribution_signature' => ['nullable', 'string', 'size:40'],
         ];
     }
 
@@ -30,6 +31,7 @@ class CustomerPaymentRequest extends FormRequest
             'method.*' => 'Selecione uma forma de pagamento.',
             'notes.max' => 'A observação deve ter até 2.000 caracteres.',
             'notes.string' => 'A observação deve ser um texto.',
+            'distribution_signature.*' => 'Revise a distribuição do pagamento e confirme novamente.',
         ];
     }
 }

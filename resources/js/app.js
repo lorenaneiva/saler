@@ -1,12 +1,14 @@
 import { initializeProductEditor } from './product-editor';
 import { focusFormControl, initializeAutocompletes, syncAutocomplete } from './autocomplete';
 import { fetchLivePage, initializeLiveSearch, replaceLiveRegions } from './live-search';
+import { initializePaymentDistributions } from './payment-distribution';
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const confirmations = new WeakSet();
 
 initializeAutocompletes();
 initializeLiveSearch();
+initializePaymentDistributions();
 
 document.querySelectorAll('[data-inline-editor]').forEach(initializeInlineEditor);
 

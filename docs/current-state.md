@@ -9,7 +9,7 @@ Revisão documental do código, testes, migrations, requisitos e histórico Git 
 - Compra com múltiplos itens, cadastro de produto pela compra, desconto, atualização imediata de estoque/custo médio e cancelamento com reversão condicionada a saldo (`PurchaseTest`). Há estados pending/confirmed/cancelled, embora o fluxo de criação confirme imediatamente.
 - Consulta de estoque, histórico de movimentos, motivos e entradas/saídas manuais com auditoria (`StockTest`).
 - Venda com múltiplos itens, snapshots de preço/custo, desconto, baixa de estoque e rejeição atômica por saldo insuficiente (`SaleTest`).
-- Pagamentos de cliente com métodos definidos, alocação automática da dívida mais antiga, saldo em aberto, idempotência da submissão e rejeição de excesso (`CustomerPaymentTest`). Perfil apresenta compra/pagamento e resumo financeiro.
+- Pagamentos de cliente com métodos definidos, alocação automática priorizando a quitação das compras com menor saldo (com prévia da distribuição no drawer), pagamento direto por venda, saldo em aberto, idempotência da submissão e rejeição de excesso (`CustomerPaymentTest`). Perfil apresenta compra/pagamento e resumo financeiro.
 - Combobox/autocomplete global com busca local/assíncrona; drawer de produto reaproveita formulário; busca nas listagens (`AutocompleteTest`, `ListSearchTest`).
 - Componente comum de moeda com saída de duas casas brasileiras (`MoneyFormattingTest`) e cálculos JS de preço/margem cobertos por testes unitários.
 

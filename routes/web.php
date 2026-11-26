@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function (): void {
         ->parameters(['produtos' => 'product'])
         ->names('products')
         ->except('show');
+    Route::get('/clientes/{customer}/pagamentos/previa', [CustomerPaymentController::class, 'preview'])->name('customers.payments.preview');
     Route::post('/clientes/{customer}/pagamentos', [CustomerPaymentController::class, 'store'])->name('customers.payments.store');
     Route::resource('clientes', CustomerController::class)
         ->parameters(['clientes' => 'customer'])

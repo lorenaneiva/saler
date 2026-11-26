@@ -6,15 +6,18 @@ use App\Models\Customer;
 use App\Models\Sale;
 use App\Models\User;
 use Brick\Math\BigDecimal;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class RegisterCustomerPayment
 {
+    public function __construct(private PlanPaymentDistribution $planDistribution) {}
+
     /**
-     * Registers a customer payment, allocating it to the oldest open sales or exclusively to the given sale.
+     * Registers a customer payment, spreading it over the open sales with the smallest balances or exclusively to the given sale.
      *
-     * @param  array{submission_token: string, amount: int|float|numeric-string, paid_on: string, method: string, notes?: ?string}  $data
+     * @param  array{submission_token: string, amount: int|float|numeric-string, paid_on: string, method: string, notes?: ?string, distribution_signature?: ?string}  $data
      */
     public function handle(Customer $customer, User $user, array $data, ?Sale $targetSale = null): void
     {
@@ -27,44 +30,31 @@ class RegisterCustomerPayment
 
             $amount = BigDecimal::of($data['amount']);
             $allocations = $targetSale === null
-                ? $this->allocateToOldestSales($customer, $amount)
+                ? $this->allocateBySmallestBalance($customer, $amount, $data['distribution_signature'] ?? null)
                 : $this->allocateToSale($customer, $targetSale, $amount);
 
-            $payment = $customer->payments()->create([...$data, 'user_id' => $user->id]);
+            $payment = $customer->payments()->create([...Arr::except($data, 'distribution_signature'), 'user_id' => $user->id]);
             $payment->allocations()->createMany($allocations);
         }, 3);
     }
 
-    /** @return list<array{sale_id: int, amount: string}> */
-    private function allocateToOldestSales(Customer $customer, BigDecimal $amount): array
+    /**
+     * @param  ?string  $expectedSignature  Signature of the distribution previewed to the user, when there was one.
+     * @return list<array{sale_id: int, amount: string}>
+     */
+    private function allocateBySmallestBalance(Customer $customer, BigDecimal $amount, ?string $expectedSignature): array
     {
-        $sales = $customer->sales()->where('status', Sale::Completed)->withPaidTotal()
-            ->orderBy('sold_on')->orderBy('id')->lockForUpdate()->get();
+        $distribution = $this->planDistribution->handle($customer, $amount, lockSales: true);
 
-        $remaining = $amount;
-        $allocations = [];
-
-        foreach ($sales as $sale) {
-            $balance = $sale->outstandingAmount();
-
-            if ($balance->isZero()) {
-                continue;
-            }
-
-            $applied = BigDecimal::min($remaining, $balance);
-            $allocations[] = ['sale_id' => $sale->id, 'amount' => (string) $applied];
-            $remaining = $remaining->minus($applied);
-
-            if ($remaining->isZero()) {
-                break;
-            }
-        }
-
-        if (! $remaining->isZero()) {
+        if (! $distribution['unallocated']->isZero()) {
             throw ValidationException::withMessages(['amount' => 'O pagamento não pode ultrapassar o saldo em aberto do cliente.']);
         }
 
-        return $allocations;
+        if ($expectedSignature !== null && ! hash_equals($distribution['signature'], $expectedSignature)) {
+            throw ValidationException::withMessages(['distribution_signature' => 'Os saldos das compras foram alterados por outra operação. Revise a nova distribuição e confirme o pagamento novamente.']);
+        }
+
+        return array_map(fn (array $line): array => ['sale_id' => $line['sale']->id, 'amount' => (string) $line['applied']], $distribution['lines']);
     }
 
     /** @return list<array{sale_id: int, amount: string}> */
