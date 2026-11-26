@@ -25,12 +25,16 @@
             </div>
         </dl>
 
-        <x-ui.list-search label="Buscar item" placeholder="Nome ou código de barras" name="q_itens" />
-        <x-ui.table label="Itens da compra">
+        @php($itemsUnit = $purchase->items_count === 1 ? 'item' : 'itens')
+        <x-ui.data-table id="purchase-items" title="Itens da compra"
+            :meta="request()->filled('q_itens') ? $purchase->items->count().' de '.$purchase->items_count.' '.$itemsUnit : $purchase->items_count.' '.$itemsUnit">
+            <x-slot:filters>
+                <x-ui.list-search label="Buscar item da compra" placeholder="Nome ou código de barras" name="q_itens" />
+            </x-slot:filters>
                 <thead>
                     <tr>
                         @foreach (['Produto', 'Quantidade', 'Custo unitário', 'Desconto', 'Total do item'] as $heading)
-                            <th scope="col" @class(['numeric' => $loop->index >= 2])>{{ $heading }}</th>
+                            <th scope="col" @class(['money' => $loop->index >= 2])>{{ $heading }}</th>
                         @endforeach
                     </tr>
                 </thead>
@@ -42,14 +46,14 @@
                             </th>
                             <td>{{ $item->quantity }}</td>
                             @foreach ([$item->unit_cost, $item->discount, $item->total] as $amount)
-                                <td class="numeric"><x-ui.money :value="$amount" /></td>
+                                <td class="money"><x-ui.money :value="$amount" /></td>
                             @endforeach
                         </tr>
                     @empty
-                        <x-ui.empty :columns="5">Nenhum item encontrado.</x-ui.empty>
+                        <x-ui.empty :columns="5">{{ request()->filled('q_itens') ? 'Nenhum item desta compra corresponde à busca.' : 'Nenhum item registrado nesta compra.' }}</x-ui.empty>
                     @endforelse
                 </tbody>
-            </x-ui.table>
+        </x-ui.data-table>
 
         @if ($purchase->status !== \App\Models\Purchase::Cancelled)
             <div class="flex flex-wrap gap-3">

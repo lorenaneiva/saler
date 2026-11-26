@@ -8,7 +8,9 @@ const confirmations = new WeakSet();
 initializeAutocompletes();
 initializeLiveSearch();
 
-document.querySelectorAll('[data-inline-editor]').forEach((editor) => {
+document.querySelectorAll('[data-inline-editor]').forEach(initializeInlineEditor);
+
+function initializeInlineEditor(editor) {
     const form = editor.querySelector('[data-inline-form]');
     const start = editor.querySelector('[data-inline-start]');
     const cancel = editor.querySelector('[data-inline-cancel]');
@@ -99,7 +101,7 @@ document.querySelectorAll('[data-inline-editor]').forEach((editor) => {
         status.hidden = false;
         focusFormControl(fields.find((field) => field.hasAttribute('aria-invalid')) ?? status);
     });
-});
+}
 
 function closeDialog(dialog) {
     if (dialog.hasAttribute('data-closing')) {
@@ -243,7 +245,6 @@ async function submitLiveForm(form, submitter) {
         }
 
         const regions = replaceLiveRegions(result.page);
-        regions.forEach((region) => region.querySelectorAll('[data-payment-preview]').forEach(initializePaymentPreview));
         const failedForm = regions.flatMap((region) => Array.from(region.querySelectorAll('form[data-live-submit]')))
             .find((candidate) => candidate.closest('[data-live-region]')?.querySelector('.notice-error'));
 
@@ -288,7 +289,9 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-document.querySelectorAll('[data-mask]').forEach((input) => {
+document.querySelectorAll('[data-mask]').forEach(initializeMask);
+
+function initializeMask(input) {
     input.addEventListener('blur', () => {
         const digits = input.value.replace(/\D/g, '');
         if (input.dataset.mask === 'cpf' && /^[\d.\-\s]+$/.test(input.value) && digits.length === 11) {
@@ -299,7 +302,7 @@ document.querySelectorAll('[data-mask]').forEach((input) => {
             input.value = digits.replace(/^(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3');
         }
     });
-});
+}
 
 document.querySelectorAll('[data-line-editor]').forEach((editor) => {
     const items = editor.querySelector('[data-line-items]');
@@ -371,4 +374,12 @@ document.querySelectorAll('[data-line-editor]').forEach((editor) => {
     });
 
     updateRows();
+});
+
+document.addEventListener('live-regions:replaced', (event) => {
+    event.detail.regions.forEach((region) => {
+        region.querySelectorAll('[data-inline-editor]').forEach(initializeInlineEditor);
+        region.querySelectorAll('[data-mask]').forEach(initializeMask);
+        region.querySelectorAll('[data-payment-preview]').forEach(initializePaymentPreview);
+    });
 });

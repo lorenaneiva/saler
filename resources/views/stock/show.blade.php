@@ -21,14 +21,14 @@
             </div>
         </dl>
 
-        <section class="grid gap-3">
-            <h2 class="text-base font-semibold">Histórico de movimentações</h2>
-            <x-ui.list-search label="Buscar movimentação" placeholder="Responsável, motivo ou observação" />
-            <x-ui.table label="Histórico de movimentações de estoque">
+        <x-ui.data-table id="stock-movements" title="Histórico de movimentações" label="Histórico de movimentações de estoque" :paginator="$movements" :unit="['movimentação', 'movimentações']">
+            <x-slot:filters>
+                <x-ui.list-search label="Buscar movimentação" placeholder="Responsável, motivo ou observação" />
+            </x-slot:filters>
                     <thead>
                         <tr>
                             @foreach (['Data', 'Tipo', 'Origem', 'Quantidade', 'Custo unitário', 'Prejuízo', 'Responsável', 'Motivo e observação'] as $heading)
-                                <th scope="col" @class(['numeric' => in_array($heading, ['Quantidade', 'Custo unitário', 'Prejuízo'], true)])>{{ $heading }}</th>
+                                <th scope="col" @class(['numeric' => $heading === 'Quantidade', 'money' => in_array($heading, ['Custo unitário', 'Prejuízo'], true)])>{{ $heading }}</th>
                             @endforeach
                         </tr>
                     </thead>
@@ -57,9 +57,9 @@
                                         </div>
                                     @endif
                                 </td>
-                                <td class="numeric"><x-ui.money :value="$movement->unit_cost" /></td>
+                                <td class="money"><x-ui.money :value="$movement->unit_cost" /></td>
                                 @php($loss = $movement->lossValue())
-                                <td class="numeric">
+                                <td class="money">
                                     @if ($loss === null)
                                         —
                                     @else
@@ -82,9 +82,7 @@
                             <x-ui.empty :columns="8">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhuma movimentação registrada.' }}</x-ui.empty>
                         @endforelse
                     </tbody>
-                </x-ui.table>
-            <x-ui.pagination :paginator="$movements" />
-        </section>
+        </x-ui.data-table>
     </div>
 
     <x-ui.dialog id="stock-movement" title="Registrar movimentação" :auto-open="$errors->any()" inline-fallback>

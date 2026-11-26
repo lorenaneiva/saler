@@ -13,18 +13,19 @@
         <x-ui.alert tone="error">{{ $message }}</x-ui.alert>
     @enderror
 
-    <x-ui.list-search label="Buscar categoria" placeholder="Nome da categoria" :active="request()->filled('q') || $status !== 'ativas'">
-        <label class="grid w-full gap-1 text-sm font-medium sm:w-48">
-            Situação
-            <select name="situacao" class="field">
-                <option value="ativas" @selected($status === 'ativas')>Ativa</option>
-                <option value="inativas" @selected($status === 'inativas')>Inativa</option>
-                <option value="todas" @selected($status === 'todas')>Todas</option>
-            </select>
-        </label>
-    </x-ui.list-search>
+    <x-ui.data-table id="categories" title="Categorias cadastradas" :paginator="$categories" :unit="['categoria', 'categorias']">
+        <x-slot:filters>
+            <x-ui.list-search label="Buscar categoria" placeholder="Nome da categoria" :active="request()->filled('q') || $status !== 'ativas'">
+                <x-ui.table-filter label="Situação">
+                    <select name="situacao" class="field">
+                        <option value="ativas" @selected($status === 'ativas')>Ativa</option>
+                        <option value="inativas" @selected($status === 'inativas')>Inativa</option>
+                        <option value="todas" @selected($status === 'todas')>Todas</option>
+                    </select>
+                </x-ui.table-filter>
+            </x-ui.list-search>
+        </x-slot:filters>
 
-    <x-ui.table label="Categorias cadastradas">
         <thead>
             <tr><th scope="col">Categoria</th><th scope="col" class="numeric">Produtos</th><th scope="col">Situação</th><th scope="col" class="text-right">Ações</th></tr>
         </thead>
@@ -77,8 +78,7 @@
                 <x-ui.empty :columns="4">{{ $search !== '' ? 'Nenhuma categoria encontrada para esta busca.' : match ($status) { 'ativas' => 'Nenhuma categoria ativa.', 'inativas' => 'Nenhuma categoria inativa.', default => 'Nenhuma categoria cadastrada.' } }}</x-ui.empty>
             @endforelse
         </tbody>
-    </x-ui.table>
-    <x-ui.pagination :paginator="$categories" />
+    </x-ui.data-table>
 
     <x-ui.dialog id="new-category" title="Nova categoria" :auto-open="$errors->has('name')" inline-fallback>
         <form method="POST" action="{{ route('categories.store') }}" class="grid gap-2">

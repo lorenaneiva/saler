@@ -9,9 +9,11 @@
         </x-slot:actions>
     </x-ui.page-header>
 
-    <x-ui.list-search label="Buscar cliente" placeholder="Nome, telefone, e-mail ou CPF" />
+    <x-ui.data-table id="customers" title="Cadastro de clientes" :paginator="$customers" :unit="['cliente', 'clientes']">
+        <x-slot:filters>
+            <x-ui.list-search label="Buscar cliente" placeholder="Nome, telefone, e-mail ou CPF" />
+        </x-slot:filters>
 
-    <x-ui.table label="Cadastro de clientes">
         <thead>
             <tr>
                 <th scope="col">Nome</th>
@@ -49,6 +51,5 @@
                 <x-ui.empty :columns="4">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhum cliente cadastrado.' }}</x-ui.empty>
             @endforelse
         </tbody>
-    </x-ui.table>
-    <x-ui.pagination :paginator="$customers" />
+    </x-ui.data-table>
 @endsection

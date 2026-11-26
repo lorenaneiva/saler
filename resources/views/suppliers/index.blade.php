@@ -9,9 +9,11 @@
         </x-slot:actions>
     </x-ui.page-header>
 
-    <x-ui.list-search label="Buscar fornecedor" placeholder="Nome, contato ou representante" />
+    <x-ui.data-table id="suppliers" title="Cadastro de fornecedores" :paginator="$suppliers" :unit="['fornecedor', 'fornecedores']">
+        <x-slot:filters>
+            <x-ui.list-search label="Buscar fornecedor" placeholder="Nome, contato ou representante" />
+        </x-slot:filters>
 
-    <x-ui.table label="Cadastro de fornecedores">
         <thead>
             <tr>
                 <th scope="col">Nome</th>
@@ -56,6 +58,5 @@
                 <x-ui.empty :columns="5">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhum fornecedor cadastrado.' }}</x-ui.empty>
             @endforelse
         </tbody>
-    </x-ui.table>
-    <x-ui.pagination :paginator="$suppliers" />
+    </x-ui.data-table>
 @endsection

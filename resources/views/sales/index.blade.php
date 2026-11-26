@@ -9,13 +9,15 @@
         </x-slot:actions>
     </x-ui.page-header>
 
-    <x-ui.list-search label="Buscar venda" placeholder="Número, cliente ou produto" />
+    <x-ui.data-table id="sales" title="Vendas registradas" :paginator="$sales" :unit="['venda', 'vendas']">
+        <x-slot:filters>
+            <x-ui.list-search label="Buscar venda" placeholder="Número, cliente ou produto" />
+        </x-slot:filters>
 
-    <x-ui.table label="Vendas registradas">
         <thead>
             <tr>
                 @foreach (['Venda', 'Cliente', 'Data', 'Total', 'Situação financeira'] as $heading)
-                    <th scope="col" @class(['numeric' => $heading === 'Total'])>{{ $heading }}</th>
+                    <th scope="col" @class(['money' => $heading === 'Total'])>{{ $heading }}</th>
                 @endforeach
             </tr>
         </thead>
@@ -27,13 +29,12 @@
                     </th>
                     <td class="wrap-anywhere"><a class="cell-link" href="{{ route('customers.show', $sale->customer_id) }}">{{ $sale->customer->name }}</a></td>
                     <td class="whitespace-nowrap">{{ $sale->sold_on->format('d/m/Y') }}</td>
-                    <td class="numeric"><x-ui.money :value="$sale->total" /></td>
-                    <td>{{ $sale->paymentStatus() }}</td>
+                    <td class="money"><x-ui.money :value="$sale->total" /></td>
+                    <td><x-ui.payment-status :status="$sale->paymentStatus()" /></td>
                 </tr>
             @empty
                 <x-ui.empty :columns="5">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhuma venda registrada.' }}</x-ui.empty>
             @endforelse
         </tbody>
-    </x-ui.table>
-    <x-ui.pagination :paginator="$sales" />
+    </x-ui.data-table>
 @endsection

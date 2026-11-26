@@ -9,14 +9,16 @@
         </x-slot:actions>
     </x-ui.page-header>
 
-    <x-ui.list-search label="Buscar no estoque" placeholder="Nome ou código de barras" />
+    <x-ui.data-table id="stock" title="Saldo atual por produto" :paginator="$products" :unit="['produto', 'produtos']">
+        <x-slot:filters>
+            <x-ui.list-search label="Buscar no estoque" placeholder="Nome ou código de barras" />
+        </x-slot:filters>
 
-    <x-ui.table label="Saldo atual por produto">
         <thead>
             <tr>
                 <th scope="col">Produto</th>
                 <th scope="col" class="numeric">Saldo atual</th>
-                <th scope="col" class="numeric">Custo médio</th>
+                <th scope="col" class="money">Custo médio</th>
             </tr>
         </thead>
         <tbody>
@@ -35,12 +37,11 @@
                             {{ $product->stock_quantity }}
                         @endif
                     </td>
-                    <td class="numeric"><x-ui.money :value="$product->average_cost" /></td>
+                    <td class="money"><x-ui.money :value="$product->average_cost" /></td>
                 </tr>
             @empty
                 <x-ui.empty :columns="3">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhum produto cadastrado.' }}</x-ui.empty>
             @endforelse
         </tbody>
-    </x-ui.table>
-    <x-ui.pagination :paginator="$products" />
+    </x-ui.data-table>
 @endsection

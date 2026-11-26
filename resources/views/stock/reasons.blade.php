@@ -9,17 +9,21 @@
         </x-slot:actions>
     </x-ui.page-header>
 
-    <x-ui.list-search label="Buscar motivo" placeholder="Nome do motivo" />
-
-        <ul class="panel divide-y divide-slate-200">
+    <x-ui.data-table id="stock-reasons" title="Motivos cadastrados" :paginator="$reasons" :unit="['motivo', 'motivos']">
+        <x-slot:filters>
+            <x-ui.list-search label="Buscar motivo" placeholder="Nome do motivo" />
+        </x-slot:filters>
+        <thead>
+            <tr><th scope="col">Motivo</th></tr>
+        </thead>
+        <tbody>
             @forelse ($reasons as $reason)
-                <li class="wrap-anywhere px-4 py-3">{{ $reason->name }}</li>
+                <tr><td class="wrap-anywhere">{{ $reason->name }}</td></tr>
             @empty
-                <li class="empty-state">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhum motivo cadastrado.' }}</li>
+                <x-ui.empty :columns="1">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhum motivo cadastrado.' }}</x-ui.empty>
             @endforelse
-        </ul>
-
-        <x-ui.pagination :paginator="$reasons" />
+        </tbody>
+    </x-ui.data-table>
 
     <x-ui.dialog id="stock-reason" title="Novo motivo" :auto-open="$errors->has('name')" inline-fallback>
         <form method="POST" action="{{ route('stock.reasons.store') }}" class="grid gap-3">

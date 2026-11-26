@@ -1,28 +1,38 @@
-<section class="grid gap-3">
-    <h2 class="text-base font-semibold">Histórico de pagamentos</h2>
-    <x-ui.list-search label="Buscar pagamento" placeholder="Número, forma de pagamento ou observação" name="q_pagamentos" :keep="['secao', 'q_compras', 'page']" />
-    <ul class="panel divide-y divide-slate-200">
+<x-ui.data-table id="customer-payments" title="Histórico de pagamentos" :paginator="$payments" :unit="['pagamento', 'pagamentos']">
+    <x-slot:filters>
+        <x-ui.list-search label="Buscar pagamento" placeholder="Número, forma de pagamento ou observação" name="q_pagamentos" :keep="['secao', 'q_compras', 'page']" />
+    </x-slot:filters>
+    <thead>
+        <tr>
+            <th scope="col">Pagamento</th>
+            <th scope="col">Data</th>
+            <th scope="col">Forma de pagamento</th>
+            <th scope="col" class="money">Valor</th>
+            <th scope="col">Abatido em</th>
+            <th scope="col">Observação</th>
+        </tr>
+    </thead>
+    <tbody>
         @forelse ($payments as $payment)
-            <li class="grid gap-2 px-5 py-4">
-                <div class="flex flex-wrap items-baseline justify-between gap-2">
-                    <p class="font-semibold"><x-ui.money :value="$payment->amount" /></p>
-                    <p class="text-sm text-slate-600">{{ $payment->paid_on->format('d/m/Y') }} · {{ \App\Models\Payment::Methods[$payment->method] }}</p>
-                </div>
-                @if ($payment->notes)
-                    <p class="wrap-anywhere text-sm">{{ $payment->notes }}</p>
-                @endif
-                <ul class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-700">
-                    @foreach ($payment->allocations as $allocation)
-                        <li>
-                            <a href="{{ route('sales.show', $allocation->sale_id) }}" class="text-brand underline">Compra #{{ $allocation->sale_id }}</a>
-                            · <x-ui.money :value="$allocation->amount" />
-                        </li>
-                    @endforeach
-                </ul>
-            </li>
+            <tr>
+                <th scope="row">{{ $payment->id }}</th>
+                <td class="whitespace-nowrap">{{ $payment->paid_on->format('d/m/Y') }}</td>
+                <td>{{ \App\Models\Payment::Methods[$payment->method] }}</td>
+                <td class="money font-semibold"><x-ui.money :value="$payment->amount" /></td>
+                <td>
+                    <ul class="grid gap-0.5">
+                        @foreach ($payment->allocations as $allocation)
+                            <li class="whitespace-nowrap">
+                                <a href="{{ route('sales.show', $allocation->sale_id) }}" class="cell-link">Compra {{ $allocation->sale_id }}</a>
+                                · <x-ui.money :value="$allocation->amount" />
+                            </li>
+                        @endforeach
+                    </ul>
+                </td>
+                <td class="wrap-anywhere">{{ $payment->notes ?: '—' }}</td>
+            </tr>
         @empty
-            <li class="px-5 py-4 text-sm text-slate-600">{{ request()->filled('q_pagamentos') ? 'Nenhum resultado para esta busca.' : 'Nenhum pagamento registrado para este cliente.' }}</li>
+            <x-ui.empty :columns="6">{{ request()->filled('q_pagamentos') ? 'Nenhum resultado para esta busca.' : 'Nenhum pagamento registrado para este cliente.' }}</x-ui.empty>
         @endforelse
-    </ul>
-    <x-ui.pagination :paginator="$payments" />
-</section>
+    </tbody>
+</x-ui.data-table>

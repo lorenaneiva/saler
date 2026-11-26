@@ -91,7 +91,7 @@ class PurchaseController extends Controller
             'supplier:id,name',
             'items' => fn ($items) => $request->filter($items, ['product.name', 'product.barcode'], 'q_itens')
                 ->with('product:id,name'),
-        ])]);
+        ])->loadCount('items')]);
     }
 
     public function confirm(Request $request, Purchase $purchase, ConfirmPurchase $confirmPurchase): RedirectResponse
