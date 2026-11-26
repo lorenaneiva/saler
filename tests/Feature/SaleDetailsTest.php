@@ -37,7 +37,7 @@ class SaleDetailsTest extends TestCase
         $response = $this->actingAs(User::factory()->create())->get(route('sales.show', $sale))->assertOk();
 
         $summary = str($response->getContent())->betweenFirst('aria-label="Resumo da venda"', '</section>');
-        $this->assertStringContainsString(e($sale->customer->name), $summary);
+        $this->assertStringContainsString('href="'.route('customers.show', $sale->customer_id).'">'.e($sale->customer->name).'</a>', $summary);
         $this->assertStringContainsString('Total da venda', $summary);
         $this->assertStringNotContainsString('Subtotal', $summary);
         $this->assertStringNotContainsString('Desconto', $summary);
@@ -62,5 +62,14 @@ class SaleDetailsTest extends TestCase
             ->assertSeeText('0 de 1 pagamento')
             ->assertSeeText('Nenhum pagamento corresponde à busca.')
             ->assertDontSee('class="field" disabled', false);
+    }
+
+    public function test_sales_list_links_the_customer_name_to_the_customer_page(): void
+    {
+        $sale = Sale::factory()->create();
+
+        $this->actingAs(User::factory()->create())->get(route('sales.index'))->assertOk()
+            ->assertSee('<a class="cell-link" href="'.route('customers.show', $sale->customer_id).'">'.e($sale->customer->name).'</a>', false)
+            ->assertSee(route('sales.show', $sale));
     }
 }

@@ -27,7 +27,7 @@
                 <dl class="sale-facts">
                     <div>
                         <dt>Cliente</dt>
-                        <dd class="wrap-anywhere">{{ $sale->customer->name }}</dd>
+                        <dd class="wrap-anywhere"><a class="text-link" href="{{ route('customers.show', $sale->customer_id) }}">{{ $sale->customer->name }}</a></dd>
                     </div>
                     <div>
                         <dt>Data da venda</dt>

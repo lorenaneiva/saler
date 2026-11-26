@@ -25,7 +25,7 @@
                     <th scope="row">
                         <a data-row-link href="{{ route('sales.show', $sale) }}">{{ $sale->id }}</a>
                     </th>
-                    <td>{{ $sale->customer->name }}</td>
+                    <td class="wrap-anywhere"><a class="cell-link" href="{{ route('customers.show', $sale->customer_id) }}">{{ $sale->customer->name }}</a></td>
                     <td class="whitespace-nowrap">{{ $sale->sold_on->format('d/m/Y') }}</td>
                     <td class="numeric"><x-ui.money :value="$sale->total" /></td>
                     <td>{{ $sale->paymentStatus() }}</td>
