@@ -28,7 +28,7 @@
                     <thead>
                         <tr>
                             @foreach (['Data', 'Tipo', 'Origem', 'Quantidade', 'Custo unitário', 'Prejuízo', 'Responsável', 'Motivo e observação'] as $heading)
-                                <th scope="col" class="whitespace-nowrap px-4 py-3">{{ $heading }}</th>
+                                <th scope="col" @class(['numeric' => in_array($heading, ['Quantidade', 'Custo unitário', 'Prejuízo'], true)])>{{ $heading }}</th>
                             @endforeach
                         </tr>
                     </thead>
@@ -40,16 +40,16 @@
                                 <td>
                                     {{ $movement->typeLabel() }}
                                     @if ($movement->purchaseItem)
-                                        <a data-row-link href="{{ route('purchases.show', $movement->purchaseItem->purchase_id) }}" class="text-brand underline">
-                                            #{{ $movement->purchaseItem->purchase_id }}
+                                        <a data-row-link href="{{ route('purchases.show', $movement->purchaseItem->purchase_id) }}">
+                                            {{ $movement->purchaseItem->purchase_id }}
                                         </a>
                                     @elseif ($movement->saleItem)
-                                        <a data-row-link href="{{ route('sales.show', $movement->saleItem->sale_id) }}" class="text-brand underline">
-                                            #{{ $movement->saleItem->sale_id }}
+                                        <a data-row-link href="{{ route('sales.show', $movement->saleItem->sale_id) }}">
+                                            {{ $movement->saleItem->sale_id }}
                                         </a>
                                     @endif
                                 </td>
-                                <td>
+                                <td class="numeric">
                                     {{ $movement->quantity_delta > 0 ? '+' : '' }}{{ $movement->quantity_delta }}
                                     @if ($movement->adjustment)
                                         <div class="whitespace-nowrap text-xs text-slate-600">
@@ -59,7 +59,7 @@
                                 </td>
                                 <td class="numeric"><x-ui.money :value="$movement->unit_cost" /></td>
                                 @php($loss = $movement->lossValue())
-                                <td class="whitespace-nowrap">
+                                <td class="numeric">
                                     @if ($loss === null)
                                         —
                                     @else

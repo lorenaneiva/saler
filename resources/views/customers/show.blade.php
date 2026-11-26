@@ -63,7 +63,7 @@
 
     <nav class="section-tabs" aria-label="Seções do cliente">
         @foreach (['compras' => 'Compras', 'aberto' => 'Contas em aberto', 'pagamentos' => 'Pagamentos', 'cadastro' => 'Cadastro'] as $key => $label)
-            <a href="{{ $key === 'resumo' ? route('customers.show', $customer) : route('customers.show', [$customer, 'secao' => $key]) }}"
+            <a href="{{ $key === 'compras' ? route('customers.show', $customer) : route('customers.show', [$customer, 'secao' => $key]) }}"
                 @if ($section === $key) aria-current="page" @endif>{{ $label }}</a>
         @endforeach
     </nav>

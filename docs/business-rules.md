@@ -42,7 +42,7 @@ Este documento separa o que o código atual evidencia do que o requisito origina
 - Token único por cliente torna reenvio da mesma submissão idempotente. O pagamento é aplicado às vendas concluídas mais antigas primeiro, por data e ID. Uma única entrada financeira pode criar várias alocações.
 - O valor deve ser positivo, data não futura, método permitido e não pode exceder o saldo total aberto do cliente. Excesso rejeita toda a transação; não há crédito excedente.
 - Saldo de venda é total menos somatório de alocações. Status financeiro derivado: pendente, parcialmente paga ou quitada. Venda não concluída não tem saldo reportado pelo método atual.
-- Perfil do cliente mostra resumo de comprado/recebido/em aberto e lista vendas abertas/históricos e pagamentos com alocações. A busca por contas em aberto é no perfil, não há rota dedicada de clientes devedores.
+- Perfil do cliente mostra resumo de comprado/recebido/em aberto e organiza abas Compras, Contas em aberto, Pagamentos e Cadastro (`?secao=`). Ao abrir o perfil sem seção, a aba Compras já vem aberta com todas as compras do cliente; parâmetro ausente ou inválido cai em `compras`. Pagamentos com alocações ficam em `secao=pagamentos`. A busca por contas em aberto é no perfil, não há rota dedicada de clientes devedores.
 - Não existe fluxo de estorno de pagamento; não há flag/status de pagamento cancelado.
 
 ## Requisitos ainda planejados ou incompletos

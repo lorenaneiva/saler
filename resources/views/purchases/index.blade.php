@@ -24,7 +24,7 @@
             @forelse ($purchases as $purchase)
                 <tr>
                     <th scope="row" class="px-4 py-4 font-semibold">
-                        <a data-row-link href="{{ route('purchases.show', $purchase) }}" class="text-brand underline">#{{ $purchase->id }}</a>
+                        <a data-row-link href="{{ route('purchases.show', $purchase) }}">{{ $purchase->id }}</a>
                     </th>
                     <td>{{ $purchase->supplier->name }}</td>
                     <td class="whitespace-nowrap">{{ $purchase->purchased_on->format('d/m/Y') }}</td>

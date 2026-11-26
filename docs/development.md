@@ -28,6 +28,6 @@
 
 ## Testes e documentação
 
-- Testes PHP vivem em `tests/Feature` e `tests/Unit`; funções JS podem ter testes nativos Node em `tests/Unit/*.test.js`. Consulte `phpunit.xml`, `composer.json` e `package.json` para execução/versionamento.
+- Testes PHP vivem em `tests/Feature` e `tests/Unit`; funções JS podem ter testes nativos Node em `tests/Unit/*.test.js`, executados com `vendor/bin/sail node --test tests/Unit/*.test.js` (não há script npm para eles; passar só o diretório falha). Consulte `phpunit.xml`, `composer.json` e `package.json` para execução/versionamento.
 - Escolha o teste mais estreito pertinente e cubra efeitos de sucesso, rejeição e atomicidade quando a regra envolve múltiplas gravações. Os testes são evidência de cobertura, não prova de fluxo de navegador além do que exercitam.
 - Quando modificar PHP, rode `vendor/bin/sail bin pint --dirty --format agent` conforme AGENTS. Documente decisões e discrepâncias em `docs/` quando mudarem; não crie documentos genéricos sem necessidade.

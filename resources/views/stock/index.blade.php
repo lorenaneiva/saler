@@ -23,7 +23,7 @@
             @forelse ($products as $product)
                 <tr>
                     <th scope="row" class="min-w-36 wrap-anywhere font-semibold">
-                        <a data-row-link href="{{ route('stock.show', $product) }}" class="text-brand underline">{{ $product->name }}</a>
+                        <a data-row-link href="{{ route('stock.show', $product) }}">{{ $product->name }}</a>
                         @unless ($product->is_active)
                             <x-ui.badge class="ml-2">Inativo</x-ui.badge>
                         @endunless

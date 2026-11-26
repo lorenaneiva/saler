@@ -26,7 +26,7 @@
                 <tr data-inline-editor>
                     <th scope="row" class="min-w-36 font-semibold">
                         <x-ui.inline-field :form="$editForm" name="name" label="Nome" :value="$customer->name" required maxlength="255" autocomplete="name">
-                            <a data-row-link href="{{ route('customers.show', $customer) }}" class="text-brand underline">
+                            <a data-row-link href="{{ route('customers.show', $customer) }}">
                                 {{ $customer->name }}
                             </a>
                         </x-ui.inline-field>

@@ -30,7 +30,7 @@
                 <thead>
                     <tr>
                         @foreach (['Produto', 'Quantidade', 'Custo unitário', 'Desconto', 'Total do item'] as $heading)
-                            <th scope="col" @class(['whitespace-nowrap', 'numeric' => $loop->index >= 2])>{{ $heading }}</th>
+                            <th scope="col" @class(['numeric' => $loop->index >= 2])>{{ $heading }}</th>
                         @endforeach
                     </tr>
                 </thead>

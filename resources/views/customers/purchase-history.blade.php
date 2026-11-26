@@ -13,7 +13,7 @@
                 @forelse ($sales as $sale)
                     <tr>
                         <th scope="row" >
-                            <a data-row-link href="{{ route('sales.show', $sale) }}" class="text-brand underline">#{{ $sale->id }}</a>
+                            <a data-row-link href="{{ route('sales.show', $sale) }}">{{ $sale->id }}</a>
                         </th>
                         <td class="whitespace-nowrap">{{ $sale->sold_on->format('d/m/Y') }}</td>
                         <td class="numeric"><x-ui.money :value="$sale->total" /></td>

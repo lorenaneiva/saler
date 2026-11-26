@@ -15,7 +15,7 @@
         <thead>
             <tr>
                 @foreach (['Venda', 'Cliente', 'Data', 'Total', 'Situação financeira'] as $heading)
-                    <th scope="col">{{ $heading }}</th>
+                    <th scope="col" @class(['numeric' => $heading === 'Total'])>{{ $heading }}</th>
                 @endforeach
             </tr>
         </thead>
@@ -23,7 +23,7 @@
             @forelse ($sales as $sale)
                 <tr>
                     <th scope="row">
-                        <a data-row-link href="{{ route('sales.show', $sale) }}" class="text-brand underline">#{{ $sale->id }}</a>
+                        <a data-row-link href="{{ route('sales.show', $sale) }}">{{ $sale->id }}</a>
                     </th>
                     <td>{{ $sale->customer->name }}</td>
                     <td class="whitespace-nowrap">{{ $sale->sold_on->format('d/m/Y') }}</td>

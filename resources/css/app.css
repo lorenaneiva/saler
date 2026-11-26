@@ -102,17 +102,22 @@
     .badge-danger { @apply bg-red-100 text-red-900; }
 
     .table-region { @apply max-w-full overflow-x-auto; }
-    .data-table { @apply w-full border-collapse text-left text-sm; }
+    .data-table { @apply w-full border-collapse text-left text-sm; table-layout: fixed; min-width: 32rem; }
+    .data-table:has(thead tr > :nth-child(5)) { min-width: 40rem; }
+    .data-table:has(thead tr > :nth-child(6)) { min-width: 48rem; }
+    .data-table:has(thead tr > :nth-child(7)) { min-width: 56rem; }
+    .data-table:has(thead tr > :nth-child(8)) { min-width: 64rem; }
     .data-table thead { @apply border-b text-xs; background: #edf2f9; border-color: var(--line); color: var(--muted); }
     .data-table :is(th, td) { @apply px-3 py-2.5 sm:px-4; }
     .data-table tbody tr + tr { border-top: 1px solid var(--line); }
+    .data-table tbody tr:nth-child(even) { background: #f2f5f9; }
     .data-table tr:has([data-row-link]) { position: relative; isolation: isolate; }
-    .data-table tr:has([data-row-link]):is(:hover, :focus-within) { background: #eff6ff; }
+    .data-table tr:has([data-row-link]):is(:hover, :focus-within) { background: #d9e6f8; }
     .data-table [data-row-link]::after { content: ''; position: absolute; inset: 0; z-index: 1; }
     .data-table tr:has([data-row-link]) :is(a:not([data-row-link]), button, input, select, textarea) { position: relative; z-index: 2; }
     .data-table .numeric { @apply text-right whitespace-nowrap tabular-nums; }
-    .data-table .row-actions { @apply flex items-center justify-end gap-1 whitespace-nowrap; }
-    .data-table a:not([class*="button"]) { @apply font-semibold underline decoration-transparent underline-offset-2 hover:decoration-current; color: var(--color-brand); }
+    .data-table .row-actions { @apply flex flex-wrap items-center justify-end gap-1; }
+    .data-table a:not([class*="button"]) { color: inherit; font-weight: inherit; text-decoration: none; }
     .empty-state, .data-table .empty-state { @apply p-6 text-center text-sm; color: var(--muted); }
 
     .pagination { @apply flex flex-wrap items-center justify-between gap-2 py-1 text-sm; color: var(--muted); }

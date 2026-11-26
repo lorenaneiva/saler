@@ -5,7 +5,7 @@ Revisão documental do código, testes, migrations, requisitos e histórico Git 
 ## Implementado com cobertura identificada
 
 - Login/logout por sessão, proteção de rotas e bloqueio após cinco tentativas de login inválidas (`AuthenticationTest`). Não há matriz de papéis/permissões.
-- Cadastros de categoria, produto, cliente e fornecedor; busca/paginação; desativação de produtos e fornecedores; reativação de fornecedor; edição contextual de categoria/fornecedor/cliente e drawer de produto (`CategoryTest`, `ProductTest`, `CustomerTest`, `SupplierTest`, `InlineEditingTest`, `ProductDrawerTest`).
+- Cadastros de categoria, produto, cliente e fornecedor; busca/paginação; desativação de produtos e fornecedores; reativação de fornecedor; edição contextual de categoria/fornecedor/cliente e drawer de produto (`CategoryTest`, `ProductTest`, `CustomerTest`, `SupplierTest`, `InlineEditingTest`, `ProductDrawerTest`). `CustomerTest` cobre acesso de visitante, criação/listagem/consulta, edição, validação, resumo financeiro e histórico de compras exibido por padrão ao abrir o perfil (aba Compras).
 - Compra com múltiplos itens, cadastro de produto pela compra, desconto, atualização imediata de estoque/custo médio e cancelamento com reversão condicionada a saldo (`PurchaseTest`). Há estados pending/confirmed/cancelled, embora o fluxo de criação confirme imediatamente.
 - Consulta de estoque, histórico de movimentos, motivos e entradas/saídas manuais com auditoria (`StockTest`).
 - Venda com múltiplos itens, snapshots de preço/custo, desconto, baixa de estoque e rejeição atômica por saldo insuficiente (`SaleTest`).
@@ -25,7 +25,8 @@ Revisão documental do código, testes, migrations, requisitos e histórico Git 
 
 ## Bugs conhecidos e dívidas técnicas observáveis
 
-- `tests/Feature/CustomerTest.php` existe, mas a revisão não encontrou métodos de teste nomeados; a cobertura efetiva de cliente parece estar espalhada em `InlineEditingTest`/`CustomerPaymentTest`. Confirme o arquivo quando ampliar testes do módulo.
+- `tests/Feature/CustomerTest.php` foi sobrescrito por engano com conteúdo Blade no commit `025bb3e` e restaurado em 26/11/2026 a partir da versão anterior.
+- Corrigido em 26/11/2026: `<x-ui.money>` exibia `R$ 0,00` quando recebia `BigDecimal` (ex.: `Sale::paidAmount()`/`outstandingAmount()`), afetando “Valor pago”/“Saldo em aberto” no detalhe da venda e as colunas Pago/Em aberto do perfil do cliente. O componente agora aceita qualquer `Stringable`; cobertura em `MoneyFormattingTest` e `ListSearchTest`. A seção padrão antiga `resumo` (que consultava listas sem exibi-las) foi removida.
 - `tests/Feature/ExampleTest.php` e `tests/Unit/ExampleTest.php` são testes de scaffold, não evidência de requisito de domínio.
 - `README.md` original era o README padrão do Laravel (substituído por overview e instruções neste trabalho); o nome/descrição Composer ainda identificam o esqueleto `laravel/laravel`.
 - O PDF e o diagrama são documentos de referência originais, não especificação executável; algumas regras planejadas divergem do código, listadas em [regras de negócio](business-rules.md).
@@ -33,11 +34,11 @@ Revisão documental do código, testes, migrations, requisitos e histórico Git 
 - A exibição monetária em `<x-ui.money>` converte para float antes de `number_format`; embora testes cubram valores usuais e a camada seja somente apresentação, vale avaliar limites de precisão para valores extremos permitidos pelas colunas.
 - Testes cobrem controllers/HTML/ações e utilitários, mas não foi identificado teste automatizado real de navegador para foco, leitor de tela, posicionamento/responsividade do drawer e autocomplete. Acessibilidade visual precisa de verificação manual.
 
-Não foi executada suíte de testes nesta tarefa, pois o escopo é exclusivamente documentação. Não há bug de interface assumido sem evidência; itens acima são lacunas ou riscos a validar.
+Em 26/11/2026 a suíte PHPUnit completa (84 testes) e os testes JS de `tests/Unit/*.test.js` (8 testes) foram executados e aprovados. Não há bug de interface assumido sem evidência; itens acima são lacunas ou riscos a validar.
 
 ## Próximos passos recomendados
 
 1. Definir com o negócio a política de custo médio após estorno de compra confirmada.
 2. Priorizar e especificar vencimentos/parcelamento, cancelamento/estorno e relatórios antes de implementar tabelas e fluxos novos.
-3. Adicionar testes de domínio diretamente em clientes e cobertura de navegador para fluxos críticos de drawer/autocomplete e acessibilidade.
+3. Adicionar cobertura de navegador para fluxos críticos de drawer/autocomplete e acessibilidade.
 4. Rever precisão de apresentação em limites extremos e documentar versões/ambientes de produção quando existirem dados confiáveis.

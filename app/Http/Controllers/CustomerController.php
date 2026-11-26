@@ -40,8 +40,8 @@ class CustomerController extends Controller
     public function show(ListSearchRequest $request, Customer $customer): View
     {
         $section = $request->query('secao');
-        if (! in_array($section, ['resumo', 'compras', 'aberto', 'pagamentos', 'cadastro'], true)) {
-            $section = 'resumo';
+        if (! in_array($section, ['compras', 'aberto', 'pagamentos', 'cadastro'], true)) {
+            $section = 'compras';
         }
 
         $completedSales = $customer->sales()->where('status', Sale::Completed)
@@ -64,8 +64,8 @@ class CustomerController extends Controller
         return view('customers.show', [
             'customer' => $customer,
             'section' => $section,
-            'sales' => in_array($section, ['resumo', 'compras', 'aberto'], true) ? $sales->paginate(20)->withQueryString() : null,
-            'payments' => in_array($section, ['resumo', 'pagamentos'], true)
+            'sales' => in_array($section, ['compras', 'aberto'], true) ? $sales->paginate(20)->withQueryString() : null,
+            'payments' => $section === 'pagamentos'
                 ? $request->filter($customer->payments(), ['id', 'notes'], 'q_pagamentos', ['method' => Payment::Methods])
                     ->with('allocations')->orderByDesc('paid_on')->orderByDesc('id')
                     ->paginate(10, pageName: 'pagamentos')->withQueryString()

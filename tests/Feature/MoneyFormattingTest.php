@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
+use Brick\Math\BigDecimal;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
@@ -35,6 +36,7 @@ class MoneyFormattingTest extends TestCase
             ['15.5', 'R$ 15,50'],
             ['0', 'R$ 0,00'],
             ['-1250.5000', 'R$ -1.250,50'],
+            [BigDecimal::of('1250.50'), 'R$ 1.250,50'],
         ] as [$value, $formatted]) {
             $rendered = view('components.ui.money', ['value' => $value])->render();
 

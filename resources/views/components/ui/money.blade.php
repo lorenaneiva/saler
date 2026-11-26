@@ -1,6 +1,7 @@
 @props(['value'])
 
 @php
-    $amount = is_numeric($value) ? (float) $value : 0.0;
+    $numericValue = $value instanceof Stringable ? (string) $value : $value;
+    $amount = is_numeric($numericValue) ? (float) $numericValue : 0.0;
 @endphp
 R$ {{ number_format($amount, 2, ',', '.') }}

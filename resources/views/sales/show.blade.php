@@ -41,7 +41,7 @@
                 <thead>
                     <tr>
                         @foreach (['Produto', 'Quantidade', 'Preço unitário', 'Custo unitário da venda', 'Subtotal'] as $heading)
-                            <th scope="col" @class(['whitespace-nowrap', 'numeric' => $loop->index >= 2])>{{ $heading }}</th>
+                            <th scope="col" @class(['numeric' => $loop->index >= 2])>{{ $heading }}</th>
                         @endforeach
                     </tr>
                 </thead>
@@ -77,7 +77,7 @@
                 <tbody>
                     @forelse ($payments as $payment)
                         <tr>
-                            <th scope="row">#{{ $payment->id }}</th>
+                            <th scope="row">{{ $payment->id }}</th>
                             <td>{{ $payment->paid_on->format('d/m/Y') }}</td>
                             <td>{{ \App\Models\Payment::Methods[$payment->method] }}</td>
                             <td class="numeric"><x-ui.money :value="$payment->allocation->amount" /></td>
