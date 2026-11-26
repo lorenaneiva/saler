@@ -11,13 +11,16 @@
                 @foreach ([
                     'Cliente' => $sale->customer->name,
                     'Data da venda' => $sale->sold_on->format('d/m/Y'),
-                    'Subtotal' => 'R$ '.str_replace('.', ',', $sale->subtotal),
-                    'Desconto' => 'R$ '.str_replace('.', ',', $sale->discount),
-                    'Total' => 'R$ '.str_replace('.', ',', $sale->total),
                 ] as $label => $value)
                     <div>
                         <dt class="text-sm text-slate-600">{{ $label }}</dt>
                         <dd class="wrap-anywhere font-semibold">{{ $value }}</dd>
+                    </div>
+                @endforeach
+                @foreach (['Subtotal' => $sale->subtotal, 'Desconto' => $sale->discount, 'Total' => $sale->total] as $label => $amount)
+                    <div>
+                        <dt class="text-sm text-slate-600">{{ $label }}</dt>
+                        <dd class="wrap-anywhere font-semibold"><x-ui.money :value="$amount" /></dd>
                     </div>
                 @endforeach
             </dl>

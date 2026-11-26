@@ -6,8 +6,8 @@
         <select name="items[{{ $index }}][product_id]" data-item-field="product_id" class="field" required data-autocomplete-url="{{ route('autocomplete.options', 'sale-products') }}">
             <option value="">Selecione</option>
             @foreach ($products as $product)
-                <option value="{{ $product->id }}" @selected(($item['product_id'] ?? null) == $product->id)>
-                    {{ $product->name }} · R$ {{ str_replace('.', ',', $product->sale_price) }} · {{ $product->stock_quantity }} em estoque
+                <option value="{{ $product->id }}" @selected(($item['product_id'] ?? null) == $product->id) data-keywords="R$ {{ number_format((float) $product->sale_price, 2, ',', '.') }}">
+                    {{ $product->name }} · R$ {{ number_format((float) $product->sale_price, 2, ',', '.') }} · {{ $product->stock_quantity }} em estoque
                 </option>
             @endforeach
         </select>

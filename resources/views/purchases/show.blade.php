@@ -13,13 +13,16 @@
             @foreach ([
                 'Fornecedor' => $purchase->supplier->name,
                 'Data da compra' => $purchase->purchased_on->format('d/m/Y'),
-                'Total' => 'R$ '.number_format((float) $purchase->total, 2, ',', '.'),
             ] as $label => $value)
                 <div class="grid gap-1">
                     <dt class="text-sm font-medium text-slate-600">{{ $label }}</dt>
                     <dd class="wrap-anywhere font-semibold">{{ $value }}</dd>
                 </div>
             @endforeach
+            <div class="grid gap-1">
+                <dt class="text-sm font-medium text-slate-600">Total</dt>
+                <dd class="wrap-anywhere font-semibold"><x-ui.money :value="$purchase->total" /></dd>
+            </div>
         </dl>
 
         <x-ui.list-search label="Buscar item" placeholder="Nome ou código de barras" name="q_itens" />

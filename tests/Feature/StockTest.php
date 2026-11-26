@@ -46,7 +46,7 @@ class StockTest extends TestCase
         ]);
         $this->get(route('stock.show', $product))->assertOk()
             ->assertSee('Histórico de movimentações')->assertSee('Entrada manual')
-            ->assertSee('Saldo de abertura')->assertSee('R$ 10,0000')->assertSee('Joana Silva')
+            ->assertSee('Saldo de abertura')->assertSee('R$ 10,00')->assertSee('Joana Silva')->assertDontSee('R$ 10,0000')
             ->assertDontSee('name="unit_cost"', false);
     }
 

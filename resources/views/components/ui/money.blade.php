@@ -1,7 +1,6 @@
 @props(['value'])
 
 @php
-    [$integer, $fraction] = array_pad(explode('.', (string) $value, 2), 2, '');
-    $integer = preg_replace('/\B(?=(?:[0-9]{3})+(?![0-9]))/', '.', $integer);
+    $amount = is_numeric($value) ? (float) $value : 0.0;
 @endphp
-R$ {{ $integer }},{{ str_pad($fraction, 2, '0') }}
+R$ {{ number_format($amount, 2, ',', '.') }}

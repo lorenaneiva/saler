@@ -59,7 +59,13 @@
                                 </td>
                                 <td class="numeric"><x-ui.money :value="$movement->unit_cost" /></td>
                                 @php($loss = $movement->lossValue())
-                                <td class="whitespace-nowrap">{{ $loss === null ? '—' : 'R$ '.str_replace('.', ',', $loss) }}</td>
+                                <td class="whitespace-nowrap">
+                                    @if ($loss === null)
+                                        —
+                                    @else
+                                        <x-ui.money :value="$loss" />
+                                    @endif
+                                </td>
                                 <td>{{ $movement->user->name }}</td>
                                 <td class="min-w-32 wrap-anywhere">
                                     @if ($movement->adjustment)
