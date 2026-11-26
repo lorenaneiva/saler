@@ -1,0 +1,43 @@
+# Version control, editors and local tooling
+.git
+.gitattributes
+.github
+.idea
+.vscode
+.claude
+.ai
+.mcp.json
+*.md
+!README.md
+
+# Secrets and local environment files
+.env
+.env.*
+auth.json
+
+# Dependencies and build output are produced inside the image
+node_modules
+vendor
+public/build
+public/hot
+public/storage
+
+# Local runtime data
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/app/*
+storage/pail
+bootstrap/cache/*.php
+database/*.sqlite
+.phpunit.cache
+.phpunit.result.cache
+
+# Development-only files
+tests
+compose.yaml
+docker-compose*.yml
+phpunit.xml
+Dockerfile
+.dockerignore

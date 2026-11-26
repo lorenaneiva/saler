@@ -1,0 +1,28 @@
+# Render terminates HTTPS and forwards plain HTTP to $PORT.
+{
+	auto_https off
+	admin off
+	skip_install_trust
+
+	frankenphp {
+		# Few threads keep memory predictable on a 512 MB instance with a single user.
+		num_threads 4
+	}
+}
+
+:{$PORT:8080} {
+	root * /app/public
+	encode zstd br gzip
+
+	@assets path /build/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options SAMEORIGIN
+		-Server
+	}
+
+	php_server
+}

@@ -31,3 +31,12 @@
 - Testes PHP vivem em `tests/Feature` e `tests/Unit`; funções JS podem ter testes nativos Node em `tests/Unit/*.test.js`, executados com `vendor/bin/sail node --test tests/Unit/*.test.js` (não há script npm para eles; passar só o diretório falha). Consulte `phpunit.xml`, `composer.json` e `package.json` para execução/versionamento.
 - Escolha o teste mais estreito pertinente e cubra efeitos de sucesso, rejeição e atomicidade quando a regra envolve múltiplas gravações. Os testes são evidência de cobertura, não prova de fluxo de navegador além do que exercitam.
 - Quando modificar PHP, rode `vendor/bin/sail bin pint --dirty --format agent` conforme AGENTS. Documente decisões e discrepâncias em `docs/` quando mudarem; não crie documentos genéricos sem necessidade.
+
+## Deploy (Render + Neon)
+
+- Produção roda no Render como Web Service Docker (`render.yaml`, plano free) a partir da branch `main`; o banco PostgreSQL fica no Neon. A imagem (`Dockerfile`) usa FrankenPHP, instala só dependências `--no-dev`, compila os assets com Vite e roda como usuária sem privilégios na porta `$PORT`.
+- Nenhum segredo entra na imagem nem no Git. No painel do Render, cadastre `APP_KEY` (gere com `vendor/bin/sail artisan key:generate --show`), `APP_URL` (URL pública `https://…onrender.com`) e `DB_URL` (connection string do Neon, com `sslmode=require`).
+- A cada início, `docker/start.sh` roda `php artisan optimize` e `migrate --force` (só migrations pendentes, com novas tentativas para o Neon acordar). Seeders não rodam em produção.
+- O Render termina HTTPS no balanceador; por isso `bootstrap/app.php` confia em todos os proxies e o cookie de sessão é `secure`. O health check é `/up`.
+- Para criar a primeira usuária, abra o Shell do serviço no Render e rode `php artisan app:create-user`; a senha é digitada de forma oculta e nunca passada como argumento ou variável de ambiente.
+- No plano free o serviço hiberna sem acesso e o primeiro request seguinte demora; filas rodam `sync` porque não há worker.
