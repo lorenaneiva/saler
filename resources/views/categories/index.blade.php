@@ -17,8 +17,8 @@
         <label class="grid w-full gap-1 text-sm font-medium sm:w-48">
             Situação
             <select name="situacao" class="field">
-                <option value="ativas" @selected($status === 'ativas')>Ativas</option>
-                <option value="inativas" @selected($status === 'inativas')>Inativas</option>
+                <option value="ativas" @selected($status === 'ativas')>Ativa</option>
+                <option value="inativas" @selected($status === 'inativas')>Inativa</option>
                 <option value="todas" @selected($status === 'todas')>Todas</option>
             </select>
         </label>
