@@ -44,4 +44,22 @@ class ListSearchTest extends TestCase
         $this->get(route('sales.index', ['q' => 'feijão']))->assertOk()
             ->assertSee(route('sales.show', $sale))->assertDontSee(route('sales.show', $other));
     }
+
+    public function test_clear_filters_button_is_always_rendered_and_only_enabled_with_active_filters(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $disabledButton = '<span class="button-quiet clear-filters" aria-disabled="true"';
+        $enabledButton = '<a href="'.route('products.index').'" class="button-quiet clear-filters">Limpar</a>';
+
+        $this->get(route('products.index'))->assertOk()->assertSee($disabledButton, false)->assertDontSee($enabledButton, false);
+        $this->get(route('products.index', ['situacao' => 'ativos']))->assertOk()->assertSee($enabledButton, false)->assertDontSee($disabledButton, false);
+
+        $this->get(route('customers.index'))->assertOk()->assertSee($disabledButton, false);
+        $this->get(route('customers.index', ['q' => 'Ana']))->assertOk()->assertDontSee($disabledButton, false)
+            ->assertSee('<a href="'.route('customers.index').'" class="button-quiet clear-filters">Limpar</a>', false);
+
+        $this->get(route('categories.index'))->assertOk()->assertSee($disabledButton, false);
+        $this->get(route('categories.index', ['situacao' => 'todas']))->assertOk()->assertDontSee($disabledButton, false)
+            ->assertSee('<a href="'.route('categories.index').'" class="button-quiet clear-filters">Limpar</a>', false);
+    }
 }

@@ -89,6 +89,8 @@
     .button-small { @apply min-h-8 px-2.5 py-1; }
     .icon-button { @apply size-10 px-0 text-xl; }
     button:disabled { @apply cursor-not-allowed opacity-55; }
+    .clear-filters[aria-disabled="true"] { @apply cursor-not-allowed opacity-55 select-none hover:bg-transparent; }
+    @starting-style { a.clear-filters { opacity: .55; } }
     button[data-busy]::before { content: ''; @apply size-3.5 rounded-full border-2 border-current border-r-transparent; animation: spin 700ms linear infinite; }
 
     .notice { @apply border px-3.5 py-2.5 text-sm; animation: appear var(--duration) ease-out; }

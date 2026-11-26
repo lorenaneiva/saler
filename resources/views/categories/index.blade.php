@@ -13,7 +13,7 @@
         <x-ui.alert tone="error">{{ $message }}</x-ui.alert>
     @enderror
 
-    <x-ui.list-search label="Buscar categoria" placeholder="Nome da categoria">
+    <x-ui.list-search label="Buscar categoria" placeholder="Nome da categoria" :active="request()->filled('q') || $status !== 'ativas'">
         <label class="grid w-full gap-1 text-sm font-medium sm:w-48">
             Situação
             <select name="situacao" class="field">

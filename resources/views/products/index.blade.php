@@ -42,9 +42,7 @@
         </label>
         <div class="page-actions">
             <button class="button-secondary">Filtrar</button>
-            @if (array_filter($filters))
-                <a href="{{ route('products.index') }}" class="button-quiet">Limpar</a>
-            @endif
+            <x-ui.clear-filters :href="route('products.index')" :active="(bool) array_filter($filters)" />
         </div>
     </form>
 

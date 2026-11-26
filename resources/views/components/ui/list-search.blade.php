@@ -1,4 +1,4 @@
-@props(['label', 'placeholder', 'name' => 'q', 'keep' => []])
+@props(['label', 'placeholder', 'name' => 'q', 'keep' => [], 'active' => null])
 
 @php
     $parameters = array_filter(request()->only($keep), 'is_string');
@@ -17,7 +17,5 @@
     </label>
     {{ $slot }}
     <button class="button-secondary">Buscar</button>
-    @if ($value !== '')
-        <a class="button-quiet" href="{{ route(request()->route()->getName(), array_merge(request()->route()->parameters(), $parameters)) }}">Limpar</a>
-    @endif
+    <x-ui.clear-filters :href="route(request()->route()->getName(), array_merge(request()->route()->parameters(), $parameters))" :active="$active ?? $value !== ''" />
 </form>
