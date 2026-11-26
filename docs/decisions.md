@@ -1,0 +1,22 @@
+# Decisões técnicas e de produto registradas
+
+Registro reconstruído de código, migrations, testes e mensagens/commits disponíveis no histórico desta conversa e no Git até 26/11/2026. A justificativa é inferida quando não há ADR formal; cada item marca essa condição.
+
+| Decisão | Evidência e motivo | Consequência de mudar |
+| --- | --- | --- |
+| Monólito Laravel com Blade e interações JS pontuais | `routes/web.php`, `resources/views`, JS ES modules; commits mostram evolução incremental sem SPA. Inferência: reduzir complexidade operacional do MVP. | Introduzir SPA/API ou framework exige rever autenticação, build, testes, navegação e contratos JSON. |
+| Actions para operações que gravam vários registros | `RegisterSale`, `ConfirmPurchase`, `CancelPurchase`, `RegisterStockMovement`, `RegisterCustomerPayment` concentram transações e locks. | Mover lógica para controllers/models pode quebrar atomicidade/idempotência e espalhar regras. |
+| Custo médio e custo histórico guardados com 4 casas | migration de produtos/movimentos/itens; `BigDecimal` em `ConfirmPurchase`; evita truncar cálculo ponderado e snapshots. | Reduzir casas muda resultados históricos, margem e perdas; requer migração, reconciliação e testes. |
+| Preços, totais e pagamentos com 2 casas | migrations, Form Requests, ações e teste de pricing; corresponde à precisão monetária de entrada/venda. | Aumentar/reduzir precisão afeta contratos de validação, exibição, cálculos e migração. |
+| Formatação brasileira de moeda fica na apresentação | `<x-ui.money>` e `MoneyFormattingTest`; requisito explícito pediu duas casas visuais sem alterar armazenamento/cálculos. | Duplicar formatação cria inconsistência; mudar precisão visual não pode contaminar domínio. |
+| Pagamento é uma entrada financeira e aloca-se por pivot para vendas | `payments` + `payment_allocations`; token de submissão único e Action aloca vendas antigas primeiro, prevenindo duplicação e permitindo um pagamento quitar várias vendas. | Alterar para alocação manual/parcelas exige revisar saldo, constraints, perfil/histórico e idempotência. |
+| Estoque é um saldo mais um livro de movimentos com origem | `stock_movements`, vínculos a itens e ajustes; teste cobre movimentos e reversão. | Atualização direta sem movimento rompe auditoria e torna reconciliação difícil. |
+| Compra mantém estados e estorno explícito; produto é desativado em vez de apagado | `Purchase` estados, `CancelPurchase`, exclusão lógica via `is_active`; preserve referências históricas. | Hard delete pode quebrar FKs e históricos; novos estados exigem definir transições/efeitos de estoque. |
+| Selects evoluíram para autocomplete comum | `autocomplete.js`, `AutocompleteTest`; preferência registrada para pesquisa imediata com acentos, teclado e poucos cliques. | Implementação por tela duplica acessibilidade/valores; mudança central requer compatibilidade com selects nativos, formulários e popups. |
+| Produto é editado em drawer na listagem e novo cadastro reutiliza editor | `product-editor.js`, `products/editor.blade.php`, testes do drawer; requisito explícito priorizou manter lista/contexto visíveis e evitar linhas comprimidas. | Navegação para outra tela perde contexto; editor paralelo duplica validação e comportamento. |
+| Listagens preservam contexto de consulta | `withQueryString`, testes `ListSearchTest`/`ProductDrawerTest`; busca/paginação/posição são parte da produtividade diária. | Redirect/reload sem query pode frustrar e esconder o registro editado. |
+| Foco usa sombra cinza sutil, sem anel afastado em campos | CSS global com transição 180 ms e outline de teclado global; requisito explícito de foco discreto mantendo teclado identificável. | Regras locais podem reintroduzir inconsistência/shift; centralizar evita colisão com textos. |
+
+## Diretrizes ao rever uma decisão
+
+Decisões acima não substituem requisitos atuais nem provam que toda tela está correta. Antes de alterá-las, identifique a regra, consulte migrations e consumidores, descreva impacto nos snapshots/auditoria, e cubra a transição com testes. Se o comportamento pretendido mudar, atualize esta tabela e `business-rules.md` na mesma tarefa.

@@ -1,3 +1,33 @@
+# Saler — guia de entrada para agentes
+
+Saler é um sistema web para administrar as operações diárias de um pequeno comércio. A pessoa usuária principal é uma vendedora que precisa cadastrar produtos e clientes, lançar compras e vendas, acompanhar estoque e registrar recebimentos com rapidez. Priorize clareza, baixa carga cognitiva e preservação do histórico comercial e financeiro.
+
+## Antes de iniciar uma tarefa
+
+1. Leia este arquivo e as regras Laravel/Boost mantidas abaixo.
+2. Consulte [README.md](README.md) para iniciar o projeto e [docs/README.md](docs/README.md) para o índice da documentação do domínio.
+3. Leia os documentos específicos da tarefa: [arquitetura](docs/architecture.md), [regras de negócio](docs/business-rules.md), [padrões de desenvolvimento](docs/development.md), [Design System e UX](docs/design-system.md), [estado atual](docs/current-state.md) e [decisões técnicas](docs/decisions.md).
+4. Trate migrations, código e testes como evidência do comportamento implementado. O PDF [docs/requisitos-funcionais.pdf](docs/requisitos-funcionais.pdf) descreve requisitos do MVP e evoluções planejadas; não assuma que tudo foi construído. Consulte também o [diagrama lógico do banco](docs/modelagem-logica-banco-de-dados.webp).
+5. Verifique `git status` antes de editar e preserve alterações não relacionadas.
+
+## Stack e limites de mudança
+
+- Laravel 13 (constraint `^13.17`), PHP `^8.5`, Blade, Eloquent, PostgreSQL no Sail, Vite 8, Tailwind CSS 4 e JavaScript ES modules sem framework de interface.
+- A aplicação separa regras transacionais em `app/Actions`, validação em `app/Http/Requests`, acesso HTTP em controllers, persistência/relacionamentos em models e apresentação em Blade/CSS/JS.
+- Não altere regras financeiras, saldos, estoque ou precisão armazenada como efeito colateral de uma tarefa de apresentação. Antes de qualquer mudança de domínio, trace o fluxo inteiro, leia testes relacionados e escreva/ajuste testes quando solicitado ou exigido pela tarefa.
+- Reutilize componentes existentes em `resources/views/components/ui` e os módulos JS existentes. Não introduza dependências sem autorização.
+- Não documente credenciais nem copie valores de `.env`; ele contém configuração local sensível. Use `.env.example` para orientar setup.
+
+## Validação e manutenção da documentação
+
+- Execute comandos PHP, Artisan, Composer e Node por `vendor/bin/sail`, conforme as instruções abaixo.
+- Se alterar PHP, rode `vendor/bin/sail bin pint --dirty --format agent`. Rode os testes mais estreitos que cubram a mudança quando a tarefa pedir validação/testes; não amplie o escopo sem necessidade.
+- Ao alterar comportamento, compare os requisitos com código e testes e atualize os documentos de domínio/estado/decisões afetados. Marque claramente o que é requisito planejado, comportamento evidenciado e hipótese pendente de validação.
+- Não declare uma funcionalidade concluída só pela existência de uma rota, view ou classe. Registre limites de cobertura e divergências.
+- Mantenha este arquivo como índice e regras operacionais para agentes; mantenha detalhes de domínio nos documentos em `docs/` para evitar duplicação.
+
+---
+
 <laravel-boost-guidelines>
 === foundation rules ===
 
