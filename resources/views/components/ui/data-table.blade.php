@@ -23,7 +23,17 @@
         @endif
     </header>
     <div id="{{ $id }}-results" class="table-results" data-live-region>
-        <x-ui.table :label="$label ?? $title" :framed="false">{{ $slot }}</x-ui.table>
+        <x-ui.table :label="$label ?? $title" :framed="false">
+            {{ $slot }}
+            @if ($paginator?->hasPages())
+                {{-- Blank rows keep every page as tall as a full one, so the pagination controls never move. --}}
+                <tbody class="table-fillers" aria-hidden="true">
+                    @for ($filler = max($paginator->count(), 1); $filler < $paginator->perPage(); $filler++)
+                        <tr><td></td></tr>
+                    @endfor
+                </tbody>
+            @endif
+        </x-ui.table>
         @if ($paginator)
             <x-ui.pagination :paginator="$paginator" />
         @endif

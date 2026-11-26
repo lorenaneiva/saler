@@ -4,6 +4,7 @@ import { fetchLivePage, initializeLiveSearch, replaceLiveRegions } from './live-
 import { initializePaymentDistributions } from './payment-distribution';
 import { commercialSummary, normalizePlainDecimal } from './product-pricing';
 import { renderCommercialSummary } from './commercial-summary';
+import { initializeTableFillers } from './table-fillers';
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const confirmations = new WeakSet();
@@ -11,6 +12,7 @@ const confirmations = new WeakSet();
 initializeAutocompletes();
 initializeLiveSearch();
 initializePaymentDistributions();
+initializeTableFillers();
 
 document.querySelectorAll('[data-inline-editor]').forEach(initializeInlineEditor);
 

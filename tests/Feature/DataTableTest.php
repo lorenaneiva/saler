@@ -46,11 +46,11 @@ class DataTableTest extends TestCase
 
         $this->actingAs(User::factory()->create())->get(route('customers.index', ['q' => 'Silva', 'page' => 2]))->assertOk()
             ->assertSeeText('45 clientes')
-            ->assertSeeText('11–20 de 45')
+            ->assertSeeText('16–30 de 45')
             ->assertSee('href="'.e(route('customers.index', ['q' => 'Silva', 'page' => 1])).'" rel="prev" aria-label="Página anterior"', false)
             ->assertSee('href="'.e(route('customers.index', ['q' => 'Silva', 'page' => 3])).'" rel="next" aria-label="Próxima página"', false)
             ->assertSee('<input type="hidden" name="q" value="Silva">', false)
-            ->assertSee('name="page" value="2" min="1" max="5"', false);
+            ->assertSee('name="page" value="2" min="1" max="3"', false);
     }
 
     public function test_search_forms_and_clear_links_drop_the_current_page_so_filtering_restarts_on_page_one(): void
@@ -72,5 +72,19 @@ class DataTableTest extends TestCase
             ->assertSee('<th scope="col" class="money">Total</th>', false)
             ->assertSee('<td class="money">R$ 15,00', false)
             ->assertSee('<span class="badge badge-danger">Pendente</span>', false);
+    }
+
+    public function test_short_pages_are_completed_with_blank_rows_only_when_there_is_more_than_one_page(): void
+    {
+        Customer::factory()->count(20)->create();
+        $this->actingAs(User::factory()->create());
+
+        $lastPage = $this->get(route('customers.index', ['page' => 2]))->assertOk()->assertSeeText('16–20 de 20')->getContent();
+        $this->assertSame(10, substr_count(str($lastPage)->betweenFirst('<tbody class="table-fillers" aria-hidden="true">', '</tbody>'), '<tr>'));
+
+        $emptyPage = $this->get(route('customers.index', ['page' => 9]))->assertOk()->getContent();
+        $this->assertSame(14, substr_count(str($emptyPage)->betweenFirst('<tbody class="table-fillers" aria-hidden="true">', '</tbody>'), '<tr>'));
+
+        $this->get(route('customers.index', ['q' => Customer::query()->value('name')]))->assertOk()->assertDontSee('table-fillers', false);
     }
 }

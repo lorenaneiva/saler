@@ -81,7 +81,7 @@ class ProductDrawerTest extends TestCase
     public function test_refreshing_the_filtered_page_after_saving_keeps_pagination_and_updated_values(): void
     {
         $category = Category::factory()->create();
-        Product::factory()->count(20)->for($category)->create(['name' => 'Arroz A']);
+        Product::factory()->count(15)->for($category)->create(['name' => 'Arroz A']);
         $product = Product::factory()->for($category)->create(['name' => 'Arroz Z', 'sale_price' => '10.00']);
         $this->actingAs(User::factory()->create());
 
@@ -89,10 +89,10 @@ class ProductDrawerTest extends TestCase
             'name' => 'Arroz Z', 'category_id' => $category->id, 'sale_price' => '15.50',
         ])->assertOk();
 
-        $this->get(route('products.index', ['q' => 'Arroz', 'categoria' => $category->id, 'situacao' => 'ativos', 'page' => 3]))
+        $this->get(route('products.index', ['q' => 'Arroz', 'categoria' => $category->id, 'situacao' => 'ativos', 'page' => 2]))
             ->assertOk()->assertSee('Arroz Z')->assertSee('R$ 15,50')->assertDontSee('Arroz A')
             ->assertSee('data-product-list', false)
-            ->assertViewHas('products', fn ($products): bool => $products->currentPage() === 3 && $products->total() === 21);
+            ->assertViewHas('products', fn ($products): bool => $products->currentPage() === 2 && $products->total() === 16);
     }
 
     public function test_guests_cannot_load_or_submit_product_drawer_forms(): void

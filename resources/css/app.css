@@ -139,6 +139,8 @@
     .data-table tr:has([data-row-link]):is(:hover, :focus-within) { background: #d9e6f8; }
     .data-table [data-row-link]::after { content: ''; position: absolute; inset: 0; z-index: 1; }
     .data-table tr:has([data-row-link]) :is(a:not([data-row-link]), button, input, select, textarea) { position: relative; z-index: 2; }
+    .data-table tbody.table-fillers tr, .data-table tbody.table-fillers tr:hover { background: transparent; border: 0; }
+    .data-table tbody.table-fillers td { height: var(--table-row-height, 2.5625rem); padding: 0; }
     .data-table .numeric { @apply whitespace-nowrap tabular-nums; }
     .data-table .money { @apply text-right whitespace-nowrap tabular-nums; }
     .data-table .row-actions { @apply flex flex-wrap items-center justify-end gap-1; }

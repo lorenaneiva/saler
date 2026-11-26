@@ -1,6 +1,7 @@
 import { commercialSummary, formatProductPrice, parseProductPrice } from './product-pricing';
 import { focusFormControl, initializeAutocompletes } from './autocomplete';
 import { renderCommercialSummary } from './commercial-summary';
+import { syncTableFillers } from './table-fillers';
 
 /** Money fields use Brazilian formatting while typing and are sent as plain decimals. */
 function prepareMoneyInput(input) {
@@ -164,6 +165,7 @@ export function initializeProductEditor(closeDialog) {
         const position = { left: window.scrollX, top: window.scrollY };
         replacement.style.minHeight = `${current.getBoundingClientRect().height}px`;
         current.replaceWith(replacement);
+        syncTableFillers(replacement);
         const table = replacement.querySelector('.table-region');
         if (table) {
             table.scrollLeft = horizontalScroll;
