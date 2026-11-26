@@ -5,7 +5,7 @@ Revisão documental do código, testes, migrations, requisitos e histórico Git 
 ## Implementado com cobertura identificada
 
 - Login/logout por sessão, proteção de rotas e bloqueio após cinco tentativas de login inválidas (`AuthenticationTest`). Não há matriz de papéis/permissões.
-- Cadastros de categoria, produto, cliente e fornecedor; busca/paginação; desativação de produtos, fornecedores e categorias já usadas; reativação de fornecedor e categoria; filtro de situação em categorias (ativas por padrão); edição contextual de categoria/fornecedor/cliente e drawer de produto (`CategoryTest`, `ProductTest`, `CustomerTest`, `SupplierTest`, `InlineEditingTest`, `ProductDrawerTest`). `CustomerTest` cobre acesso de visitante, criação/listagem/consulta, edição, validação, resumo financeiro e histórico de compras exibido por padrão ao abrir o perfil (aba Compras).
+- Cadastros de categoria, produto, cliente e fornecedor; busca/paginação; desativação de produtos, fornecedores e categorias já usadas (categoria só sem produtos ativos); reativação de fornecedor e categoria; filtro de situação em categorias (ativas por padrão); edição contextual de categoria/fornecedor/cliente e drawer de produto (`CategoryTest`, `ProductTest`, `CustomerTest`, `SupplierTest`, `InlineEditingTest`, `ProductDrawerTest`). `CustomerTest` cobre acesso de visitante, criação/listagem/consulta, edição, validação, resumo financeiro e histórico de compras exibido por padrão ao abrir o perfil (aba Compras).
 - Compra com múltiplos itens, cadastro de produto pela compra, desconto, atualização imediata de estoque/custo médio e cancelamento com reversão condicionada a saldo (`PurchaseTest`). Há estados pending/confirmed/cancelled, embora o fluxo de criação confirme imediatamente.
 - Consulta de estoque, histórico de movimentos, motivos e entradas/saídas manuais com auditoria (`StockTest`).
 - Venda com múltiplos itens, snapshots de preço/custo, desconto, baixa de estoque e rejeição atômica por saldo insuficiente (`SaleTest`).
@@ -35,7 +35,7 @@ Revisão documental do código, testes, migrations, requisitos e histórico Git 
 - A exibição monetária em `<x-ui.money>` converte para float antes de `number_format`; embora testes cubram valores usuais e a camada seja somente apresentação, vale avaliar limites de precisão para valores extremos permitidos pelas colunas.
 - Testes cobrem controllers/HTML/ações e utilitários, mas não foi identificado teste automatizado real de navegador para foco, leitor de tela, posicionamento/responsividade do drawer e autocomplete. Acessibilidade visual precisa de verificação manual.
 
-Em 26/11/2026 a suíte PHPUnit completa (89 testes) e os testes JS de `tests/Unit/*.test.js` (8 testes) foram executados e aprovados. Não há bug de interface assumido sem evidência; itens acima são lacunas ou riscos a validar.
+Em 26/11/2026 a suíte PHPUnit completa (90 testes) e os testes JS de `tests/Unit/*.test.js` (8 testes) foram executados e aprovados. Não há bug de interface assumido sem evidência; itens acima são lacunas ou riscos a validar.
 
 ## Próximos passos recomendados
 

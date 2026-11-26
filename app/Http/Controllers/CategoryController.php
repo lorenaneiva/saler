@@ -23,7 +23,8 @@ class CategoryController extends Controller
         }
 
         return view('categories.index', [
-            'categories' => Category::query()->withCount('products')
+            'categories' => Category::query()
+                ->withCount(['products', 'products as active_products_count' => fn ($products) => $products->where('is_active', true)])
                 ->when($search !== '', fn ($categories) => $categories->whereLike('name', $pattern))
                 ->when($status !== 'todas', fn ($categories) => $categories->where('is_active', $status === 'ativas'))
                 ->orderBy('name')->orderBy('id')->paginate(20)->withQueryString(),
@@ -67,7 +68,20 @@ class CategoryController extends Controller
 
     public function deactivate(Category $category): RedirectResponse
     {
-        $category->forceFill(['is_active' => false])->save();
+        $deactivated = $category->getConnection()->transaction(function () use ($category): bool {
+            $lockedCategory = Category::query()->lockForUpdate()->findOrFail($category->getKey());
+
+            if ($lockedCategory->products()->where('is_active', true)->exists()) {
+                return false;
+            }
+
+            return $lockedCategory->forceFill(['is_active' => false])->save();
+        });
+
+        if (! $deactivated) {
+            return back(fallback: route('categories.index'))
+                ->withErrors(['category' => 'Categorias com produtos ativos não podem ser desativadas; desative os produtos antes.']);
+        }
 
         return back(fallback: route('categories.index'))->with('status', 'Categoria desativada.');
     }

@@ -89,7 +89,7 @@ class CategoryTest extends TestCase
     public function test_category_linked_to_a_product_offers_deactivation_instead_of_deletion(): void
     {
         $category = Category::factory()->create(['name' => 'Bebidas']);
-        Product::factory()->for($category)->create();
+        Product::factory()->for($category)->create()->forceFill(['is_active' => false])->save();
 
         $this->actingAs(User::factory()->create())
             ->get(route('categories.index'))->assertOk()
@@ -119,10 +119,27 @@ class CategoryTest extends TestCase
         $this->assertModelExists($category);
     }
 
+    public function test_category_with_active_products_cannot_be_deactivated(): void
+    {
+        $category = Category::factory()->create(['name' => 'Bebidas']);
+        Product::factory()->for($category)->create();
+
+        $this->actingAs(User::factory()->create())
+            ->get(route('categories.index'))->assertOk()
+            ->assertSee('aria-label="Desativar Bebidas indisponível: há produtos ativos"', false)
+            ->assertDontSee(route('categories.deactivate', $category));
+
+        $this->patch(route('categories.deactivate', $category))
+            ->assertRedirectToRoute('categories.index')
+            ->assertSessionHasErrors(['category' => 'Categorias com produtos ativos não podem ser desativadas; desative os produtos antes.']);
+
+        $this->assertTrue($category->fresh()->is_active);
+    }
+
     public function test_category_can_be_deactivated_and_activated_again(): void
     {
         $category = Category::factory()->create();
-        Product::factory()->for($category)->create();
+        Product::factory()->for($category)->create()->forceFill(['is_active' => false])->save();
 
         $this->actingAs(User::factory()->create())
             ->patch(route('categories.deactivate', $category))

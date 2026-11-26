@@ -55,6 +55,10 @@
                                     @method('DELETE')
                                     <button class="button-quiet danger button-small" aria-label="Excluir {{ $category->name }}">Excluir</button>
                                 </form>
+                            @elseif ($category->is_active && $category->active_products_count > 0)
+                                <button type="button" data-inline-display disabled class="button-quiet danger button-small"
+                                    title="Desative os produtos ativos desta categoria antes"
+                                    aria-label="Desativar {{ $category->name }} indisponível: há produtos ativos">Desativar</button>
                             @else
                                 <form data-inline-display method="POST" action="{{ $category->is_active ? route('categories.deactivate', $category) : route('categories.activate', $category) }}"
                                     @if ($category->is_active) data-confirm="Desativar a categoria {{ $category->name }}?" @endif>
