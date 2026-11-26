@@ -23,6 +23,7 @@
 
         <section class="grid gap-3">
             <h2 class="text-base font-semibold">Histórico de movimentações</h2>
+            <x-ui.list-search label="Buscar movimentação" placeholder="Responsável, motivo ou observação" />
             <x-ui.table label="Histórico de movimentações de estoque">
                     <thead>
                         <tr>
@@ -39,11 +40,11 @@
                                 <td>
                                     {{ $movement->typeLabel() }}
                                     @if ($movement->purchaseItem)
-                                        <a href="{{ route('purchases.show', $movement->purchaseItem->purchase_id) }}" class="text-emerald-800 underline">
+                                        <a data-row-link href="{{ route('purchases.show', $movement->purchaseItem->purchase_id) }}" class="text-brand underline">
                                             #{{ $movement->purchaseItem->purchase_id }}
                                         </a>
                                     @elseif ($movement->saleItem)
-                                        <a href="{{ route('sales.show', $movement->saleItem->sale_id) }}" class="text-emerald-800 underline">
+                                        <a data-row-link href="{{ route('sales.show', $movement->saleItem->sale_id) }}" class="text-brand underline">
                                             #{{ $movement->saleItem->sale_id }}
                                         </a>
                                     @endif
@@ -72,7 +73,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <x-ui.empty :columns="8">Nenhuma movimentação registrada.</x-ui.empty>
+                            <x-ui.empty :columns="8">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhuma movimentação registrada.' }}</x-ui.empty>
                         @endforelse
                     </tbody>
                 </x-ui.table>

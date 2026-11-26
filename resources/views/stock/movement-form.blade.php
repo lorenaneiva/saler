@@ -36,7 +36,7 @@
         @if ($reasons->isEmpty())
             <p class="text-sm text-slate-600">Cadastre um motivo para registrar a movimentação.</p>
         @endif
-        <a href="{{ route('stock.reasons.index') }}" class="w-fit text-sm text-emerald-800 underline">Motivos de ajuste</a>
+        <a href="{{ route('stock.reasons.index') }}" class="w-fit text-sm text-brand underline">Motivos de ajuste</a>
     </div>
     <label class="grid content-start gap-2 font-medium">
         <span>Observação (opcional)</span>

@@ -9,6 +9,8 @@
         </x-slot:actions>
     </x-ui.page-header>
 
+    <x-ui.list-search label="Buscar compra" placeholder="Número, fornecedor ou produto" />
+
     <x-ui.table label="Compras de mercadorias">
         <thead>
             <tr>
@@ -22,14 +24,14 @@
             @forelse ($purchases as $purchase)
                 <tr>
                     <th scope="row" class="px-4 py-4 font-semibold">
-                        <a href="{{ route('purchases.show', $purchase) }}" class="text-emerald-800 underline">#{{ $purchase->id }}</a>
+                        <a data-row-link href="{{ route('purchases.show', $purchase) }}" class="text-brand underline">#{{ $purchase->id }}</a>
                     </th>
                     <td>{{ $purchase->supplier->name }}</td>
                     <td class="whitespace-nowrap">{{ $purchase->purchased_on->format('d/m/Y') }}</td>
                     <td class="numeric"><x-ui.money :value="$purchase->total" /></td>
                 </tr>
             @empty
-                <x-ui.empty :columns="4">Nenhuma compra registrada.</x-ui.empty>
+                <x-ui.empty :columns="4">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhuma compra registrada.' }}</x-ui.empty>
             @endforelse
         </tbody>
     </x-ui.table>

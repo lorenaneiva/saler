@@ -12,13 +12,6 @@
         </x-slot:actions>
     </x-ui.page-header>
 
-    <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-700">
-        <span>Telefone: <x-ui.contact :value="$customer->phone" kind="phone" /></span>
-        @if ($customer->email)
-            <span class="wrap-anywhere">E-mail: {{ $customer->email }}</span>
-        @endif
-    </div>
-
     <dl class="metrics" aria-label="Resumo financeiro">
         <div class="metric">
             <dt>Total comprado</dt>
@@ -39,21 +32,17 @@
     </dl>
 
     <nav class="section-tabs" aria-label="Seções do cliente">
-        @foreach (['geral' => 'Visão geral', 'compras' => 'Compras', 'aberto' => 'Contas em aberto', 'pagamentos' => 'Pagamentos', 'cadastro' => 'Cadastro'] as $key => $label)
-            <a href="{{ $key === 'geral' ? route('customers.show', $customer) : route('customers.show', [$customer, 'secao' => $key]) }}"
+        @foreach (['compras' => 'Compras', 'aberto' => 'Contas em aberto', 'pagamentos' => 'Pagamentos', 'cadastro' => 'Cadastro'] as $key => $label)
+            <a href="{{ $key === 'resumo' ? route('customers.show', $customer) : route('customers.show', [$customer, 'secao' => $key]) }}"
                 @if ($section === $key) aria-current="page" @endif>{{ $label }}</a>
         @endforeach
     </nav>
 
-    @if ($sales)
+    @if ($section === 'compras' || $section === 'aberto')
         @include('customers.purchase-history', ['sales' => $sales, 'section' => $section])
-    @endif
-
-    @if ($payments)
+    @elseif ($section === 'pagamentos')
         @include('customers.payment-history', ['payments' => $payments])
-    @endif
-
-    @if (in_array($section, ['geral', 'cadastro'], true))
+    @elseif ($section === 'cadastro')
         <section class="grid gap-2" aria-labelledby="customer-data-title">
             <h2 id="customer-data-title" class="text-base font-semibold">Dados cadastrais</h2>
             <dl class="panel grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">

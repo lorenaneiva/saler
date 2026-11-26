@@ -47,7 +47,7 @@
                         @include('purchases.item-fields', ['index' => $index, 'item' => is_array($item) ? $item : []])
                     @endforeach
                 </div>
-                <button type="button" data-line-add class="button-secondary">Adicionar produto</button>
+                <button type="button" data-line-add class="button-secondary">Adicionar item</button>
             </fieldset>
 
             <div class="page-actions">

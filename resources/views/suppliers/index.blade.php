@@ -9,6 +9,8 @@
         </x-slot:actions>
     </x-ui.page-header>
 
+    <x-ui.list-search label="Buscar fornecedor" placeholder="Nome, contato ou representante" />
+
     <x-ui.table label="Cadastro de fornecedores">
         <thead>
             <tr>
@@ -30,7 +32,7 @@
                     </td>
                     <td>
                         <div class="row-actions">
-                            <a href="{{ route('suppliers.edit', $supplier) }}" aria-label="Editar {{ $supplier->name }}" class="button-quiet button-small">Editar</a>
+                            <a data-row-link href="{{ route('suppliers.edit', $supplier) }}" aria-label="Editar {{ $supplier->name }}" class="button-quiet button-small">Editar</a>
                             <form method="POST" action="{{ $supplier->is_active ? route('suppliers.destroy', $supplier) : route('suppliers.activate', $supplier) }}"
                                 @if ($supplier->is_active) data-confirm="Desativar o fornecedor {{ $supplier->name }}?" @endif>
                                 @csrf
@@ -44,7 +46,7 @@
                     </td>
                 </tr>
             @empty
-                <x-ui.empty :columns="5">Nenhum fornecedor cadastrado.</x-ui.empty>
+                <x-ui.empty :columns="5">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhum fornecedor cadastrado.' }}</x-ui.empty>
             @endforelse
         </tbody>
     </x-ui.table>

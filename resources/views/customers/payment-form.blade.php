@@ -1,6 +1,6 @@
 <x-ui.errors />
 
-<dl class="metric metric-emphasis rounded-md">
+<dl class="metric metric-emphasis">
     <dt>Saldo disponível para abater</dt>
     <dd><x-ui.money :value="$outstandingTotal" /></dd>
 </dl>

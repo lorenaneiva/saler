@@ -34,12 +34,12 @@
             <ul class="panel grid divide-y divide-slate-200">
                 @foreach ($modules as [$name, $description, $route])
                     <li>
-                        <a href="{{ route($route) }}" class="flex min-h-14 items-center justify-between gap-3 px-4 py-2 transition-colors duration-200 hover:bg-emerald-50">
+                        <a href="{{ route($route) }}" class="flex min-h-14 items-center justify-between gap-3 px-4 py-2 transition-colors duration-200 hover:bg-blue-50">
                             <span>
                                 <span class="block text-sm font-semibold">{{ $name }}</span>
                                 <span class="block text-sm text-slate-600">{{ $description }}</span>
                             </span>
-                            <span aria-hidden="true" class="text-emerald-800">→</span>
+                            <span aria-hidden="true" class="text-brand">→</span>
                         </a>
                     </li>
                 @endforeach

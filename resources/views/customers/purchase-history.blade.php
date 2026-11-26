@@ -1,5 +1,6 @@
 <section class="grid gap-3">
     <h2 class="text-base font-semibold">{{ $section === 'aberto' ? 'Contas em aberto' : 'Histórico de compras' }}</h2>
+    <x-ui.list-search label="Buscar compra" placeholder="Número da venda ou nome do produto" name="q_compras" :keep="['secao', 'q_pagamentos', 'pagamentos']" />
     <x-ui.table label="Compras do cliente">
             <thead>
                 <tr>
@@ -12,7 +13,7 @@
                 @forelse ($sales as $sale)
                     <tr>
                         <th scope="row" >
-                            <a href="{{ route('sales.show', $sale) }}" class="text-emerald-800 underline">#{{ $sale->id }}</a>
+                            <a data-row-link href="{{ route('sales.show', $sale) }}" class="text-brand underline">#{{ $sale->id }}</a>
                         </th>
                         <td class="whitespace-nowrap">{{ $sale->sold_on->format('d/m/Y') }}</td>
                         <td class="numeric"><x-ui.money :value="$sale->total" /></td>
@@ -26,7 +27,7 @@
                         </td>
                     </tr>
                 @empty
-                    <x-ui.empty :columns="6">{{ $section === 'aberto' ? 'Nenhuma conta em aberto.' : 'Nenhuma compra registrada para este cliente.' }}</x-ui.empty>
+                    <x-ui.empty :columns="6">{{ request()->filled('q_compras') ? 'Nenhum resultado para esta busca.' : ($section === 'aberto' ? 'Nenhuma conta em aberto.' : 'Nenhuma compra registrada para este cliente.') }}</x-ui.empty>
                 @endforelse
             </tbody>
     </x-ui.table>

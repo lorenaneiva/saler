@@ -47,6 +47,18 @@ class CustomerPaymentTest extends TestCase
             ->assertSeeTextInOrder(['Saldo em aberto', 'R$ 100,00'])
             ->assertSee('Quitada')->assertSee('Parcialmente paga')
             ->assertSee('Histórico de pagamentos')->assertSee('Pix recebido no balcão');
+
+        $this->get(route('sales.show', $olderSale))->assertOk()
+            ->assertSeeTextInOrder(['Quitada', 'Valor pago', 'R$ 500,00', 'Saldo em aberto', 'R$ 0,00'])
+            ->assertSeeTextInOrder(['Valor abatido nesta venda', '#'.$payment->id, '24/11/2026', 'Pix', 'R$ 500,00'])
+            ->assertDontSeeText('R$ 600,00');
+
+        $this->get(route('sales.show', $newerSale))->assertOk()
+            ->assertSeeTextInOrder(['Parcialmente paga', 'Valor pago', 'R$ 100,00', 'Saldo em aberto', 'R$ 100,00'])
+            ->assertSeeTextInOrder(['Valor abatido nesta venda', '#'.$payment->id, 'Pix', 'R$ 100,00'])
+            ->assertDontSeeText('R$ 500,00');
+
+        $this->get(route('sales.index'))->assertOk()->assertSeeText('Quitada')->assertSeeText('Parcialmente paga');
     }
 
     public function test_repeated_submission_is_recorded_once_and_only_reduces_the_oldest_debt(): void

@@ -22,6 +22,7 @@
             @endforeach
         </dl>
 
+        <x-ui.list-search label="Buscar item" placeholder="Nome ou código de barras" name="q_itens" />
         <x-ui.table label="Itens da compra">
                 <thead>
                     <tr>
@@ -31,15 +32,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($purchase->items as $item)
+                    @forelse ($purchase->items as $item)
                         <tr>
-                            <th scope="row" class="min-w-36 font-semibold">{{ $item->product->name }}</th>
+                            <th scope="row" class="min-w-36 font-semibold">
+                                <a data-row-link href="{{ route('stock.show', $item->product_id) }}">{{ $item->product->name }}</a>
+                            </th>
                             <td>{{ $item->quantity }}</td>
                             @foreach ([$item->unit_cost, $item->discount, $item->total] as $amount)
                                 <td class="numeric"><x-ui.money :value="$amount" /></td>
                             @endforeach
                         </tr>
-                    @endforeach
+                    @empty
+                        <x-ui.empty :columns="5">Nenhum item encontrado.</x-ui.empty>
+                    @endforelse
                 </tbody>
             </x-ui.table>
 

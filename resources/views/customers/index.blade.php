@@ -9,6 +9,8 @@
         </x-slot:actions>
     </x-ui.page-header>
 
+    <x-ui.list-search label="Buscar cliente" placeholder="Nome, telefone, e-mail ou CPF" />
+
     <x-ui.table label="Cadastro de clientes">
         <thead>
             <tr>
@@ -21,7 +23,7 @@
             @forelse ($customers as $customer)
                 <tr>
                     <th scope="row" class="min-w-36 font-semibold">
-                        <a href="{{ route('customers.show', $customer) }}" class="text-emerald-800 underline">
+                        <a data-row-link href="{{ route('customers.show', $customer) }}" class="text-brand underline">
                             {{ $customer->name }}
                         </a>
                     </th>
@@ -29,7 +31,7 @@
                     <td>{{ $customer->email ?? '—' }}</td>
                 </tr>
             @empty
-                <x-ui.empty :columns="3">Nenhum cliente cadastrado.</x-ui.empty>
+                <x-ui.empty :columns="3">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhum cliente cadastrado.' }}</x-ui.empty>
             @endforelse
         </tbody>
     </x-ui.table>

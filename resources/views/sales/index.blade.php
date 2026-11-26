@@ -9,10 +9,12 @@
         </x-slot:actions>
     </x-ui.page-header>
 
+    <x-ui.list-search label="Buscar venda" placeholder="Número, cliente ou produto" />
+
     <x-ui.table label="Vendas registradas">
         <thead>
             <tr>
-                @foreach (['Venda', 'Cliente', 'Data', 'Total'] as $heading)
+                @foreach (['Venda', 'Cliente', 'Data', 'Total', 'Situação financeira'] as $heading)
                     <th scope="col">{{ $heading }}</th>
                 @endforeach
             </tr>
@@ -21,14 +23,15 @@
             @forelse ($sales as $sale)
                 <tr>
                     <th scope="row">
-                        <a href="{{ route('sales.show', $sale) }}" class="text-emerald-800 underline">#{{ $sale->id }}</a>
+                        <a data-row-link href="{{ route('sales.show', $sale) }}" class="text-brand underline">#{{ $sale->id }}</a>
                     </th>
                     <td>{{ $sale->customer->name }}</td>
                     <td class="whitespace-nowrap">{{ $sale->sold_on->format('d/m/Y') }}</td>
                     <td class="numeric"><x-ui.money :value="$sale->total" /></td>
+                    <td>{{ $sale->paymentStatus() }}</td>
                 </tr>
             @empty
-                <x-ui.empty :columns="4">Nenhuma venda registrada.</x-ui.empty>
+                <x-ui.empty :columns="5">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhuma venda registrada.' }}</x-ui.empty>
             @endforelse
         </tbody>
     </x-ui.table>

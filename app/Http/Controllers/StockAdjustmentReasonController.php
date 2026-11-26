@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ListSearchRequest;
 use App\Models\StockAdjustmentReason;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -10,10 +11,11 @@ use Illuminate\View\View;
 
 class StockAdjustmentReasonController extends Controller
 {
-    public function index(): View
+    public function index(ListSearchRequest $request): View
     {
         return view('stock.reasons', [
-            'reasons' => StockAdjustmentReason::query()->orderBy('name')->paginate(20),
+            'reasons' => $request->filter(StockAdjustmentReason::query(), ['name'])
+                ->orderBy('name')->paginate(20)->withQueryString(),
         ]);
     }
 

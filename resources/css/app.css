@@ -3,23 +3,23 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @theme {
+    --color-brand: #2058ad;
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
     :root {
-        --surface: #f6f8f7;
-        --ink: #172720;
-        --muted: #4d6157;
-        --line: #dce5df;
-        --brand: #10614c;
-        --brand-hover: #0b4a39;
-        --sidebar: #142820;
+        --surface: #f6f8fc;
+        --ink: #18263b;
+        --muted: #4d607a;
+        --line: #dbe3ef;
+        --brand-hover: #17468d;
+        --sidebar: #142941;
         --duration: 180ms;
     }
 
     body { background: var(--surface); color: var(--ink); }
-    :focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+    :focus-visible { outline: 2px solid var(--color-brand); outline-offset: 3px; }
 }
 
 @layer components {
@@ -28,56 +28,53 @@
     .app-content { @apply grid gap-4 py-5 sm:gap-5 sm:py-6; }
     .app-sidebar { @apply relative z-20 flex items-center justify-between gap-4 px-4 py-3 text-white lg:sticky lg:top-0 lg:h-dvh lg:flex-col lg:items-stretch lg:justify-start lg:overflow-y-auto lg:px-3 lg:py-5; background: var(--sidebar); }
     .brand { @apply flex w-fit items-center gap-2.5 text-lg font-semibold tracking-tight lg:ml-2; }
-    .brand-mark { @apply grid size-8 shrink-0 place-items-center rounded-md bg-emerald-300 text-base font-semibold text-emerald-950; }
-    .app-sidebar :focus-visible { outline-color: #a7f3d0; }
+    .brand-mark { @apply grid size-8 shrink-0 place-items-center bg-blue-300 text-base font-semibold text-blue-950; }
+    .app-sidebar :focus-visible { outline-color: #bfdbfe; }
     .module-nav { @apply grid gap-4; }
     .module-group { @apply grid gap-0.5; }
-    .module-group p { @apply px-2.5 pb-1 text-xs font-medium text-emerald-100/80; }
-    .module-link { @apply flex min-h-10 items-center gap-2.5 rounded-md px-2.5 text-sm font-medium text-white/85 hover:bg-white/10 hover:text-white; transition: background-color var(--duration), color var(--duration); }
-    .module-link[aria-current="page"] { @apply bg-emerald-200/15 text-emerald-100; }
-    .module-icon { @apply inline-grid size-5 shrink-0 place-items-center text-base; }
+    .module-group p { @apply px-2.5 pb-1 text-xs font-medium text-blue-100/80; }
+    .module-link { @apply flex min-h-10 items-center gap-2.5 px-2.5 text-sm font-medium text-white/85 hover:bg-white/10 hover:text-white; transition: background-color var(--duration), color var(--duration); }
+    .module-link[aria-current="page"] { @apply bg-blue-200/15 text-blue-100; }
+    .module-icon { @apply block size-5 shrink-0; }
     .desktop-navigation { @apply hidden lg:grid; }
     .mobile-navigation { @apply lg:hidden; }
-    .mobile-navigation summary { @apply flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-md border border-white/25 px-3 text-sm; }
+    .mobile-navigation summary { @apply flex min-h-10 cursor-pointer list-none items-center gap-2 border border-white/25 px-3 text-sm; }
     .mobile-navigation summary::-webkit-details-marker { display: none; }
     .mobile-navigation .module-nav { @apply absolute inset-x-0 top-full gap-3 border-t border-white/15 px-4 py-4 sm:grid-cols-2; background: var(--sidebar); animation: appear var(--duration) ease-out; }
-    .app-topbar { @apply border-b bg-white; border-color: var(--line); }
-    .topbar-inner { @apply flex min-h-12 items-center justify-end gap-3 py-1.5; }
-    .topbar-account { @apply truncate text-sm font-medium; color: var(--muted); }
-    .skip-link { @apply fixed left-4 top-3 z-50 -translate-y-24 rounded-md bg-white px-3 py-2 focus:translate-y-0; }
+    .skip-link { @apply fixed left-4 top-3 z-50 -translate-y-24 bg-white px-3 py-2 focus:translate-y-0; }
 
     .page-header { @apply flex flex-wrap items-end justify-between gap-x-5 gap-y-3; }
     .page-title { @apply text-2xl font-semibold tracking-tight sm:text-[1.8rem]; overflow-wrap: anywhere; }
     .page-description { @apply mt-0.5 text-sm; color: var(--muted); }
     .page-actions, .form-actions { @apply flex flex-wrap items-center gap-2; }
     .form-actions { @apply mt-4; }
-    .back-link { @apply mb-1 inline-flex text-sm font-medium hover:underline; color: var(--brand); }
-    .panel { @apply rounded-lg border bg-white; border-color: var(--line); }
+    .back-link { @apply mb-1 inline-flex text-sm font-medium hover:underline; color: var(--color-brand); }
+    .panel { @apply border bg-white; border-color: var(--line); }
     .form-panel { @apply grid gap-4 p-4 sm:p-5; }
     .form-grid { @apply grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-3; }
     .filter-bar { @apply grid items-end gap-3 p-3 sm:grid-cols-2 xl:grid-cols-[minmax(13rem,1.5fr)_repeat(3,minmax(7rem,1fr))_auto]; }
     .filter-bar label { @apply grid gap-1 text-sm font-medium; }
-    .field { @apply block min-h-10 w-full min-w-0 rounded-md border bg-white px-3 py-2 text-sm placeholder:text-slate-500; border-color: #adbbb3; color: var(--ink); transition: border-color var(--duration), background-color var(--duration); }
-    .field:focus { border-color: var(--brand); }
+    .field { @apply rounded-none block min-h-10 w-full min-w-0 border bg-white px-3 py-2 text-sm placeholder:text-slate-500; border-color: #94a3b8; color: var(--ink); transition: border-color var(--duration), background-color var(--duration); }
+    .field:focus { border-color: var(--color-brand); }
     .field[aria-invalid="true"] { @apply border-red-600; }
 
-    .button-primary, .button-secondary, .button-danger, .button-quiet, .icon-button { @apply inline-flex min-h-10 w-fit cursor-pointer items-center justify-center gap-2 rounded-md border px-3 py-1.5 text-sm font-semibold whitespace-nowrap; transition: background-color var(--duration), color var(--duration), opacity var(--duration); }
-    .button-primary { @apply border-transparent text-white; background: var(--brand); }
+    .button-primary, .button-secondary, .button-danger, .button-quiet, .icon-button { @apply rounded-none inline-flex min-h-10 w-fit cursor-pointer items-center justify-center gap-2 border px-3 py-1.5 text-sm font-semibold whitespace-nowrap; transition: background-color var(--duration), color var(--duration), opacity var(--duration); }
+    .button-primary { @apply border-transparent text-white; background: var(--color-brand); }
     .button-primary:hover { background: var(--brand-hover); }
-    .button-secondary, .icon-button { @apply border-slate-300 bg-white hover:bg-emerald-50; }
+    .button-secondary, .icon-button { @apply border-slate-300 bg-white hover:bg-blue-50; }
     .button-danger { @apply border-transparent bg-red-700 text-white hover:bg-red-800; }
-    .button-quiet { @apply border-transparent hover:bg-slate-100; color: var(--brand); }
+    .button-quiet { @apply border-transparent hover:bg-slate-100; color: var(--color-brand); }
     .button-quiet.danger { @apply text-red-800 hover:bg-red-50; }
     .button-small { @apply min-h-8 px-2.5 py-1; }
     .icon-button { @apply size-10 px-0 text-xl; }
     button:disabled { @apply cursor-not-allowed opacity-55; }
     button[data-busy]::before { content: ''; @apply size-3.5 rounded-full border-2 border-current border-r-transparent; animation: spin 700ms linear infinite; }
 
-    .notice { @apply rounded-md border px-3.5 py-2.5 text-sm; animation: appear var(--duration) ease-out; }
+    .notice { @apply border px-3.5 py-2.5 text-sm; animation: appear var(--duration) ease-out; }
     .notice-success { @apply border-emerald-200 bg-emerald-50 text-emerald-950; }
     .notice-error { @apply border-red-200 bg-red-50 text-red-950; }
     .notice-info { @apply border-slate-200 bg-slate-50 text-slate-800; }
-    .badge { @apply inline-flex w-fit items-center rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap; }
+    .badge { @apply inline-flex w-fit items-center px-2 py-0.5 text-xs font-semibold whitespace-nowrap; }
     .badge-neutral { @apply bg-slate-100 text-slate-700; }
     .badge-success { @apply bg-emerald-100 text-emerald-950; }
     .badge-warning { @apply bg-amber-100 text-amber-950; }
@@ -85,31 +82,34 @@
 
     .table-region { @apply max-w-full overflow-x-auto; }
     .data-table { @apply w-full border-collapse text-left text-sm; }
-    .data-table thead { @apply border-b text-xs; background: #eef3ef; border-color: var(--line); color: var(--muted); }
+    .data-table thead { @apply border-b text-xs; background: #edf2f9; border-color: var(--line); color: var(--muted); }
     .data-table :is(th, td) { @apply px-3 py-2.5 sm:px-4; }
     .data-table tbody tr + tr { border-top: 1px solid var(--line); }
-    .data-table tbody tr:hover { background: #f8fbf9; }
+    .data-table tr:has([data-row-link]) { position: relative; isolation: isolate; }
+    .data-table tr:has([data-row-link]):is(:hover, :focus-within) { background: #eff6ff; }
+    .data-table [data-row-link]::after { content: ''; position: absolute; inset: 0; z-index: 1; }
+    .data-table tr:has([data-row-link]) :is(a:not([data-row-link]), button, input, select, textarea) { position: relative; z-index: 2; }
     .data-table .numeric { @apply text-right whitespace-nowrap tabular-nums; }
     .data-table .row-actions { @apply flex items-center justify-end gap-1 whitespace-nowrap; }
-    .data-table a:not([class*="button"]) { @apply font-semibold underline decoration-transparent underline-offset-2 hover:decoration-current; color: var(--brand); }
+    .data-table a:not([class*="button"]) { @apply font-semibold underline decoration-transparent underline-offset-2 hover:decoration-current; color: var(--color-brand); }
     .empty-state, .data-table .empty-state { @apply p-6 text-center text-sm; color: var(--muted); }
 
     .pagination { @apply flex flex-wrap items-center justify-between gap-2 py-1 text-sm; color: var(--muted); }
     .pagination nav { @apply flex flex-wrap items-center gap-1; }
-    .pagination nav :is(a, span) { @apply rounded-md border border-slate-200 bg-white px-2.5 py-1.5; }
-    .pagination nav a:hover { @apply border-emerald-700 text-emerald-900; }
+    .pagination nav :is(a, span) { @apply border border-slate-200 bg-white px-2.5 py-1.5; }
+    .pagination nav a:hover { @apply border-blue-700 text-blue-900; }
     .pagination [aria-disabled="true"] { @apply opacity-60; }
     .section-tabs { @apply flex flex-wrap gap-1 border-b; border-color: var(--line); }
-    .section-tabs a { @apply rounded-t-md border-b-2 border-transparent px-3 py-2 text-sm font-semibold hover:bg-emerald-50; transition: background-color var(--duration); }
-    .section-tabs [aria-current="page"] { border-color: var(--brand); color: var(--brand); }
-    .metrics { @apply grid grid-cols-2 divide-x divide-y overflow-hidden rounded-lg border bg-white sm:grid-cols-4 sm:divide-y-0; border-color: var(--line); }
+    .section-tabs a { @apply border-b-2 border-transparent px-3 py-2 text-sm font-semibold hover:bg-blue-50; transition: background-color var(--duration); }
+    .section-tabs [aria-current="page"] { border-color: var(--color-brand); color: var(--color-brand); }
+    .metrics { @apply grid grid-cols-2 divide-x divide-y overflow-hidden border bg-white sm:grid-cols-4 sm:divide-y-0; border-color: var(--line); }
     .metric { @apply min-w-0 border-slate-200 px-3 py-2.5 sm:px-4; }
     .metric dt { @apply text-xs font-medium; color: var(--muted); }
     .metric dd { @apply wrap-anywhere text-lg font-semibold tabular-nums sm:text-xl; }
-    .metric-emphasis { @apply bg-emerald-50 text-emerald-950; }
+    .metric-emphasis { @apply bg-blue-50 text-blue-950; }
 
-    .app-dialog { @apply fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-lg border bg-white shadow-lg; border-color: var(--line); color: var(--ink); }
-    .app-dialog::backdrop { background: rgb(13 32 22 / .5); }
+    .app-dialog { @apply fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-y-auto border bg-white shadow-lg; border-color: var(--line); color: var(--ink); }
+    .app-dialog::backdrop { background: rgb(15 29 52 / .5); }
     .app-dialog[open] { animation: appear var(--duration) ease-out; }
     .app-dialog[data-closing] { animation: disappear var(--duration) ease-in forwards; }
     .app-drawer { @apply inset-y-0 right-0 left-auto m-0 h-dvh max-h-dvh w-full max-w-lg rounded-none border-y-0 border-r-0; }

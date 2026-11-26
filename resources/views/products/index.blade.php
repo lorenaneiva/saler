@@ -12,7 +12,7 @@
     <form method="GET" action="{{ route('products.index') }}" class="panel filter-bar" role="search">
         <label>
             Buscar produto
-            <input name="q" type="search" value="{{ $filters['search'] }}" maxlength="100" placeholder="Nome ou código de barras" class="field">
+            <input name="q" type="search" value="{{ $filters['search'] }}" maxlength="100" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Digite o nome ou leia o código de barras" class="field">
         </label>
         <label>
             Categoria
@@ -90,7 +90,7 @@
                     <td><x-ui.badge :tone="$product->is_active ? 'success' : 'neutral'">{{ $product->is_active ? 'Ativo' : 'Inativo' }}</x-ui.badge></td>
                     <td>
                         <div class="row-actions">
-                            <a href="{{ route('products.edit', $product) }}" aria-label="Editar {{ $product->name }}" class="button-quiet button-small">Editar</a>
+                            <a data-row-link href="{{ route('products.edit', $product) }}" aria-label="Editar {{ $product->name }}" class="button-quiet button-small">Editar</a>
                             @if ($product->is_active)
                                 <form method="POST" action="{{ route('products.destroy', $product) }}" data-confirm="Desativar o produto {{ $product->name }}?">
                                     @csrf

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Actions\RegisterSale;
+use App\Http\Requests\ListSearchRequest;
 use App\Http\Requests\SaleRequest;
 use App\Models\Customer;
+use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Sale;
 use Illuminate\Http\RedirectResponse;
@@ -12,10 +14,11 @@ use Illuminate\View\View;
 
 class SaleController extends Controller
 {
-    public function index(): View
+    public function index(ListSearchRequest $request): View
     {
         return view('sales.index', [
-            'sales' => Sale::query()->with('customer:id,name')->orderByDesc('sold_on')->orderByDesc('id')->paginate(20),
+            'sales' => $request->filter(Sale::query(), ['id', 'customer.name', 'items.product.name'])
+                ->with('customer:id,name')->withPaidTotal()->orderByDesc('sold_on')->orderByDesc('id')->paginate(20)->withQueryString(),
         ]);
     }
 
@@ -35,8 +38,18 @@ class SaleController extends Controller
         return to_route('sales.show', $sale)->with('status', 'Venda registrada e estoque atualizado.');
     }
 
-    public function show(Sale $sale): View
+    public function show(ListSearchRequest $request, Sale $sale): View
     {
-        return view('sales.show', ['sale' => $sale->load(['customer:id,name', 'items.product:id,name'])]);
+        $sale->load([
+            'customer:id,name',
+            'items' => fn ($items) => $request->filter($items, ['product.name', 'product.barcode'], 'q_itens')
+                ->with('product:id,name'),
+        ])->loadSum('paymentAllocations as paid_total', 'amount');
+
+        return view('sales.show', [
+            'sale' => $sale,
+            'payments' => $request->filter($sale->payments(), ['id', 'notes'], 'q_pagamentos', ['method' => Payment::Methods])
+                ->orderByDesc('paid_on')->orderByDesc('payments.id')->paginate(20)->withQueryString(),
+        ]);
     }
 }

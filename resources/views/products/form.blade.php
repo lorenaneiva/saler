@@ -27,6 +27,7 @@
                 <div class="grid content-start gap-2">
                     <label for="{{ $field }}" class="font-medium">{{ $label }} @if ($required)<x-required-mark />@endif</label>
                     <input id="{{ $field }}" name="{{ $field }}" class="field" type="text"
+                        @if ($field === 'barcode') data-barcode-input autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Digite ou use o leitor" @endif
                         maxlength="{{ $maxLength }}" @required($required) value="{{ is_scalar($value) ? $value : '' }}"
                         @error($field) aria-invalid="true" aria-describedby="{{ $field }}-error" @enderror>
                     @error($field)

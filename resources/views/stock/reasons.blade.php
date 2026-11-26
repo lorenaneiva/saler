@@ -9,11 +9,13 @@
         </x-slot:actions>
     </x-ui.page-header>
 
+    <x-ui.list-search label="Buscar motivo" placeholder="Nome do motivo" />
+
         <ul class="panel divide-y divide-slate-200">
             @forelse ($reasons as $reason)
                 <li class="wrap-anywhere px-4 py-3">{{ $reason->name }}</li>
             @empty
-                <li class="empty-state">Nenhum motivo cadastrado.</li>
+                <li class="empty-state">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhum motivo cadastrado.' }}</li>
             @endforelse
         </ul>
 

@@ -26,6 +26,14 @@
             @endif
         </div>
 
+        <dl class="metrics" aria-label="Resumo da venda">
+            <div class="metric"><dt>Situação operacional</dt><dd>{{ $sale->status === 'cancelled' ? 'Cancelada' : 'Concluída' }}</dd></div>
+            <div class="metric"><dt>Situação financeira</dt><dd>{{ $sale->paymentStatus() }}</dd></div>
+            <div class="metric"><dt>Valor pago</dt><dd><x-ui.money :value="$sale->paidAmount()" /></dd></div>
+            <div class="metric metric-emphasis"><dt>Saldo em aberto</dt><dd><x-ui.money :value="$sale->outstandingAmount()" /></dd></div>
+        </dl>
+
+        <x-ui.list-search label="Buscar item" placeholder="Nome ou código de barras" name="q_itens" :keep="['q_pagamentos', 'page']" />
         <x-ui.table label="Itens da venda">
                 <thead>
                     <tr>
@@ -35,16 +43,48 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($sale->items as $item)
+                    @forelse ($sale->items as $item)
                         <tr>
-                            <th scope="row" class="min-w-36 wrap-anywhere font-semibold">{{ $item->product->name }}</th>
+                            <th scope="row" class="min-w-36 wrap-anywhere font-semibold">
+                                <a data-row-link href="{{ route('stock.show', $item->product_id) }}">{{ $item->product->name }}</a>
+                            </th>
                             <td>{{ $item->quantity }}</td>
                             @foreach ([$item->unit_price, $item->unit_cost, $item->subtotal] as $amount)
                                 <td class="numeric"><x-ui.money :value="$amount" /></td>
                             @endforeach
                         </tr>
-                    @endforeach
+                    @empty
+                        <x-ui.empty :columns="5">Nenhum item encontrado.</x-ui.empty>
+                    @endforelse
                 </tbody>
             </x-ui.table>
+
+        <section class="grid gap-3">
+            <h2 class="text-base font-semibold">Pagamentos desta venda</h2>
+            <x-ui.list-search label="Buscar pagamento" placeholder="Número, forma de pagamento ou observação" name="q_pagamentos" :keep="['q_itens']" />
+            <x-ui.table label="Pagamentos desta venda">
+                <thead>
+                    <tr>
+                        <th scope="col">Pagamento</th>
+                        <th scope="col">Data</th>
+                        <th scope="col">Forma de pagamento</th>
+                        <th scope="col" class="numeric">Valor abatido nesta venda</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($payments as $payment)
+                        <tr>
+                            <th scope="row">#{{ $payment->id }}</th>
+                            <td>{{ $payment->paid_on->format('d/m/Y') }}</td>
+                            <td>{{ \App\Models\Payment::Methods[$payment->method] }}</td>
+                            <td class="numeric"><x-ui.money :value="$payment->allocation->amount" /></td>
+                        </tr>
+                    @empty
+                        <x-ui.empty :columns="4">{{ request()->filled('q_pagamentos') ? 'Nenhum resultado para esta busca.' : 'Nenhum pagamento vinculado a esta venda.' }}</x-ui.empty>
+                    @endforelse
+                </tbody>
+            </x-ui.table>
+            <x-ui.pagination :paginator="$payments" />
+        </section>
     </div>
 @endsection

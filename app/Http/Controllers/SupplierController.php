@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ListSearchRequest;
 use App\Http\Requests\SupplierRequest;
 use App\Models\Supplier;
 use Illuminate\Http\RedirectResponse;
@@ -9,10 +10,11 @@ use Illuminate\View\View;
 
 class SupplierController extends Controller
 {
-    public function index(): View
+    public function index(ListSearchRequest $request): View
     {
         return view('suppliers.index', [
-            'suppliers' => Supplier::query()->orderBy('name')->orderBy('id')->paginate(20),
+            'suppliers' => $request->filter(Supplier::query(), ['name', 'contact', 'representative'])
+                ->orderBy('name')->orderBy('id')->paginate(20)->withQueryString(),
         ]);
     }
 

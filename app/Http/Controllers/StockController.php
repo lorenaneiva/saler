@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\RegisterStockMovement;
+use App\Http\Requests\ListSearchRequest;
 use App\Http\Requests\StockMovementRequest;
 use App\Models\Product;
 use App\Models\StockAdjustmentReason;
@@ -11,20 +12,22 @@ use Illuminate\View\View;
 
 class StockController extends Controller
 {
-    public function index(): View
+    public function index(ListSearchRequest $request): View
     {
         return view('stock.index', [
-            'products' => Product::query()->orderBy('name')->orderBy('id')->paginate(20),
+            'products' => $request->filter(Product::query(), ['name', 'barcode'])
+                ->orderBy('name')->orderBy('id')->paginate(20)->withQueryString(),
         ]);
     }
 
-    public function show(Product $product): View
+    public function show(ListSearchRequest $request, Product $product): View
     {
         return view('stock.show', [
             'product' => $product,
             'reasons' => StockAdjustmentReason::query()->orderBy('name')->get(['id', 'name']),
-            'movements' => $product->stockMovements()->with(['user:id,name', 'purchaseItem:id,purchase_id', 'saleItem:id,sale_id', 'adjustment.reason'])
-                ->latest()->orderByDesc('id')->paginate(20),
+            'movements' => $request->filter($product->stockMovements(), ['justification', 'user.name', 'adjustment.reason.name'])
+                ->with(['user:id,name', 'purchaseItem:id,purchase_id', 'saleItem:id,sale_id', 'adjustment.reason'])
+                ->latest()->orderByDesc('id')->paginate(20)->withQueryString(),
         ]);
     }
 

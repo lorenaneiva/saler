@@ -9,6 +9,8 @@
         </x-slot:actions>
     </x-ui.page-header>
 
+    <x-ui.list-search label="Buscar no estoque" placeholder="Nome ou código de barras" />
+
     <x-ui.table label="Saldo atual por produto">
         <thead>
             <tr>
@@ -21,7 +23,7 @@
             @forelse ($products as $product)
                 <tr>
                     <th scope="row" class="min-w-36 wrap-anywhere font-semibold">
-                        <a href="{{ route('stock.show', $product) }}" class="text-emerald-800 underline">{{ $product->name }}</a>
+                        <a data-row-link href="{{ route('stock.show', $product) }}" class="text-brand underline">{{ $product->name }}</a>
                         @unless ($product->is_active)
                             <x-ui.badge class="ml-2">Inativo</x-ui.badge>
                         @endunless
@@ -36,7 +38,7 @@
                     <td class="numeric"><x-ui.money :value="$product->average_cost" /></td>
                 </tr>
             @empty
-                <x-ui.empty :columns="3">Nenhum produto cadastrado.</x-ui.empty>
+                <x-ui.empty :columns="3">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhum produto cadastrado.' }}</x-ui.empty>
             @endforelse
         </tbody>
     </x-ui.table>

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['customer_id', 'user_id', 'sold_on', 'subtotal', 'discount', 'total', 'notes'])]
@@ -36,6 +37,12 @@ class Sale extends Model
     public function paymentAllocations(): HasMany
     {
         return $this->hasMany(PaymentAllocation::class);
+    }
+
+    /** @return BelongsToMany<Payment, $this> */
+    public function payments(): BelongsToMany
+    {
+        return $this->belongsToMany(Payment::class, 'payment_allocations')->as('allocation')->withPivot('amount');
     }
 
     /** @param Builder<Sale> $query */

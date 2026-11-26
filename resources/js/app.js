@@ -134,6 +134,14 @@ document.querySelectorAll('[data-payment-preview]').forEach((preview) => {
     update();
 });
 
+// O leitor em modo teclado pode enviar Enter ao concluir a leitura.
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.isComposing && event.target.matches?.('[data-barcode-input]')) {
+        event.preventDefault();
+        event.target.select();
+    }
+});
+
 document.querySelectorAll('[data-mask]').forEach((input) => {
     input.addEventListener('blur', () => {
         const digits = input.value.replace(/\D/g, '');
@@ -170,6 +178,7 @@ document.querySelectorAll('[data-line-editor]').forEach((editor) => {
                     productSelect.name = `items[${index}][product_id]`;
                 }
 
+                row.querySelector('[data-create-product]').hidden = isNewProduct;
                 productFields.hidden = !isNewProduct;
                 productFields.disabled = !isNewProduct;
                 productFields.querySelectorAll('[data-new-product-field]').forEach((field) => {
@@ -196,6 +205,15 @@ document.querySelectorAll('[data-line-editor]').forEach((editor) => {
     });
 
     items.addEventListener('click', (event) => {
+        const createProduct = event.target.closest('[data-create-product]');
+        if (createProduct) {
+            const row = createProduct.closest('[data-item-row]');
+            row.querySelector('[data-product-select]').value = 'new';
+            updateRows();
+            row.querySelector('[data-new-product-field="name"]').focus();
+            return;
+        }
+
         const remover = event.target.closest('[data-remove-item]');
         if (remover && items.children.length > 1) {
             remover.closest('[data-item-row]').remove();

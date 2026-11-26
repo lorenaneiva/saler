@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\CancelPurchase;
 use App\Actions\ConfirmPurchase;
+use App\Http\Requests\ListSearchRequest;
 use App\Http\Requests\PurchaseRequest;
 use App\Models\Category;
 use App\Models\Product;
@@ -17,10 +18,11 @@ use Illuminate\View\View;
 
 class PurchaseController extends Controller
 {
-    public function index(): View
+    public function index(ListSearchRequest $request): View
     {
         return view('purchases.index', [
-            'purchases' => Purchase::query()->with('supplier:id,name')->orderByDesc('purchased_on')->orderByDesc('id')->paginate(20),
+            'purchases' => $request->filter(Purchase::query(), ['id', 'supplier.name', 'items.product.name'])
+                ->with('supplier:id,name')->orderByDesc('purchased_on')->orderByDesc('id')->paginate(20)->withQueryString(),
         ]);
     }
 
@@ -79,9 +81,13 @@ class PurchaseController extends Controller
         return to_route('purchases.show', $purchase)->with('status', 'Compra registrada e estoque atualizado.');
     }
 
-    public function show(Purchase $purchase): View
+    public function show(ListSearchRequest $request, Purchase $purchase): View
     {
-        return view('purchases.show', ['purchase' => $purchase->load(['supplier:id,name', 'items.product:id,name'])]);
+        return view('purchases.show', ['purchase' => $purchase->load([
+            'supplier:id,name',
+            'items' => fn ($items) => $request->filter($items, ['product.name', 'product.barcode'], 'q_itens')
+                ->with('product:id,name'),
+        ])]);
     }
 
     public function confirm(Request $request, Purchase $purchase, ConfirmPurchase $confirmPurchase): RedirectResponse

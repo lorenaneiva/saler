@@ -13,18 +13,7 @@
         <x-ui.alert tone="error">{{ $message }}</x-ui.alert>
     @enderror
 
-    @if ($registeredCount > 0 || $search !== '')
-        <form method="GET" action="{{ route('categories.index') }}" class="panel flex flex-wrap items-end gap-2 p-3" role="search">
-            <label class="grid w-full gap-1 text-sm font-medium sm:w-72">
-                Buscar categoria
-                <input class="field" type="search" name="q" value="{{ $search }}" maxlength="100" placeholder="Nome da categoria">
-            </label>
-            <button class="button-secondary">Buscar</button>
-            @if ($search !== '')
-                <a href="{{ route('categories.index') }}" class="button-quiet">Limpar</a>
-            @endif
-        </form>
-    @endif
+    <x-ui.list-search label="Buscar categoria" placeholder="Nome da categoria" />
 
     <x-ui.table label="Categorias cadastradas">
         <thead>
@@ -43,7 +32,7 @@
                     </td>
                     <td>
                         <div class="row-actions">
-                            <a href="{{ route('categories.edit', $category) }}" class="button-quiet button-small"
+                            <a data-row-link href="{{ route('categories.edit', $category) }}" class="button-quiet button-small"
                                 aria-label="Editar {{ $category->name }}">Editar</a>
                             @if ($category->products_count === 0)
                                 <form method="POST" action="{{ route('categories.destroy', $category) }}"

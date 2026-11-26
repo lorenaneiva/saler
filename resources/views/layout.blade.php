@@ -12,16 +12,16 @@
     @php
         $groups = [
             'Operações' => [
-                ['dashboard', 'dashboard', 'Painel', '▦'],
-                ['sales.index', 'sales.*', 'Vendas', '↗'],
-                ['purchases.index', 'purchases.*', 'Compras', '↙'],
-                ['stock.index', 'stock.*', 'Estoque', '▤'],
+                ['dashboard', 'dashboard', 'Painel', 'dashboard'],
+                ['sales.index', 'sales.*', 'Vendas', 'point_of_sale'],
+                ['purchases.index', 'purchases.*', 'Compras', 'shopping_cart'],
+                ['stock.index', 'stock.*', 'Estoque', 'inventory_2'],
             ],
             'Cadastros' => [
-                ['customers.index', 'customers.*', 'Clientes', '◉'],
-                ['products.index', 'products.*', 'Produtos', '◇'],
-                ['categories.index', 'categories.*', 'Categorias', '▥'],
-                ['suppliers.index', 'suppliers.*', 'Fornecedores', '▣'],
+                ['customers.index', 'customers.*', 'Clientes', 'people'],
+                ['products.index', 'products.*', 'Produtos', 'local_offer'],
+                ['categories.index', 'categories.*', 'Categorias', 'category'],
+                ['suppliers.index', 'suppliers.*', 'Fornecedores', 'local_shipping'],
             ],
         ];
     @endphp
@@ -32,25 +32,20 @@
         </a>
 
         <details class="mobile-navigation">
-            <summary>Menu <span aria-hidden="true">☰</span></summary>
+            <summary>Menu <x-ui.module-icon name="menu" /></summary>
             <nav aria-label="Menu principal" class="module-nav">
                 @include('partials.module-links', ['groups' => $groups])
+                @include('partials.logout')
             </nav>
         </details>
         <nav aria-label="Menu principal" class="module-nav desktop-navigation">
             @include('partials.module-links', ['groups' => $groups])
         </nav>
+        <div class="mt-auto hidden lg:block">
+            @include('partials.logout')
+        </div>
     </aside>
     <div class="min-w-0">
-        <header class="app-topbar">
-            <div class="workspace topbar-inner">
-                <span class="topbar-account">{{ auth()->user()->name }}</span>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button class="button-secondary button-small">Sair</button>
-                </form>
-            </div>
-        </header>
         <main id="conteudo" class="workspace app-content" tabindex="-1">
             @if (session('status'))
                 <x-ui.alert>{{ session('status') }}</x-ui.alert>

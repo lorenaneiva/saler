@@ -28,7 +28,7 @@
                         @endforeach
                     </select>
                     @if ($customers->isEmpty())
-                        <a href="{{ route('customers.create') }}" class="w-fit text-sm text-emerald-800 underline">Cadastrar cliente</a>
+                        <a href="{{ route('customers.create') }}" class="w-fit text-sm text-brand underline">Cadastrar cliente</a>
                     @endif
                 </div>
                 <label class="grid content-start gap-2 font-medium">
@@ -41,7 +41,7 @@
                 <legend class="mb-3 text-lg font-semibold">Itens da venda</legend>
                 @if ($products->isEmpty())
                     <p class="text-sm text-slate-600">Nenhum produto ativo com saldo disponível.</p>
-                    <a href="{{ route('stock.index') }}" class="w-fit text-sm text-emerald-800 underline">Consultar estoque</a>
+                    <a href="{{ route('stock.index') }}" class="w-fit text-sm text-brand underline">Consultar estoque</a>
                 @endif
                 <div data-line-items class="grid gap-3">
                     @foreach ($rows as $index => $item)
