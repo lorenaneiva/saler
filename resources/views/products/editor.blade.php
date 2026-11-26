@@ -87,7 +87,7 @@
                                 ] as $field => [$label, $required])
                                     @php($value = old($field, $field === 'purchased_on' ? now()->toDateString() : null))
                                     <div class="grid content-start gap-1">
-                                        <label for="product-{{ $field }}">{{ $label }} @if ($required)<x-required-mark />@else<span class="font-normal text-slate-600">(opcional)</span>@endif</label>
+                                        <label for="product-{{ $field }}">{{ $label }} @if ($required)<x-required-mark />@endif</label>
                                         <input id="product-{{ $field }}" name="{{ $field }}" class="field" @required($required)
                                             @if ($field === 'purchased_on') type="date"
                                             @elseif ($field === 'quantity') type="number" min="1" max="1000000" step="1" inputmode="numeric"
