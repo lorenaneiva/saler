@@ -1,11 +1,18 @@
 {
-    "mcpServers": {
-        "laravel-boost": {
-            "command": "vendor/bin/sail",
-            "args": [
-                "artisan",
-                "boost:mcp"
-            ]
-        }
+  "mcpServers": {
+    "laravel-boost": {
+      "command": "vendor/bin/sail",
+      "args": [
+        "artisan",
+        "boost:mcp"
+      ]
+    },
+    "phpstorm": {
+      "url": "http://127.0.0.1:64442/stream",
+      "type": "http",
+      "headers": {
+        "IJ_MCP_LAUNCH_ORIGIN": "${IJ_MCP_LAUNCH_ORIGIN:-}"
+      }
     }
+  }
 }

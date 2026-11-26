@@ -24,7 +24,7 @@ Manter `role=combobox/listbox/option`, `aria-expanded`, seleção ativa, rótulo
 
 ## Tabelas, filtros e dados
 
-- Listagens usam `<x-ui.table>`, cabeçalho contrastante, linhas compactas, alinhamento tabular à direita para números e paginação reutilizável. Cabeçalho de coluna numérica também recebe `numeric`, para ficar alinhado com os valores.
+- Listagens usam `<x-ui.table>`, cabeçalho contrastante, linhas compactas e paginação reutilizável. Padrão de referência: tabela de Fornecedores — todos os dados (texto, números, valores, situação) ficam alinhados à esquerda em colunas de largura igual, e apenas a coluna Ações fica à direita (`text-right` no cabeçalho, `.row-actions` na célula). A classe `numeric` só aplica algarismos tabulares e evita quebra; não alinha à direita.
 - `.data-table` usa `table-layout: fixed`: todas as colunas têm a mesma largura e o texto quebra dentro da célula. A largura mínima cresce com o número de colunas (32rem até 4, depois +8rem por coluna, até 64rem com 8); abaixo disso a região rola horizontalmente. Não reintroduza `whitespace-nowrap` ou padding próprio em `th` de tabela, pois isso quebra o espaçamento uniforme.
 - Linhas alternam branco e azul-acinzentado bem claro (`#f2f5f9`); linhas clicáveis escurecem para `#d9e6f8` no hover/foco.
 - Barra de busca/filtros fica no topo; `<x-ui.list-search>` aceita filtros extras no slot (ex.: situação em Categorias), enviados junto com a busca; busca textual tem limite de 100 caracteres e consultas paginadas preservam query string. Produtos têm filtros de categoria, fornecedor e situação.
