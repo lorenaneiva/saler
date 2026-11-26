@@ -1,7 +1,7 @@
 <x-ui.errors />
 
 <dl class="metric metric-emphasis">
-    <dt>Saldo disponível para abater</dt>
+    <dt>{{ $balanceLabel ?? 'Saldo disponível para abater' }}</dt>
     <dd><x-ui.money :value="$outstandingTotal" /></dd>
 </dl>
 
@@ -11,7 +11,7 @@
         $paidOn = old('paid_on', now()->toDateString());
         $notes = old('notes');
     @endphp
-    <form method="POST" action="{{ route('customers.payments.store', $customer) }}" class="grid gap-4">
+    <form method="POST" action="{{ $action }}" class="grid gap-4" data-payment-form @if ($liveSubmit ?? false) data-live-submit @endif>
         @csrf
         <input type="hidden" name="submission_token" value="{{ $paymentToken }}">
         <div class="grid gap-3 sm:grid-cols-2">
@@ -41,7 +41,7 @@
         </label>
         <div class="grid gap-1 text-sm">
             <output class="font-semibold" data-payment-preview="{{ $outstandingTotal }}" aria-live="polite"></output>
-            <p class="text-slate-600">O pagamento abate primeiro a compra mais antiga.</p>
+            <p class="text-slate-600">{{ $allocationHint ?? 'O pagamento abate primeiro a compra mais antiga.' }}</p>
         </div>
         <div class="page-actions">
             <button class="button-primary">Registrar pagamento</button>
@@ -49,5 +49,5 @@
         </div>
     </form>
 @else
-    <p class="text-sm text-slate-600">O cliente está sem saldo em aberto.</p>
+    <p class="text-sm text-slate-600">{{ $settledMessage ?? 'O cliente está sem saldo em aberto.' }}</p>
 @endif

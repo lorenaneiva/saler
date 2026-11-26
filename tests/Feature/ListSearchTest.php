@@ -37,7 +37,7 @@ class ListSearchTest extends TestCase
 
         $this->actingAs(User::factory()->create())
             ->get(route('sales.show', [$sale, 'q_itens' => '000456', 'q_pagamentos' => 'dinheiro']))
-            ->assertOk()->assertSeeText('Feijão')->assertSeeText('Dinheiro')->assertDontSeeText('Pix')
+            ->assertOk()->assertSeeText('Feijão')->assertSeeText('Dinheiro')->assertDontSee('<td>Pix</td>', false)
             ->assertSeeTextInOrder(['Valor pago', 'R$ 10,00', 'Saldo em aberto', 'R$ 10,00']);
 
         $other = Sale::factory()->create();

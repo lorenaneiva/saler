@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Models\Sale;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class SaleController extends Controller
@@ -53,6 +54,7 @@ class SaleController extends Controller
 
         return view('sales.show', [
             'sale' => $sale,
+            'paymentToken' => (string) Str::uuid(),
             'payments' => $request->filter($sale->payments(), ['id', 'notes'], 'q_pagamentos', ['method' => Payment::Methods])
                 ->orderByDesc('paid_on')->orderByDesc('payments.id')->paginate(20)->withQueryString(),
         ]);

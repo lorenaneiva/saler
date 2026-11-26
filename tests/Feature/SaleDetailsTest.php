@@ -37,7 +37,7 @@ class SaleDetailsTest extends TestCase
         $response = $this->actingAs(User::factory()->create())->get(route('sales.show', $sale))->assertOk();
 
         $summary = str($response->getContent())->betweenFirst('aria-label="Resumo da venda"', '</section>');
-        $this->assertStringContainsString($sale->customer->name, $summary);
+        $this->assertStringContainsString(e($sale->customer->name), $summary);
         $this->assertStringContainsString('Total da venda', $summary);
         $this->assertStringNotContainsString('Subtotal', $summary);
         $this->assertStringNotContainsString('Desconto', $summary);

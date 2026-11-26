@@ -1,6 +1,6 @@
 import { initializeProductEditor } from './product-editor';
 import { focusFormControl, initializeAutocompletes, syncAutocomplete } from './autocomplete';
-import { initializeLiveSearch } from './live-search';
+import { fetchLivePage, initializeLiveSearch, replaceLiveRegions } from './live-search';
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const confirmations = new WeakSet();
@@ -190,6 +190,12 @@ document.addEventListener('submit', (event) => {
         return;
     }
 
+    if (form.hasAttribute('data-live-submit')) {
+        event.preventDefault();
+        submitLiveForm(form, event.submitter);
+        return;
+    }
+
     if (form.dataset.confirm && !confirmations.delete(form) && confirmDialog) {
         event.preventDefault();
         confirmedForm = form;
@@ -223,7 +229,41 @@ function toCents(value) {
     return BigInt(whole) * 100n + BigInt(fraction.padEnd(2, '0'));
 }
 
-document.querySelectorAll('[data-payment-preview]').forEach((preview) => {
+async function submitLiveForm(form, submitter) {
+    const dialog = form.closest('dialog');
+    form.setAttribute('data-submitting', '');
+    form.setAttribute('aria-busy', 'true');
+    submitter?.setAttribute('data-busy', '');
+
+    try {
+        const result = await fetchLivePage(form.action, { method: 'POST', body: new FormData(form) });
+        if (!result) {
+            HTMLFormElement.prototype.submit.call(form);
+            return;
+        }
+
+        const regions = replaceLiveRegions(result.page);
+        regions.forEach((region) => region.querySelectorAll('[data-payment-preview]').forEach(initializePaymentPreview));
+        const failedForm = regions.flatMap((region) => Array.from(region.querySelectorAll('form[data-live-submit]')))
+            .find((candidate) => candidate.closest('[data-live-region]')?.querySelector('.notice-error'));
+
+        if (failedForm) {
+            focusFormControl(failedForm.querySelector('[aria-invalid="true"]') ?? failedForm.elements.amount);
+        } else if (dialog?.open) {
+            closeDialog(dialog);
+        }
+    } catch {
+        HTMLFormElement.prototype.submit.call(form);
+    } finally {
+        form.removeAttribute('data-submitting');
+        form.removeAttribute('aria-busy');
+        submitter?.removeAttribute('data-busy');
+    }
+}
+
+document.querySelectorAll('[data-payment-preview]').forEach(initializePaymentPreview);
+
+function initializePaymentPreview(preview) {
     const input = preview.form.elements.amount;
     const balance = toCents(preview.dataset.paymentPreview);
     const whole = new Intl.NumberFormat('pt-BR');
@@ -238,7 +278,7 @@ document.querySelectorAll('[data-payment-preview]').forEach((preview) => {
 
     input.addEventListener('input', update);
     update();
-});
+}
 
 // O leitor em modo teclado pode enviar Enter ao concluir a leitura.
 document.addEventListener('keydown', (event) => {

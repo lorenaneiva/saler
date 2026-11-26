@@ -144,12 +144,15 @@
     .table-search-field svg { @apply pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2; color: var(--muted); }
     .table-search-field .field { @apply pl-8; }
     .table-search-field .field::-webkit-search-cancel-button { display: none; }
-    .data-table .table-totals { @apply border-t text-sm; border-color: var(--line); }
-    .data-table .table-totals :is(th, td) { @apply py-1.5; }
-    .data-table .table-totals tr:first-child :is(th, td) { @apply pt-2.5; }
-    .data-table .table-totals th { @apply text-right font-medium; color: var(--muted); }
-    .data-table .table-totals .table-grand-total { @apply border-t bg-slate-50 text-base; border-color: var(--line); }
-    .data-table .table-totals .table-grand-total :is(th, td) { @apply py-2.5 font-semibold; color: var(--ink); }
+    .data-table .table-totals { @apply border-t-2; border-color: var(--line); }
+    .data-table .table-totals tr { @apply border-t bg-white; border-color: var(--line); }
+    .data-table .table-totals :is(th, td) { @apply py-2.5 text-right; }
+    .data-table .table-totals th { @apply font-medium; color: var(--muted); }
+    .data-table .table-totals td { @apply font-semibold; }
+    .data-table .table-totals .table-grand-total { @apply text-base; background: #edf2f9; }
+    .data-table .table-totals .table-grand-total :is(th, td) { @apply py-3 font-bold; color: var(--ink); }
+    .table-section-tools { @apply flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap; }
+    .table-section-tools .table-search { @apply min-w-0 flex-1 sm:flex-none; }
 
     .sale-summary { @apply grid; }
     .sale-summary-main { @apply flex flex-wrap items-end justify-between gap-x-8 gap-y-3 px-4 py-4 sm:px-5; }

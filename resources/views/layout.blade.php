@@ -47,9 +47,11 @@
     </aside>
     <div class="min-w-0">
         <main id="conteudo" class="workspace app-content" tabindex="-1">
-            @if (session('status'))
-                <x-ui.alert>{{ session('status') }}</x-ui.alert>
-            @endif
+            <div id="flash-status" class="contents" data-live-region>
+                @if (session('status'))
+                    <x-ui.alert>{{ session('status') }}</x-ui.alert>
+                @endif
+            </div>
             @yield('content')
         </main>
     </div>

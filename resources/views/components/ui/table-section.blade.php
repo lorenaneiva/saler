@@ -8,7 +8,12 @@
                 <p id="{{ $id }}-meta" class="table-section-meta" data-live-region>{{ $meta }}</p>
             @endif
         </div>
-        {{ $search ?? '' }}
+        @if (isset($search) || isset($actions))
+            <div class="table-section-tools">
+                {{ $search ?? '' }}
+                {{ $actions ?? '' }}
+            </div>
+        @endif
     </header>
     {{ $slot }}
 </section>

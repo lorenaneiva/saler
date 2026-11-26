@@ -9,6 +9,7 @@
         $outstandingAmount = $sale->outstandingAmount();
         $hasOutstandingAmount = $outstandingAmount->isPositive();
         $hasDiscount = \Brick\Math\BigDecimal::of($sale->discount ?? 0)->isPositive();
+        $canReceivePayment = $isCompleted && $hasOutstandingAmount;
         $visibleItems = $sale->items->count();
         $itemsMeta = request()->filled('q_itens')
             ? $visibleItems.' de '.$sale->items_count.' '.($sale->items_count === 1 ? 'item' : 'itens')
@@ -21,7 +22,7 @@
     <div class="grid gap-4">
         <x-ui.page-header :title="'Venda #'.$sale->id" :back="route('sales.index')" back-label="Vendas" />
 
-        <section class="panel sale-summary" aria-label="Resumo da venda">
+        <section id="sale-summary" class="panel sale-summary" aria-label="Resumo da venda" data-live-region>
             <div class="sale-summary-main">
                 <dl class="sale-facts">
                     <div>
@@ -79,7 +80,7 @@
                     <thead>
                         <tr>
                             @foreach (['Produto', 'Quantidade', 'Preço unitário', 'Custo unitário da venda', 'Subtotal'] as $heading)
-                                <th scope="col" @class(['numeric' => $loop->index >= 2])>{{ $heading }}</th>
+                                <th scope="col" @class(['numeric' => $loop->index >= 2, 'text-right' => $loop->last])>{{ $heading }}</th>
                             @endforeach
                         </tr>
                     </thead>
@@ -91,7 +92,7 @@
                                 </th>
                                 <td>{{ $item->quantity }}</td>
                                 @foreach ([$item->unit_price, $item->unit_cost, $item->subtotal] as $amount)
-                                    <td class="numeric"><x-ui.money :value="$amount" /></td>
+                                    <td @class(['numeric', 'text-right' => $loop->last])><x-ui.money :value="$amount" /></td>
                                 @endforeach
                             </tr>
                         @empty
@@ -101,15 +102,15 @@
                     <tfoot class="table-totals">
                         <tr>
                             <th scope="row" colspan="4">Subtotal</th>
-                            <td class="numeric"><x-ui.money :value="$sale->subtotal" /></td>
+                            <td class="numeric text-right"><x-ui.money :value="$sale->subtotal" /></td>
                         </tr>
                         <tr>
                             <th scope="row" colspan="4">Desconto</th>
-                            <td class="numeric">{{ $hasDiscount ? '− ' : '' }}<x-ui.money :value="$sale->discount" /></td>
+                            <td class="numeric text-right">{{ $hasDiscount ? '− ' : '' }}<x-ui.money :value="$sale->discount" /></td>
                         </tr>
                         <tr class="table-grand-total">
                             <th scope="row" colspan="4">Total da venda</th>
-                            <td class="numeric"><x-ui.money :value="$sale->total" /></td>
+                            <td class="numeric text-right"><x-ui.money :value="$sale->total" /></td>
                         </tr>
                     </tfoot>
                 </x-ui.table>
@@ -120,6 +121,12 @@
             <x-slot:search>
                 <x-ui.list-search embedded label="Buscar pagamento" placeholder="Número, forma ou observação" name="q_pagamentos" :keep="['q_itens']" :disabled="$sale->payments_count === 0" />
             </x-slot:search>
+            <x-slot:actions>
+                <span id="sale-payment-action" class="contents" data-live-region>
+                    <button type="button" class="button-primary" data-dialog-open="sale-payment" @disabled(! $canReceivePayment)
+                        @unless ($canReceivePayment) title="{{ $isCompleted ? 'Esta venda já está quitada.' : 'Vendas canceladas não recebem pagamentos.' }}" @endunless>Registrar pagamento</button>
+                </span>
+            </x-slot:actions>
 
             <div id="sale-payments-results" class="table-results" data-live-region>
                 <x-ui.table label="Pagamentos desta venda" :framed="false">
@@ -146,14 +153,11 @@
                                         <p class="font-semibold text-slate-700">Nenhum pagamento vinculado a esta venda.</p>
                                         <p class="mt-1">
                                             @if ($hasOutstandingAmount)
-                                                Quando um pagamento do cliente for abatido nesta venda, ele aparecerá aqui.
+                                                Use “Registrar pagamento” para receber o saldo em aberto desta venda.
                                             @else
                                                 Não há valores a receber nesta venda.
                                             @endif
                                         </p>
-                                        @if ($hasOutstandingAmount)
-                                            <a class="button-quiet mt-2" href="{{ route('customers.show', $sale->customer_id) }}">Abrir cliente para registrar pagamento</a>
-                                        @endif
                                     @else
                                         Nenhum pagamento corresponde à busca.
                                     @endif
@@ -166,4 +170,17 @@
             </div>
         </x-ui.table-section>
     </div>
+
+    <x-ui.dialog id="sale-payment" title="Registrar pagamento" :auto-open="$errors->any()" drawer inline-fallback>
+        <div id="sale-payment-form" class="contents" data-live-region>
+            @include('customers.payment-form', [
+                'action' => route('sales.payments.store', $sale),
+                'outstandingTotal' => (string) $outstandingAmount,
+                'balanceLabel' => 'Saldo em aberto desta venda',
+                'allocationHint' => 'O pagamento será destinado exclusivamente à venda #'.$sale->id.'.',
+                'liveSubmit' => true,
+                'settledMessage' => $isCompleted ? 'Esta venda está quitada.' : 'Vendas canceladas não recebem pagamentos.',
+            ])
+        </div>
+    </x-ui.dialog>
 @endsection

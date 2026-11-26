@@ -24,7 +24,7 @@ class CustomerPaymentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'submission_token.*' => 'Recarregue o perfil antes de registrar o pagamento.',
+            'submission_token.*' => 'Recarregue a página antes de registrar o pagamento.',
             'amount.*' => 'Informe um valor de pagamento maior que zero, com até duas casas decimais.',
             'paid_on.*' => 'Informe uma data de pagamento válida, até hoje.',
             'method.*' => 'Selecione uma forma de pagamento.',

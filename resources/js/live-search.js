@@ -11,6 +11,29 @@ function searchUrl(form) {
     return url;
 }
 
+export function replaceLiveRegions(page) {
+    const replacements = [];
+    document.querySelectorAll('[data-live-region][id]').forEach((region) => {
+        const replacement = page.getElementById(region.id);
+        if (replacement) {
+            const imported = document.importNode(replacement, true);
+            region.replaceWith(imported);
+            replacements.push(imported);
+        }
+    });
+
+    return replacements;
+}
+
+export async function fetchLivePage(url, options = {}) {
+    const response = await fetch(url, { ...options, headers: { Accept: 'text/html', ...options.headers } });
+    if (!response.ok) {
+        return null;
+    }
+
+    return { url: response.url, page: new DOMParser().parseFromString(await response.text(), 'text/html') };
+}
+
 export function initializeLiveSearch() {
     const forms = document.querySelectorAll('form[data-live-search]');
     let pendingRequest;
@@ -23,19 +46,13 @@ export function initializeLiveSearch() {
         form.setAttribute('aria-busy', 'true');
 
         try {
-            const response = await fetch(url, { headers: { Accept: 'text/html' }, signal: request.signal });
-            if (!response.ok) {
+            const result = await fetchLivePage(url, { signal: request.signal });
+            if (!result) {
                 window.location.assign(url);
                 return;
             }
 
-            const page = new DOMParser().parseFromString(await response.text(), 'text/html');
-            document.querySelectorAll('[data-live-region][id]').forEach((region) => {
-                const replacement = page.getElementById(region.id);
-                if (replacement) {
-                    region.replaceWith(document.importNode(replacement, true));
-                }
-            });
+            replaceLiveRegions(result.page);
             window.history.replaceState(window.history.state, '', url);
         } catch (error) {
             if (error.name !== 'AbortError') {
