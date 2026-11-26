@@ -7,7 +7,7 @@ Saler é um sistema web para administrar as operações diárias de um pequeno c
 1. Leia este arquivo e as regras Laravel/Boost mantidas abaixo.
 2. Consulte [README.md](README.md) para iniciar o projeto e [docs/README.md](docs/README.md) para o índice da documentação do domínio.
 3. Leia os documentos específicos da tarefa: [arquitetura](docs/architecture.md), [regras de negócio](docs/business-rules.md), [padrões de desenvolvimento](docs/development.md), [Design System e UX](docs/design-system.md), [estado atual](docs/current-state.md) e [decisões técnicas](docs/decisions.md).
-4. Trate migrations, código e testes como evidência do comportamento implementado. O PDF [docs/requisitos-funcionais.pdf](docs/requisitos-funcionais.pdf) descreve requisitos do MVP e evoluções planejadas; não assuma que tudo foi construído. Consulte também o [diagrama lógico do banco](docs/modelagem-logica-banco-de-dados.webp).
+4. Trate migrations, código e testes como evidência do comportamento implementado. O PDF [docs/requisitos-funcionais.pdf](docs/requisitos-funcionais.pdf) descreve requisitos do MVP e evoluções planejadas; não assuma que tudo foi construído. O modelo de dados atual está no diagrama de [arquitetura](docs/architecture.md) e nas migrations.
 5. Verifique `git status` antes de editar e preserve alterações não relacionadas.
 
 ## Stack e limites de mudança

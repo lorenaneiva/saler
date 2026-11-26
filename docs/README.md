@@ -4,14 +4,13 @@
 
 | Documento | Consulte para |
 | --- | --- |
-| [Arquitetura](architecture.md) | localizar camadas, módulos, entidades e fluxos de dados |
+| [Arquitetura](architecture.md) | localizar camadas, módulos, entidades, modelo de dados e fluxos |
 | [Regras de negócio](business-rules.md) | entender o comportamento efetivamente implementado e suas diferenças em relação aos requisitos |
 | [Padrões de desenvolvimento](development.md) | editar código, validar mudanças e preservar segurança e convenções |
 | [Design System e UX](design-system.md) | construir ou ajustar interfaces consistentes |
 | [Estado atual](current-state.md) | conhecer capacidades, lacunas, riscos e próximos passos conhecidos |
 | [Decisões técnicas](decisions.md) | entender escolhas registradas e seus custos de mudança |
 | [Requisitos funcionais (PDF)](requisitos-funcionais.pdf) | consultar o escopo do MVP e evoluções planejadas |
-| [Modelagem lógica (imagem)](modelagem-logica-banco-de-dados.webp) | consultar o diagrama de dados originalmente fornecido |
 
 ## Como interpretar esta documentação
 

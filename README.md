@@ -24,6 +24,6 @@ Configure o ambiente local a partir de `.env.example`; não compartilhe nem vers
 
 - [AGENTS.md](AGENTS.md): ponto de entrada, regras operacionais e checklist de documentação.
 - [Índice de domínio](docs/README.md): arquitetura, regras de negócio, padrões, UX, estado atual e decisões.
-- [Requisitos funcionais originais](docs/requisitos-funcionais.pdf) e [diagrama lógico](docs/modelagem-logica-banco-de-dados.webp): referências de requisitos; não substituem código/migrations/testes como evidência do que está implementado.
+- [Requisitos funcionais originais](docs/requisitos-funcionais.pdf): referência de requisitos; não substituem código/migrations/testes como evidência do que está implementado.
 
 Leia [docs/current-state.md](docs/current-state.md) antes de assumir que um requisito planejado está disponível. Use Sail para comandos PHP/Artisan/Composer/Node e consulte `AGENTS.md` para validações e convenções.
