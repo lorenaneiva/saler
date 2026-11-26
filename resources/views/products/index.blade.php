@@ -11,7 +11,7 @@
 
     <x-ui.data-table id="products" title="Catálogo de produtos" :paginator="$products" :unit="['produto', 'produtos']" data-product-list>
         <x-slot:filters>
-            <x-ui.list-search label="Buscar produto" placeholder="Digite o nome ou leia o código de barras" :active="(bool) array_filter($filters)" autocapitalize="none" spellcheck="false">
+            <x-ui.list-search label="Buscar produto" placeholder="Nome ou código de barras" :active="(bool) array_filter($filters)" autocapitalize="none" spellcheck="false">
                 <x-ui.table-filter label="Categoria">
                     <select name="categoria" class="field">
                         <option value="">Todas</option>

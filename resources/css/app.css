@@ -114,7 +114,7 @@
     .table-section .table-results { transition: opacity var(--duration) ease-in-out; }
     .table-section[aria-busy="true"] .table-results { @apply pointer-events-none opacity-60; }
     .table-search { @apply flex w-full min-w-0 flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap; }
-    .table-search-field { @apply relative block w-full min-w-0 sm:w-64 sm:flex-none; }
+    .table-search-field { @apply relative block w-full min-w-0 sm:w-72 sm:flex-none; }
     .table-search-field svg { @apply pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2; color: var(--muted); }
     .table-search-field .field { @apply pl-8; }
     .table-search-field .field::-webkit-search-cancel-button { display: none; }
