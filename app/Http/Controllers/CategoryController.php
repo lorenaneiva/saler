@@ -27,7 +27,7 @@ class CategoryController extends Controller
                 ->withCount(['products', 'products as active_products_count' => fn ($products) => $products->where('is_active', true)])
                 ->when($search !== '', fn ($categories) => $categories->whereLike('name', $pattern))
                 ->when($status !== 'todas', fn ($categories) => $categories->where('is_active', $status === 'ativas'))
-                ->orderBy('name')->orderBy('id')->paginate(20)->withQueryString(),
+                ->orderBy('name')->orderBy('id')->paginate(self::PerPage)->withQueryString(),
             'registeredCount' => Category::query()->count(),
             'search' => $search,
             'status' => $status,

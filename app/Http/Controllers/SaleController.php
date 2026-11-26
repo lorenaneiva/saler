@@ -21,7 +21,7 @@ class SaleController extends Controller
     {
         return view('sales.index', [
             'sales' => $request->filter(Sale::query(), ['id', 'customer.name', 'items.product.name'])
-                ->with('customer:id,name')->withPaidTotal()->orderByDesc('sold_on')->orderByDesc('id')->paginate(20)->withQueryString(),
+                ->with('customer:id,name')->withPaidTotal()->orderByDesc('sold_on')->orderByDesc('id')->paginate(self::PerPage)->withQueryString(),
         ]);
     }
 
@@ -56,7 +56,7 @@ class SaleController extends Controller
             'sale' => $sale,
             'paymentToken' => (string) Str::uuid(),
             'payments' => $request->filter($sale->payments(), ['id', 'notes'], 'q_pagamentos', ['method' => Payment::Methods])
-                ->orderByDesc('paid_on')->orderByDesc('payments.id')->paginate(20)->withQueryString(),
+                ->orderByDesc('paid_on')->orderByDesc('payments.id')->paginate(self::PerPage)->withQueryString(),
         ]);
     }
 }

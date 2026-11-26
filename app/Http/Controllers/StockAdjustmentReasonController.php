@@ -15,7 +15,7 @@ class StockAdjustmentReasonController extends Controller
     {
         return view('stock.reasons', [
             'reasons' => $request->filter(StockAdjustmentReason::query(), ['name'])
-                ->orderBy('name')->paginate(20)->withQueryString(),
+                ->orderBy('name')->paginate(self::PerPage)->withQueryString(),
         ]);
     }
 

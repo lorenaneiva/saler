@@ -22,7 +22,7 @@ class PurchaseController extends Controller
     {
         return view('purchases.index', [
             'purchases' => $request->filter(Purchase::query(), ['id', 'supplier.name', 'items.product.name'])
-                ->with('supplier:id,name')->orderByDesc('purchased_on')->orderByDesc('id')->paginate(20)->withQueryString(),
+                ->with('supplier:id,name')->orderByDesc('purchased_on')->orderByDesc('id')->paginate(self::PerPage)->withQueryString(),
         ]);
     }
 

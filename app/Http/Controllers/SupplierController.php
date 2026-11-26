@@ -15,7 +15,7 @@ class SupplierController extends Controller
     {
         return view('suppliers.index', [
             'suppliers' => $request->filter(Supplier::query(), ['name', 'contact', 'representative'])
-                ->orderBy('name')->orderBy('id')->paginate(20)->withQueryString(),
+                ->orderBy('name')->orderBy('id')->paginate(self::PerPage)->withQueryString(),
         ]);
     }
 

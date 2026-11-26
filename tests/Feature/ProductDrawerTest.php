@@ -89,10 +89,10 @@ class ProductDrawerTest extends TestCase
             'name' => 'Arroz Z', 'category_id' => $category->id, 'sale_price' => '15.50',
         ])->assertOk();
 
-        $this->get(route('products.index', ['q' => 'Arroz', 'categoria' => $category->id, 'situacao' => 'ativos', 'page' => 2]))
+        $this->get(route('products.index', ['q' => 'Arroz', 'categoria' => $category->id, 'situacao' => 'ativos', 'page' => 3]))
             ->assertOk()->assertSee('Arroz Z')->assertSee('R$ 15,50')->assertDontSee('Arroz A')
             ->assertSee('data-product-list', false)
-            ->assertViewHas('products', fn ($products): bool => $products->currentPage() === 2 && $products->total() === 21);
+            ->assertViewHas('products', fn ($products): bool => $products->currentPage() === 3 && $products->total() === 21);
     }
 
     public function test_guests_cannot_load_or_submit_product_drawer_forms(): void

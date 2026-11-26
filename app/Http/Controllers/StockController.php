@@ -16,7 +16,7 @@ class StockController extends Controller
     {
         return view('stock.index', [
             'products' => $request->filter(Product::query()->withRegisteredCost(), ['name', 'barcode'])
-                ->orderBy('name')->orderBy('id')->paginate(20)->withQueryString(),
+                ->orderBy('name')->orderBy('id')->paginate(self::PerPage)->withQueryString(),
         ]);
     }
 
@@ -27,7 +27,7 @@ class StockController extends Controller
             'reasons' => StockAdjustmentReason::query()->orderBy('name')->get(['id', 'name']),
             'movements' => $request->filter($product->stockMovements(), ['justification', 'user.name', 'adjustment.reason.name'])
                 ->with(['user:id,name', 'purchaseItem:id,purchase_id', 'saleItem:id,sale_id', 'adjustment.reason'])
-                ->latest()->orderByDesc('id')->paginate(20)->withQueryString(),
+                ->latest()->orderByDesc('id')->paginate(self::PerPage)->withQueryString(),
         ]);
     }
 

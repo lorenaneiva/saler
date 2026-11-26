@@ -36,7 +36,7 @@ class ProductController extends Controller
                 ->when($category, fn (Builder $products) => $products->where('category_id', $category))
                 ->when($supplier, fn (Builder $products) => $products->where('supplier_id', $supplier))
                 ->when(in_array($status, ['ativos', 'inativos'], true), fn (Builder $products) => $products->where('is_active', $status === 'ativos'))
-                ->orderBy('name')->orderBy('id')->paginate(20)->withQueryString(),
+                ->orderBy('name')->orderBy('id')->paginate(self::PerPage)->withQueryString(),
             'categories' => Category::query()->orderBy('name')->get(['id', 'name']),
             'suppliers' => Supplier::query()->orderBy('name')->get(['id', 'name']),
             'filters' => ['search' => $search, 'category' => $category, 'supplier' => $supplier, 'status' => $status],

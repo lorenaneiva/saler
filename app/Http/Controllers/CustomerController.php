@@ -21,7 +21,7 @@ class CustomerController extends Controller
     {
         return view('customers.index', [
             'customers' => $request->filter(Customer::query(), ['name', 'phone', 'email', 'cpf'])
-                ->orderBy('name')->orderBy('id')->paginate(20)->withQueryString(),
+                ->orderBy('name')->orderBy('id')->paginate(self::PerPage)->withQueryString(),
         ]);
     }
 
@@ -64,11 +64,11 @@ class CustomerController extends Controller
         return view('customers.show', [
             'customer' => $customer,
             'section' => $section,
-            'sales' => in_array($section, ['compras', 'aberto'], true) ? $sales->paginate(20)->withQueryString() : null,
+            'sales' => in_array($section, ['compras', 'aberto'], true) ? $sales->paginate(self::PerPage)->withQueryString() : null,
             'payments' => $section === 'pagamentos'
                 ? $request->filter($customer->payments(), ['id', 'notes'], 'q_pagamentos', ['method' => Payment::Methods])
                     ->with('allocations')->orderByDesc('paid_on')->orderByDesc('id')
-                    ->paginate(10, pageName: 'pagamentos')->withQueryString()
+                    ->paginate(self::PerPage, pageName: 'pagamentos')->withQueryString()
                 : null,
             'paymentToken' => (string) Str::uuid(),
             'purchasedTotal' => (string) BigDecimal::of($summary->purchased)->toScale(2),

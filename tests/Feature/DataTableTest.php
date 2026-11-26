@@ -46,11 +46,11 @@ class DataTableTest extends TestCase
 
         $this->actingAs(User::factory()->create())->get(route('customers.index', ['q' => 'Silva', 'page' => 2]))->assertOk()
             ->assertSeeText('45 clientes')
-            ->assertSeeText('21–40 de 45')
+            ->assertSeeText('11–20 de 45')
             ->assertSee('href="'.e(route('customers.index', ['q' => 'Silva', 'page' => 1])).'" rel="prev" aria-label="Página anterior"', false)
             ->assertSee('href="'.e(route('customers.index', ['q' => 'Silva', 'page' => 3])).'" rel="next" aria-label="Próxima página"', false)
             ->assertSee('<input type="hidden" name="q" value="Silva">', false)
-            ->assertSee('name="page" value="2" min="1" max="3"', false);
+            ->assertSee('name="page" value="2" min="1" max="5"', false);
     }
 
     public function test_search_forms_and_clear_links_drop_the_current_page_so_filtering_restarts_on_page_one(): void
