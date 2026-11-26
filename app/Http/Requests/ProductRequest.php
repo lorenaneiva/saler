@@ -2,16 +2,20 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Product;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Exists;
 
 class ProductRequest extends FormRequest
 {
-    /** @return array<string, list<string>> */
+    /** @return array<string, list<string|Exists>> */
     public function rules(): array
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'category_id' => ['required', 'integer', 'exists:categories,id'],
+            'category_id' => ['required', 'integer', $this->selectableCategoryRule()],
             'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
             'sale_price' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:9999999999.99'],
             'barcode' => ['nullable', 'string', 'max:64'],
@@ -27,7 +31,7 @@ class ProductRequest extends FormRequest
             'name.max' => 'O nome deve ter até 255 caracteres.',
             'category_id.required' => 'Selecione uma categoria.',
             'category_id.integer' => 'Selecione uma categoria válida.',
-            'category_id.exists' => 'A categoria selecionada não existe.',
+            'category_id.exists' => 'Selecione uma categoria ativa.',
             'supplier_id.integer' => 'Selecione um fornecedor válido.',
             'supplier_id.exists' => 'O fornecedor selecionado não existe.',
             'sale_price.required' => 'Informe o preço de venda.',
@@ -38,5 +42,16 @@ class ProductRequest extends FormRequest
             'barcode.string' => 'O código de barras deve ser um texto.',
             'barcode.max' => 'O código de barras deve ter até 64 caracteres.',
         ];
+    }
+
+    /** Active categories are selectable; a product may keep its current category even after it is deactivated. */
+    private function selectableCategoryRule(): Exists
+    {
+        $product = $this->route('product');
+        $currentCategoryId = $product instanceof Product ? $product->category_id : null;
+
+        return Rule::exists('categories', 'id')->where(fn (Builder $categories) => $categories
+            ->where('is_active', true)
+            ->when($currentCategoryId, fn (Builder $active) => $active->orWhere('id', $currentCategoryId)));
     }
 }

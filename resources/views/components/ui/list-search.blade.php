@@ -15,6 +15,7 @@
         {{ $label }}
         <input type="search" name="{{ $name }}" value="{{ $value }}" maxlength="100" placeholder="{{ $placeholder }}" class="field">
     </label>
+    {{ $slot }}
     <button class="button-secondary">Buscar</button>
     @if ($value !== '')
         <a class="button-quiet" href="{{ route(request()->route()->getName(), array_merge(request()->route()->parameters(), $parameters)) }}">Limpar</a>

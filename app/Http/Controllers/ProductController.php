@@ -109,7 +109,10 @@ class ProductController extends Controller
     {
         return [
             'product' => $product,
-            'categories' => Category::query()->orderBy('name')->orderBy('id')->get(['id', 'name']),
+            'categories' => Category::query()
+                ->where(fn (Builder $categories) => $categories->where('is_active', true)
+                    ->when($product->category_id, fn (Builder $active) => $active->orWhere('id', $product->category_id)))
+                ->orderBy('name')->orderBy('id')->get(['id', 'name', 'is_active']),
             'suppliers' => Supplier::query()->orderBy('name')->orderBy('id')->get(['id', 'name', 'is_active']),
         ];
     }

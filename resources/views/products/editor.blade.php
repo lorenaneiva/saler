@@ -32,7 +32,7 @@
                     <select id="product-category_id" name="category_id" class="field" required aria-describedby="product-category_id-error" @error('category_id') aria-invalid="true" @enderror>
                         <option value="">Selecione</option>
                         @foreach ($categories as $category)
-                            <option value="{{ $category->id }}" @selected(old('category_id', $product->category_id) == $category->id)>{{ $category->name }}</option>
+                            <option value="{{ $category->id }}" @selected(old('category_id', $product->category_id) == $category->id)>{{ $category->name }}{{ $category->is_active ? '' : ' (inativa)' }}</option>
                         @endforeach
                     </select>
                     <p id="product-category_id-error" data-product-field-error="category_id" class="text-sm text-red-800" @if (! $errors->has('category_id')) hidden @endif>{{ $errors->first('category_id') }}</p>

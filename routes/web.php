@@ -21,6 +21,8 @@ Route::middleware('guest')->group(function (): void {
 Route::middleware('auth')->group(function (): void {
     Route::get('/opcoes/{source}', AutocompleteController::class)->name('autocomplete.options');
     Route::view('/', 'dashboard')->name('dashboard');
+    Route::patch('/categorias/{category}/ativar', [CategoryController::class, 'activate'])->name('categories.activate');
+    Route::patch('/categorias/{category}/desativar', [CategoryController::class, 'deactivate'])->name('categories.deactivate');
     Route::resource('categorias', CategoryController::class)
         ->parameters(['categorias' => 'category'])
         ->names('categories')

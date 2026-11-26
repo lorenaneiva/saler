@@ -4,7 +4,10 @@ Este documento separa o que o código atual evidencia do que o requisito origina
 
 ## Cadastros
 
-- **Categorias — implementado:** nome obrigatório; listagem, criação, edição na linha e exclusão apenas quando não há produtos relacionados (ver `CategoryController` e `CategoryTest`).
+- **Categorias — implementado:** nome obrigatório; listagem, criação e edição na linha (ver `CategoryController` e `CategoryTest`).
+  - Situação ativa/inativa (`categories.is_active`), campo que não existia na modelagem inicial (adicionado em 26/11/2026). A listagem filtra por situação (`?situacao=ativas|inativas|todas`) e mostra só as ativas por padrão.
+  - Exclusão física só é permitida para categoria que **nunca** teve produto. O marcador `categories.has_had_products` é ligado automaticamente pelo model `Product` ao criar um produto ou trocar sua categoria, e nunca é desligado; a migration preencheu as categorias que já tinham produtos. Categorias que já tiveram produto (mesmo que o produto tenha mudado de categoria depois) só podem ser desativadas/ativadas.
+  - Categoria inativa não aparece para seleção em novo produto (cadastro ou compra) e é rejeitada na validação. Produto que já usa uma categoria inativa a mantém e pode ser editado sem trocá-la; no editor ela aparece como “(inativa)”. Desativar não altera produtos.
 - **Produtos — implementado:** nome, categoria existente, preço de venda, fornecedor opcional, código de barras opcional, custo médio, saldo e ativo/inativo. A exclusão funcional desativa o produto; preço/cadastro podem ser editados sem alterar saldo nem custo médio via formulário de catálogo. Compras podem criar o primeiro cadastro do produto.
 - **Clientes — implementado:** cadastro e edição, busca, perfil com dados, resumo financeiro, histórico de vendas e pagamentos; operações relacionadas não são apagadas por exclusão física.
 - **Fornecedores — implementado:** cadastro/edição e ativar/desativar. Produto guarda no máximo um fornecedor opcional, mas cada compra também guarda seu fornecedor.

@@ -117,6 +117,7 @@
     .data-table tr:has([data-row-link]) :is(a:not([data-row-link]), button, input, select, textarea) { position: relative; z-index: 2; }
     .data-table .numeric { @apply text-right whitespace-nowrap tabular-nums; }
     .data-table .row-actions { @apply flex flex-wrap items-center justify-end gap-1; }
+    .data-table .row-actions .button-small { min-width: 5.75rem; justify-content: center; }
     .data-table a:not([class*="button"]) { color: inherit; font-weight: inherit; text-decoration: none; }
     .empty-state, .data-table .empty-state { @apply p-6 text-center text-sm; color: var(--muted); }
 

@@ -33,7 +33,7 @@ class PurchaseController extends Controller
         $productIds = is_array($previousItems) ? collect($previousItems)->pluck('product_id')->all() : [];
 
         return view('purchases.create', [
-            'categories' => Category::query()->orderBy('name')->orderBy('id')->get(['id', 'name']),
+            'categories' => Category::query()->where('is_active', true)->orderBy('name')->orderBy('id')->get(['id', 'name']),
             'suppliers' => Supplier::query()->where('is_active', true)->orderBy('name')->orderBy('id')->get(['id', 'name']),
             'products' => $options->handle(Product::query()->where('is_active', true), $productIds, ['id', 'name']),
         ]);

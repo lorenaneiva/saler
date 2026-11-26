@@ -62,7 +62,7 @@ class ProductTest extends TestCase
                 'sale_price' => '19.999',
             ])->assertRedirectToRoute('products.create')->assertSessionHasErrors([
                 'name' => 'Informe o nome do produto.',
-                'category_id' => 'A categoria selecionada não existe.',
+                'category_id' => 'Selecione uma categoria ativa.',
                 'supplier_id' => 'O fornecedor selecionado não existe.',
                 'sale_price' => 'Informe o preço com até duas casas decimais.',
             ]);
@@ -98,9 +98,9 @@ class ProductTest extends TestCase
         $this->assertDatabaseHas('products', ['id' => $product->id, 'is_active' => false]);
         $this->get(route('products.index'))->assertOk()->assertSee('Inativo');
 
-        $this->delete(route('categories.destroy', $product->category_id))
+        $this->from(route('categories.index'))->delete(route('categories.destroy', $product->category_id))
             ->assertRedirectToRoute('categories.index')
-            ->assertSessionHasErrors(['category' => 'Categorias vinculadas a produtos não podem ser excluídas.']);
+            ->assertSessionHasErrors(['category' => 'Categorias que já tiveram produtos não podem ser excluídas; desative-as.']);
 
         $this->assertDatabaseHas('categories', ['id' => $product->category_id]);
     }

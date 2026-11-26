@@ -17,6 +17,17 @@ class Product extends Model
     /** @use HasFactory<ProductFactory> */
     use HasFactory;
 
+    protected static function booted(): void
+    {
+        static::saved(function (Product $product): void {
+            if ($product->wasChanged('category_id') || $product->wasRecentlyCreated) {
+                Category::query()->whereKey($product->category_id)
+                    ->where('has_had_products', false)
+                    ->update(['has_had_products' => true]);
+            }
+        });
+    }
+
     /** @return array<string, string> */
     protected function casts(): array
     {

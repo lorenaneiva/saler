@@ -5,7 +5,7 @@ Revisão documental do código, testes, migrations, requisitos e histórico Git 
 ## Implementado com cobertura identificada
 
 - Login/logout por sessão, proteção de rotas e bloqueio após cinco tentativas de login inválidas (`AuthenticationTest`). Não há matriz de papéis/permissões.
-- Cadastros de categoria, produto, cliente e fornecedor; busca/paginação; desativação de produtos e fornecedores; reativação de fornecedor; edição contextual de categoria/fornecedor/cliente e drawer de produto (`CategoryTest`, `ProductTest`, `CustomerTest`, `SupplierTest`, `InlineEditingTest`, `ProductDrawerTest`). `CustomerTest` cobre acesso de visitante, criação/listagem/consulta, edição, validação, resumo financeiro e histórico de compras exibido por padrão ao abrir o perfil (aba Compras).
+- Cadastros de categoria, produto, cliente e fornecedor; busca/paginação; desativação de produtos, fornecedores e categorias já usadas; reativação de fornecedor e categoria; filtro de situação em categorias (ativas por padrão); edição contextual de categoria/fornecedor/cliente e drawer de produto (`CategoryTest`, `ProductTest`, `CustomerTest`, `SupplierTest`, `InlineEditingTest`, `ProductDrawerTest`). `CustomerTest` cobre acesso de visitante, criação/listagem/consulta, edição, validação, resumo financeiro e histórico de compras exibido por padrão ao abrir o perfil (aba Compras).
 - Compra com múltiplos itens, cadastro de produto pela compra, desconto, atualização imediata de estoque/custo médio e cancelamento com reversão condicionada a saldo (`PurchaseTest`). Há estados pending/confirmed/cancelled, embora o fluxo de criação confirme imediatamente.
 - Consulta de estoque, histórico de movimentos, motivos e entradas/saídas manuais com auditoria (`StockTest`).
 - Venda com múltiplos itens, snapshots de preço/custo, desconto, baixa de estoque e rejeição atômica por saldo insuficiente (`SaleTest`).
@@ -29,12 +29,13 @@ Revisão documental do código, testes, migrations, requisitos e histórico Git 
 - Corrigido em 26/11/2026: `<x-ui.money>` exibia `R$ 0,00` quando recebia `BigDecimal` (ex.: `Sale::paidAmount()`/`outstandingAmount()`), afetando “Valor pago”/“Saldo em aberto” no detalhe da venda e as colunas Pago/Em aberto do perfil do cliente. O componente agora aceita qualquer `Stringable`; cobertura em `MoneyFormattingTest` e `ListSearchTest`. A seção padrão antiga `resumo` (que consultava listas sem exibi-las) foi removida.
 - `tests/Feature/ExampleTest.php` e `tests/Unit/ExampleTest.php` são testes de scaffold, não evidência de requisito de domínio.
 - `README.md` original era o README padrão do Laravel (substituído por overview e instruções neste trabalho); o nome/descrição Composer ainda identificam o esqueleto `laravel/laravel`.
+- O diagrama original não tem situação em categoria; `is_active` e `has_had_products` foram adicionados em 26/11/2026 (migration `add_status_columns_to_categories_table`).
 - O PDF e o diagrama são documentos de referência originais, não especificação executável; algumas regras planejadas divergem do código, listadas em [regras de negócio](business-rules.md).
 - `ConfirmPurchase` arredonda custo médio a 4 casas; `CancelPurchase` retira quantidade, mas não recalcula custo médio. Definir política antes de mexer, considerando vendas/entradas subsequentes e auditabilidade.
 - A exibição monetária em `<x-ui.money>` converte para float antes de `number_format`; embora testes cubram valores usuais e a camada seja somente apresentação, vale avaliar limites de precisão para valores extremos permitidos pelas colunas.
 - Testes cobrem controllers/HTML/ações e utilitários, mas não foi identificado teste automatizado real de navegador para foco, leitor de tela, posicionamento/responsividade do drawer e autocomplete. Acessibilidade visual precisa de verificação manual.
 
-Em 26/11/2026 a suíte PHPUnit completa (84 testes) e os testes JS de `tests/Unit/*.test.js` (8 testes) foram executados e aprovados. Não há bug de interface assumido sem evidência; itens acima são lacunas ou riscos a validar.
+Em 26/11/2026 a suíte PHPUnit completa (89 testes) e os testes JS de `tests/Unit/*.test.js` (8 testes) foram executados e aprovados. Não há bug de interface assumido sem evidência; itens acima são lacunas ou riscos a validar.
 
 ## Próximos passos recomendados
 

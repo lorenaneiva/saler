@@ -56,7 +56,7 @@ erDiagram
     STOCK_ADJUSTMENT_REASON ||--o{ STOCK_ADJUSTMENT : justifica
 ```
 
-`products.supplier_id` é opcional e aponta para um fornecedor preferencial cadastrado. A compra registra seu próprio fornecedor. Os itens de compra/venda guardam snapshots de custo/preço e quantidade; não existe tabela de parcelas. `PaymentAllocation` é a associação entre um pagamento único e uma ou mais vendas. `StockMovement` liga movimentações a itens de compra ou venda, usuário e, em ajustes manuais, a um detalhe `StockAdjustment` com motivo e saldos anterior/contado. Motivos usam a tabela/model `motivos`; detalhes de ajuste usam `ajustes_estoque`.
+`categories` tem `is_active` e `has_had_products` (histórico de vínculo usado para impedir exclusão), ausentes no diagrama original. `products.supplier_id` é opcional e aponta para um fornecedor preferencial cadastrado. A compra registra seu próprio fornecedor. Os itens de compra/venda guardam snapshots de custo/preço e quantidade; não existe tabela de parcelas. `PaymentAllocation` é a associação entre um pagamento único e uma ou mais vendas. `StockMovement` liga movimentações a itens de compra ou venda, usuário e, em ajustes manuais, a um detalhe `StockAdjustment` com motivo e saldos anterior/contado. Motivos usam a tabela/model `motivos`; detalhes de ajuste usam `ajustes_estoque`.
 
 ### Precisão persistida relevante
 
@@ -79,4 +79,4 @@ Confira os arquivos em `database/migrations/` antes de mudar precisão ou constr
 
 ## Navegação principal
 
-`routes/web.php` define CRUD para categorias, produtos, clientes e fornecedores (com exclusões deliberadamente limitadas); compras permitem listar/criar/ver e confirmar/cancelar; vendas permitem listar/criar/ver; estoque oferece listagem, detalhe/movimentação e cadastro de motivos; perfil de cliente concentra pagamentos e históricos. O autocomplete usa `/opcoes/{source}`. Consulte as rotas reais antes de assumir operações disponíveis.
+`routes/web.php` define CRUD para categorias (com rotas `categories.activate`/`categories.deactivate`), produtos, clientes e fornecedores (com exclusões deliberadamente limitadas); compras permitem listar/criar/ver e confirmar/cancelar; vendas permitem listar/criar/ver; estoque oferece listagem, detalhe/movimentação e cadastro de motivos; perfil de cliente concentra pagamentos e históricos. O autocomplete usa `/opcoes/{source}`. Consulte as rotas reais antes de assumir operações disponíveis.

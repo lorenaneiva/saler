@@ -13,11 +13,20 @@
         <x-ui.alert tone="error">{{ $message }}</x-ui.alert>
     @enderror
 
-    <x-ui.list-search label="Buscar categoria" placeholder="Nome da categoria" />
+    <x-ui.list-search label="Buscar categoria" placeholder="Nome da categoria">
+        <label class="grid w-full gap-1 text-sm font-medium sm:w-48">
+            Situação
+            <select name="situacao" class="field">
+                <option value="ativas" @selected($status === 'ativas')>Ativas</option>
+                <option value="inativas" @selected($status === 'inativas')>Inativas</option>
+                <option value="todas" @selected($status === 'todas')>Todas</option>
+            </select>
+        </label>
+    </x-ui.list-search>
 
     <x-ui.table label="Categorias cadastradas">
         <thead>
-            <tr><th scope="col">Categoria</th><th scope="col" class="numeric">Produtos</th><th scope="col" class="text-right">Ações</th></tr>
+            <tr><th scope="col">Categoria</th><th scope="col" class="numeric">Produtos</th><th scope="col">Situação</th><th scope="col" class="text-right">Ações</th></tr>
         </thead>
         <tbody>
             @forelse ($categories as $category)
@@ -34,9 +43,12 @@
                         @endif
                     </td>
                     <td>
+                        <x-ui.badge :tone="$category->is_active ? 'success' : 'neutral'">{{ $category->is_active ? 'Ativa' : 'Inativa' }}</x-ui.badge>
+                    </td>
+                    <td>
                         <div class="row-actions">
                             <x-ui.inline-actions :id="$editForm" :action="route('categories.update', $category)" :label="'Editar '.$category->name" />
-                            @if ($category->products_count === 0)
+                            @if ($category->canBeDeleted())
                                 <form data-inline-display method="POST" action="{{ route('categories.destroy', $category) }}"
                                     data-confirm="Excluir a categoria {{ $category->name }}?">
                                     @csrf
@@ -44,13 +56,21 @@
                                     <button class="button-quiet danger button-small" aria-label="Excluir {{ $category->name }}">Excluir</button>
                                 </form>
                             @else
-                                <span class="text-xs text-slate-600">Em uso</span>
+                                <form data-inline-display method="POST" action="{{ $category->is_active ? route('categories.deactivate', $category) : route('categories.activate', $category) }}"
+                                    @if ($category->is_active) data-confirm="Desativar a categoria {{ $category->name }}?" @endif>
+                                    @csrf
+                                    @method('PATCH')
+                                    <button @class(['button-quiet button-small', 'danger' => $category->is_active])
+                                        aria-label="{{ $category->is_active ? 'Desativar' : 'Ativar' }} {{ $category->name }}">
+                                        {{ $category->is_active ? 'Desativar' : 'Ativar' }}
+                                    </button>
+                                </form>
                             @endif
                         </div>
                     </td>
                 </tr>
             @empty
-                <x-ui.empty :columns="3">{{ $search === '' ? 'Nenhuma categoria cadastrada.' : 'Nenhuma categoria encontrada para esta busca.' }}</x-ui.empty>
+                <x-ui.empty :columns="4">{{ $search !== '' ? 'Nenhuma categoria encontrada para esta busca.' : match ($status) { 'ativas' => 'Nenhuma categoria ativa.', 'inativas' => 'Nenhuma categoria inativa.', default => 'Nenhuma categoria cadastrada.' } }}</x-ui.empty>
             @endforelse
         </tbody>
     </x-ui.table>

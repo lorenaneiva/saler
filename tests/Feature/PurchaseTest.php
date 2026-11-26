@@ -224,7 +224,7 @@ class PurchaseTest extends TestCase
                     ],
                 ],
             ])->assertOk()
-            ->assertSee('Selecione uma categoria válida para o novo produto.')
+            ->assertSee('Selecione uma categoria ativa para o novo produto.')
             ->assertSee('Informe um preço de venda válido para o novo produto')
             ->assertSee('value="Farinha"', false);
 
