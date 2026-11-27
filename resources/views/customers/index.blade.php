@@ -19,7 +19,7 @@
                 <x-ui.sort-header :sort="$sort" column="nome">Nome</x-ui.sort-header>
                 <x-ui.sort-header :sort="$sort" column="telefone">Telefone</x-ui.sort-header>
                 <x-ui.sort-header :sort="$sort" column="email">E-mail</x-ui.sort-header>
-                <th scope="col" class="text-right">Ações</th>
+                <th scope="col">Ações</th>
             </tr>
         </thead>
         <tbody>

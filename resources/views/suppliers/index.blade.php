@@ -20,7 +20,7 @@
                 <x-ui.sort-header :sort="$sort" column="contato">Contato</x-ui.sort-header>
                 <x-ui.sort-header :sort="$sort" column="representante">Representante</x-ui.sort-header>
                 <x-ui.sort-header :sort="$sort" column="situacao">Status</x-ui.sort-header>
-                <th scope="col" class="text-right">Ações</th>
+                <th scope="col">Ações</th>
             </tr>
         </thead>
         <tbody>

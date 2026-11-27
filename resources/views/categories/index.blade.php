@@ -31,7 +31,7 @@
                 <x-ui.sort-header :sort="$sort" column="nome">Categoria</x-ui.sort-header>
                 <x-ui.sort-header :sort="$sort" column="produtos" class="numeric">Produtos</x-ui.sort-header>
                 <x-ui.sort-header :sort="$sort" column="situacao">Situação</x-ui.sort-header>
-                <th scope="col" class="text-right">Ações</th>
+                <th scope="col">Ações</th>
             </tr>
         </thead>
         <tbody>

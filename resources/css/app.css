@@ -124,7 +124,7 @@
     .table-filter-label { @apply w-20 shrink-0 whitespace-nowrap sm:w-auto; }
 
     .table-region { @apply max-w-full overflow-x-auto; }
-    .data-table { @apply w-full border-collapse text-left text-sm; table-layout: fixed; min-width: 32rem; }
+    .data-table { @apply w-full border-collapse text-center text-sm; table-layout: fixed; min-width: 32rem; }
     .data-table:has(thead tr > :nth-child(5)) { min-width: 40rem; }
     .data-table:has(thead tr > :nth-child(6)) { min-width: 48rem; }
     .data-table:has(thead tr > :nth-child(7)) { min-width: 56rem; }
@@ -143,7 +143,7 @@
     .data-table tbody.table-fillers tr, .data-table tbody.table-fillers tr:hover { background: transparent; border: 0; }
     .data-table tbody.table-fillers td { height: var(--table-row-height, 2.5625rem); padding: 0; }
     .data-table th.sortable { @apply p-0 sm:p-0; transition: color var(--duration) ease-in-out, box-shadow var(--duration) ease-in-out; }
-    .data-table .sort-link { @apply flex w-full min-h-10 items-center gap-1 px-3 py-2.5 select-none sm:px-4; transition: background-color var(--duration) ease-in-out, color var(--duration) ease-in-out; }
+    .data-table .sort-link { @apply flex w-full min-h-10 items-center justify-center gap-1 px-3 py-2.5 select-none sm:px-4; transition: background-color var(--duration) ease-in-out, color var(--duration) ease-in-out; }
     .data-table .sort-link:hover { background: #e2e9f4; color: var(--ink); }
     .data-table .sort-link:focus-visible { outline-offset: -2px; }
     .data-table th.sortable.money .sort-link { @apply flex-row-reverse justify-start; }
@@ -160,7 +160,7 @@
     .data-table .sort-link > span:first-child { min-width: 0; text-wrap: balance; }
     /* Ten-column tables trade some cell padding for fitting desktop widths without horizontal scrolling. */
     .data-table:has(thead tr > :nth-child(10)) :is(td, th:not(.sortable), .sort-link) { padding-inline: .625rem; }
-    .data-table .row-actions { @apply flex flex-wrap items-center justify-end gap-1; }
+    .data-table .row-actions { @apply flex flex-wrap items-center justify-center gap-1; }
     .data-table .row-actions .button-small { min-width: 5.75rem; justify-content: center; }
     .data-table a:not([class*="button"]) { color: inherit; font-weight: inherit; text-decoration: none; }
     .data-table .cell-blank { display: block; text-align: center; }

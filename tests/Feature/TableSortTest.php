@@ -186,6 +186,6 @@ class TableSortTest extends TestCase
 
     public function test_action_columns_are_not_sortable(): void
     {
-        $this->get(route('categories.index'))->assertOk()->assertSee('<th scope="col" class="text-right">Ações</th>', false);
+        $this->get(route('categories.index'))->assertOk()->assertSee('<th scope="col">Ações</th>', false);
     }
 }
