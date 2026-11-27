@@ -5,6 +5,8 @@ namespace App\Models;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -63,6 +65,30 @@ class StockMovement extends Model
         return self::TypeLabels[$this->type];
     }
 
+    /**
+     * Stock on hand right after the movement: the running total of the product's movements in the order they happened
+     * (time, then id), so it never depends on how the history is filtered, sorted or paginated.
+     */
+    public static function balanceAfterColumn(): Expression
+    {
+        return new Expression('(SELECT SUM(earlier.quantity_delta) FROM stock_movements AS earlier'
+            .' WHERE earlier.product_id = stock_movements.product_id'
+            .' AND (earlier.created_at, earlier.id) <= (stock_movements.created_at, stock_movements.id))');
+    }
+
+    /** @param Builder<StockMovement> $query */
+    #[Scope]
+    protected function withBalanceAfter(Builder $query): void
+    {
+        $query->select('stock_movements.*')->selectRaw(self::balanceAfterColumn()->getValue($query->getGrammar()).' AS balance_after');
+    }
+
+    /** Price the product was actually sold for in this movement; null when no sale is linked. */
+    public function salePrice(): ?string
+    {
+        return $this->saleItem?->unit_price;
+    }
+
     /** Sortable {@see lossValue()}: null for every movement that is not a stock loss. */
     public static function lossColumn(): Expression
     {
@@ -83,6 +109,6 @@ class StockMovement extends Model
     /** @return array<string, string> */
     protected function casts(): array
     {
-        return ['quantity_delta' => 'integer', 'unit_cost' => 'decimal:4'];
+        return ['quantity_delta' => 'integer', 'unit_cost' => 'decimal:4', 'balance_after' => 'integer'];
     }
 }

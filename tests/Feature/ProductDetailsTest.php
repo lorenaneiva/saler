@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Purchase;
+use App\Models\Sale;
 use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Models\User;
@@ -39,6 +41,43 @@ class ProductDetailsTest extends TestCase
             ->assertSee('action="'.route('products.movements.store', $product).'"', false)
             ->assertSeeTextInOrder(['Histórico de movimentações', 'Perda de estoque', 'Joana Silva', 'Pacote rasgado'])
             ->assertSee('id="product-editor"', false);
+    }
+
+    public function test_history_shows_balance_after_each_movement_and_the_historical_sale_price(): void
+    {
+        $product = Product::factory()->create(['name' => 'Café', 'sale_price' => '18.00', 'stock_quantity' => 10]);
+        $purchase = Purchase::factory()->create();
+        $purchaseItem = $purchase->items()->create(['product_id' => $product->id, 'quantity' => 10, 'unit_cost' => '7.0000', 'discount' => '0.00', 'total' => '70.00']);
+        $sale = Sale::factory()->create();
+        $saleItem = $sale->items()->create(['product_id' => $product->id, 'quantity' => 3, 'unit_price' => '12.50', 'unit_cost' => '7.0000', 'subtotal' => '37.50']);
+
+        $movements = [
+            ['2026-01-01 09:00', 10, StockMovement::PurchaseEntry, ['purchase_item_id' => $purchaseItem->id]],
+            ['2026-01-02 09:00', -3, StockMovement::SaleExit, ['sale_item_id' => $saleItem->id]],
+            ['2026-01-03 09:00', -2, StockMovement::ManualExit, ['justification' => 'Avaria']],
+            ['2026-01-04 09:00', 5, StockMovement::ManualEntry, ['justification' => 'Doação']],
+        ];
+        foreach ($movements as [$moment, $delta, $type, $links]) {
+            $this->travelTo($moment);
+            $product->stockMovements()->create(['user_id' => auth()->id(), 'quantity_delta' => $delta, 'unit_cost' => '7.0000', 'type' => $type, ...$links]);
+        }
+        $this->travelBack();
+
+        $balances = fn (array $query): array => $this->get(route('products.show', [$product, ...$query]))->assertOk()
+            ->viewData('movements')->mapWithKeys(fn (StockMovement $movement): array => [$movement->quantity_delta => $movement->balance_after])->all();
+
+        $this->assertSame([5 => 10, -2 => 5, -3 => 7, 10 => 10], $balances([]));
+        $this->assertSame([-3 => 7, -2 => 5, 5 => 10, 10 => 10], $balances(['ordem' => 'quantidade']));
+        $this->assertSame([-2 => 5], $balances(['q' => 'Avaria']));
+        $this->assertSame($product->stock_quantity, $product->stockMovements()->sum('quantity_delta'));
+
+        $response = $this->get(route('products.show', [$product, 'ordem' => 'data']))->assertOk();
+        $history = str($response->getContent())->betweenFirst('id="stock-movements-results"', '</table>');
+        $this->assertStringNotContainsString('R$ 18,00', $history);
+        $response
+            ->assertSeeInOrder(['Preço unitário de venda', 'Entrada de compra', 'R$ 7,00', '—', 'Venda', 'R$ 7,00', 'R$ 12,50', 'Perda de estoque', 'R$ 7,00', '—'], false)
+            ->assertSee('<a class="text-link whitespace-nowrap" href="'.route('purchases.show', $purchase).'"', false)
+            ->assertSee('<a class="text-link whitespace-nowrap" href="'.route('sales.show', $sale).'"', false);
     }
 
     public function test_stock_value_is_unknown_until_a_purchase_records_the_cost(): void

@@ -8,6 +8,7 @@ use App\Http\Requests\ProductRequest;
 use App\Http\TableSort;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\SaleItem;
 use App\Models\StockAdjustmentReason;
 use App\Models\StockMovement;
 use App\Models\Supplier;
@@ -103,7 +104,9 @@ class ProductController extends Controller
             'tipo' => new Expression("CASE WHEN stock_movements.quantity_delta > 0 THEN 'Entrada' ELSE 'Saída' END"),
             'origem' => TableSort::labels('stock_movements.type', StockMovement::TypeLabels),
             'quantidade' => 'quantity_delta',
+            'saldo' => StockMovement::balanceAfterColumn(),
             'custo' => 'unit_cost',
+            'preco' => SaleItem::query()->select('unit_price')->whereColumn('sale_items.id', 'stock_movements.sale_item_id'),
             'prejuizo' => StockMovement::lossColumn(),
             'responsavel' => User::query()->select('name')->whereColumn('users.id', 'stock_movements.user_id'),
             'motivo' => new Expression('COALESCE(('.StockAdjustmentReason::query()->select('motivos.name')
@@ -115,8 +118,8 @@ class ProductController extends Controller
             'sort' => $sort,
             'product' => $product->load(['category:id,name', 'supplier:id,name']),
             'reasons' => StockAdjustmentReason::query()->orderBy('name')->get(['id', 'name']),
-            'movements' => $sort->apply($request->filter($product->stockMovements(), ['justification', 'user.name', 'adjustment.reason.name']))
-                ->with(['user:id,name', 'purchaseItem:id,purchase_id', 'saleItem:id,sale_id', 'adjustment.reason'])
+            'movements' => $sort->apply($request->filter($product->stockMovements()->withBalanceAfter(), ['justification', 'user.name', 'adjustment.reason.name']))
+                ->with(['user:id,name', 'purchaseItem:id,purchase_id', 'saleItem:id,sale_id,unit_price', 'adjustment.reason'])
                 ->paginate(self::PerPage)->withQueryString(),
         ]);
     }

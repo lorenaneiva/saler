@@ -74,13 +74,15 @@
             </x-slot:filters>
                     <thead>
                         <tr>
-                            <x-ui.sort-header :sort="$sort" column="data">Data</x-ui.sort-header>
-                            <x-ui.sort-header :sort="$sort" column="tipo">Tipo</x-ui.sort-header>
-                            <x-ui.sort-header :sort="$sort" column="origem">Origem</x-ui.sort-header>
-                            <x-ui.sort-header :sort="$sort" column="quantidade" class="numeric">Quantidade</x-ui.sort-header>
-                            <x-ui.sort-header :sort="$sort" column="custo" class="money">Custo unitário</x-ui.sort-header>
-                            <x-ui.sort-header :sort="$sort" column="prejuizo" class="money">Prejuízo</x-ui.sort-header>
-                            <x-ui.sort-header :sort="$sort" column="responsavel">Responsável</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="data" class="w-36">Data</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="tipo" class="w-20">Tipo</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="origem" class="w-40">Origem</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="quantidade" class="numeric w-28">Quantidade</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="saldo" class="numeric w-20">Saldo</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="custo" class="money w-28">Custo unitário</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="preco" class="money w-28">Preço unitário de venda</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="prejuizo" class="money w-28">Prejuízo</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="responsavel" class="w-32">Responsável</x-ui.sort-header>
                             <x-ui.sort-header :sort="$sort" column="motivo">Motivo e observação</x-ui.sort-header>
                         </tr>
                     </thead>
@@ -92,13 +94,11 @@
                                 <td>
                                     {{ $movement->typeLabel() }}
                                     @if ($movement->purchaseItem)
-                                        <a data-row-link href="{{ route('purchases.show', $movement->purchaseItem->purchase_id) }}">
-                                            {{ $movement->purchaseItem->purchase_id }}
-                                        </a>
+                                        <a class="text-link whitespace-nowrap" href="{{ route('purchases.show', $movement->purchaseItem->purchase_id) }}"
+                                            aria-label="Abrir compra {{ $movement->purchaseItem->purchase_id }}">#{{ $movement->purchaseItem->purchase_id }}</a>
                                     @elseif ($movement->saleItem)
-                                        <a data-row-link href="{{ route('sales.show', $movement->saleItem->sale_id) }}">
-                                            {{ $movement->saleItem->sale_id }}
-                                        </a>
+                                        <a class="text-link whitespace-nowrap" href="{{ route('sales.show', $movement->saleItem->sale_id) }}"
+                                            aria-label="Abrir venda {{ $movement->saleItem->sale_id }}">#{{ $movement->saleItem->sale_id }}</a>
                                     @endif
                                 </td>
                                 <td class="numeric">
@@ -109,7 +109,15 @@
                                         </div>
                                     @endif
                                 </td>
+                                <td class="numeric font-semibold">{{ $movement->balance_after }}</td>
                                 <td class="money"><x-ui.money :value="$movement->unit_cost" /></td>
+                                <td class="money">
+                                    @if (($salePrice = $movement->salePrice()) === null)
+                                        —
+                                    @else
+                                        <x-ui.money :value="$salePrice" />
+                                    @endif
+                                </td>
                                 @php($loss = $movement->lossValue())
                                 <td class="money">
                                     @if ($loss === null)
@@ -118,8 +126,8 @@
                                         <x-ui.money :value="$loss" />
                                     @endif
                                 </td>
-                                <td>{{ $movement->user->name }}</td>
-                                <td class="min-w-32 wrap-anywhere">
+                                <td class="wrap-anywhere">{{ $movement->user->name }}</td>
+                                <td class="wrap-anywhere">
                                     @if ($movement->adjustment)
                                         <div class="font-medium">{{ $movement->adjustment->reason->name }}</div>
                                     @endif
@@ -131,7 +139,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <x-ui.empty :columns="8">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhuma movimentação registrada.' }}</x-ui.empty>
+                            <x-ui.empty :columns="10">{{ request()->filled('q') ? 'Nenhum resultado para esta busca.' : 'Nenhuma movimentação registrada.' }}</x-ui.empty>
                         @endforelse
                     </tbody>
         </x-ui.data-table>

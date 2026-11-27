@@ -169,7 +169,7 @@ class TableSortTest extends TestCase
             [route('sales.show', $sale), 'ordem_pagamentos', ['numero', 'data', 'forma', 'valor']],
             [route('customers.show', $sale->customer_id), 'ordem_compras', ['numero', 'data', 'total', 'pago', 'aberto', 'situacao']],
             [route('customers.show', [$sale->customer_id, 'secao' => 'pagamentos']), 'ordem_pagamentos', ['numero', 'data', 'forma', 'valor', 'observacao']],
-            [route('products.show', $product), 'ordem', ['data', 'tipo', 'origem', 'quantidade', 'custo', 'prejuizo', 'responsavel', 'motivo']],
+            [route('products.show', $product), 'ordem', ['data', 'tipo', 'origem', 'quantidade', 'saldo', 'custo', 'preco', 'prejuizo', 'responsavel', 'motivo']],
             [route('products.reasons.index'), 'ordem', ['motivo']],
         ];
 
