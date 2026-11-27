@@ -15,6 +15,12 @@ class PurchaseItem extends Model
         return ['quantity' => 'integer', 'unit_cost' => 'decimal:2', 'discount' => 'decimal:2', 'total' => 'decimal:2'];
     }
 
+    /** @return BelongsTo<Purchase, $this> */
+    public function purchase(): BelongsTo
+    {
+        return $this->belongsTo(Purchase::class);
+    }
+
     /** @return BelongsTo<Product, $this> */
     public function product(): BelongsTo
     {

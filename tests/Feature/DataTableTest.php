@@ -32,7 +32,7 @@ class DataTableTest extends TestCase
 
         $this->actingAs(User::factory()->create())->get(route('customers.index'))->assertOk()
             ->assertSeeText('1 cliente')
-            ->assertSeeText('1–1 de 1')
+            ->assertDontSee('table-pagination-range', false)->assertDontSeeText('1–1 de 1')
             ->assertSee('<span class="pagination-step" aria-disabled="true" aria-label="Página anterior">', false)
             ->assertSee('<span class="pagination-step" aria-disabled="true" aria-label="Próxima página">', false)
             ->assertSee('min="1" max="1"', false)
@@ -46,7 +46,7 @@ class DataTableTest extends TestCase
 
         $this->actingAs(User::factory()->create())->get(route('customers.index', ['q' => 'Silva', 'page' => 2]))->assertOk()
             ->assertSeeText('45 clientes')
-            ->assertSeeText('16–30 de 45')
+            ->assertDontSeeText('16–30 de 45')
             ->assertSee('href="'.e(route('customers.index', ['q' => 'Silva', 'page' => 1])).'" rel="prev" aria-label="Página anterior"', false)
             ->assertSee('href="'.e(route('customers.index', ['q' => 'Silva', 'page' => 3])).'" rel="next" aria-label="Próxima página"', false)
             ->assertSee('<input type="hidden" name="q" value="Silva">', false)
@@ -79,7 +79,7 @@ class DataTableTest extends TestCase
         Customer::factory()->count(20)->create();
         $this->actingAs(User::factory()->create());
 
-        $lastPage = $this->get(route('customers.index', ['page' => 2]))->assertOk()->assertSeeText('16–20 de 20')->getContent();
+        $lastPage = $this->get(route('customers.index', ['page' => 2]))->assertOk()->assertSeeText('20 clientes')->getContent();
         $this->assertSame(10, substr_count(str($lastPage)->betweenFirst('<tbody class="table-fillers" aria-hidden="true">', '</tbody>'), '<tr>'));
 
         $emptyPage = $this->get(route('customers.index', ['page' => 9]))->assertOk()->getContent();

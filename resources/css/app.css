@@ -114,7 +114,7 @@
     .table-section-tools { @apply ml-auto flex w-full flex-wrap items-center justify-end gap-2 lg:w-auto; }
     .table-section .table-results { transition: opacity var(--duration) ease-in-out; }
     .table-section[aria-busy="true"] .table-results { @apply pointer-events-none opacity-60; }
-    .table-search { @apply flex w-full min-w-0 flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap; }
+    .table-search { @apply flex w-full min-w-0 flex-wrap items-center justify-end gap-2 sm:w-auto; }
     .table-search-field { @apply relative block w-full min-w-0 sm:w-72 sm:flex-none; }
     .table-search-field svg { @apply pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2; color: var(--muted); }
     .table-search-field .field { @apply pl-8; }
@@ -129,7 +129,7 @@
     .data-table:has(thead tr > :nth-child(6)) { min-width: 48rem; }
     .data-table:has(thead tr > :nth-child(7)) { min-width: 56rem; }
     .data-table:has(thead tr > :nth-child(8)) { min-width: 64rem; }
-    .data-table:has(thead tr > :nth-child(10)) { min-width: 80rem; }
+    .data-table:has(thead tr > :nth-child(10)) { min-width: 71rem; }
     .data-table thead { @apply border-b text-xs; background: #edf2f9; border-color: var(--line); color: var(--muted); }
     .data-table :is(th, td) { @apply px-3 py-2.5 align-middle sm:px-4; }
     .data-table tbody tr { transition: background-color var(--duration) ease-in-out; }
@@ -156,6 +156,10 @@
     .sort-icon[data-direction="asc"] .sort-icon-asc, .sort-icon[data-direction="desc"] .sort-icon-desc { opacity: 1; }
     .data-table .numeric { @apply whitespace-nowrap tabular-nums; }
     .data-table .money { @apply text-right whitespace-nowrap tabular-nums; }
+    .data-table th:is(.numeric, .money), .data-table .money .text-unknown { white-space: normal; }
+    .data-table .sort-link > span:first-child { min-width: 0; text-wrap: balance; }
+    /* Ten-column tables trade some cell padding for fitting desktop widths without horizontal scrolling. */
+    .data-table:has(thead tr > :nth-child(10)) :is(td, th:not(.sortable), .sort-link) { padding-inline: .625rem; }
     .data-table .row-actions { @apply flex flex-wrap items-center justify-end gap-1; }
     .data-table .row-actions .button-small { min-width: 5.75rem; justify-content: center; }
     .data-table a:not([class*="button"]) { color: inherit; font-weight: inherit; text-decoration: none; }
@@ -186,7 +190,6 @@
     .payment-distribution-summary dd { @apply font-semibold tabular-nums; }
 
     .table-pagination { @apply flex flex-wrap items-center justify-end gap-x-4 gap-y-2 border-t px-3 py-2 text-sm tabular-nums sm:px-4; border-color: var(--line); color: var(--muted); }
-    .table-pagination-range { @apply whitespace-nowrap; }
     .table-pagination-controls { @apply flex items-center gap-1; }
     .pagination-step { @apply inline-grid size-8 shrink-0 place-items-center border border-slate-200 bg-white; color: var(--ink); transition: border-color var(--duration), color var(--duration), opacity var(--duration); }
     .pagination-step svg { @apply size-4; }

@@ -15,6 +15,12 @@ class SaleItem extends Model
         return ['quantity' => 'integer', 'unit_price' => 'decimal:2', 'unit_cost' => 'decimal:4', 'subtotal' => 'decimal:2'];
     }
 
+    /** @return BelongsTo<Sale, $this> */
+    public function sale(): BelongsTo
+    {
+        return $this->belongsTo(Sale::class);
+    }
+
     /** @return BelongsTo<Product, $this> */
     public function product(): BelongsTo
     {

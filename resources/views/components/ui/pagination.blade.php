@@ -8,7 +8,6 @@
 @endphp
 
 <nav class="table-pagination" aria-label="Paginação">
-    <p class="table-pagination-range">{{ $paginator->firstItem() ?? 0 }}–{{ $paginator->lastItem() ?? 0 }} de {{ $paginator->total() }}</p>
     <div class="table-pagination-controls">
         @if ($paginator->onFirstPage())
             <span class="pagination-step" aria-disabled="true" aria-label="Página anterior"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m12 5-5 5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>

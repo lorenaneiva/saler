@@ -119,7 +119,7 @@ class ProductController extends Controller
             'product' => $product->load(['category:id,name', 'supplier:id,name']),
             'reasons' => StockAdjustmentReason::query()->orderBy('name')->get(['id', 'name']),
             'movements' => $sort->apply($request->filter($product->stockMovements()->withBalanceAfter(), ['justification', 'user.name', 'adjustment.reason.name']))
-                ->with(['user:id,name', 'purchaseItem:id,purchase_id', 'saleItem:id,sale_id,unit_price', 'adjustment.reason'])
+                ->with(['user:id,name', 'purchaseItem:id,purchase_id', 'purchaseItem.purchase:id,purchased_on', 'saleItem:id,sale_id,unit_price', 'saleItem.sale:id,sold_on', 'adjustment.reason'])
                 ->paginate(self::PerPage)->withQueryString(),
         ]);
     }

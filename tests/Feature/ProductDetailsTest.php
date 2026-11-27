@@ -75,9 +75,11 @@ class ProductDetailsTest extends TestCase
         $history = str($response->getContent())->betweenFirst('id="stock-movements-results"', '</table>');
         $this->assertStringNotContainsString('R$ 18,00', $history);
         $response
-            ->assertSeeInOrder(['Preço unitário de venda', 'Entrada de compra', 'R$ 7,00', '—', 'Venda', 'R$ 7,00', 'R$ 12,50', 'Perda de estoque', 'R$ 7,00', '—'], false)
+            ->assertSeeInOrder(['Custo unit.', 'Preço de venda', 'Entrada de compra', 'R$ 7,00', '—', 'Venda', 'R$ 7,00', 'R$ 12,50', 'Perda de estoque', 'R$ 7,00', '—'], false)
             ->assertSee('<a class="text-link whitespace-nowrap" href="'.route('purchases.show', $purchase).'"', false)
-            ->assertSee('<a class="text-link whitespace-nowrap" href="'.route('sales.show', $sale).'"', false);
+            ->assertSee('<a class="text-link whitespace-nowrap" href="'.route('sales.show', $sale).'"', false)
+            ->assertSee('title="Data da compra">de '.$purchase->purchased_on->format('d/m/Y'), false)
+            ->assertSee('title="Data da venda">de '.$sale->sold_on->format('d/m/Y'), false);
     }
 
     public function test_stock_value_is_unknown_until_a_purchase_records_the_cost(): void

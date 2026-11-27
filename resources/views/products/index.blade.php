@@ -54,7 +54,7 @@
                 <x-ui.sort-header :sort="$sort" column="margem" class="numeric">Margem</x-ui.sort-header>
                 <x-ui.sort-header :sort="$sort" column="estoque">Estoque</x-ui.sort-header>
                 <x-ui.sort-header :sort="$sort" column="situacao">Situação</x-ui.sort-header>
-                <th scope="col" class="text-right">Ações</th>
+                <th scope="col" class="w-56 text-right">Ações</th>
             </tr>
         </thead>
         <tbody>

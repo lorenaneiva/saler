@@ -21,7 +21,7 @@ class ListSearchTest extends TestCase
 
         $this->actingAs(User::factory()->create())
             ->get(route('customers.index', ['q' => '10%']))
-            ->assertOk()->assertSeeText('1–15 de 21')->assertDontSeeText('Cliente 100')
+            ->assertOk()->assertSeeText('21 clientes')->assertDontSeeText('Cliente 100')
             ->assertSee(route('customers.index', ['q' => '10%', 'page' => 2]));
     }
 

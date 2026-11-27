@@ -74,31 +74,36 @@
             </x-slot:filters>
                     <thead>
                         <tr>
-                            <x-ui.sort-header :sort="$sort" column="data" class="w-36">Data</x-ui.sort-header>
-                            <x-ui.sort-header :sort="$sort" column="tipo" class="w-20">Tipo</x-ui.sort-header>
-                            <x-ui.sort-header :sort="$sort" column="origem" class="w-40">Origem</x-ui.sort-header>
-                            <x-ui.sort-header :sort="$sort" column="quantidade" class="numeric w-28">Quantidade</x-ui.sort-header>
-                            <x-ui.sort-header :sort="$sort" column="saldo" class="numeric w-20">Saldo</x-ui.sort-header>
-                            <x-ui.sort-header :sort="$sort" column="custo" class="money w-28">Custo unitário</x-ui.sort-header>
-                            <x-ui.sort-header :sort="$sort" column="preco" class="money w-28">Preço unitário de venda</x-ui.sort-header>
-                            <x-ui.sort-header :sort="$sort" column="prejuizo" class="money w-28">Prejuízo</x-ui.sort-header>
-                            <x-ui.sort-header :sort="$sort" column="responsavel" class="w-32">Responsável</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="data" class="w-[6.75rem]">Data</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="tipo" class="w-[4.75rem]">Tipo</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="origem" class="w-[8.25rem]">Origem</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="quantidade" class="numeric w-[6.75rem]">Quantidade</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="saldo" class="numeric w-[5rem]">Saldo</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="custo" class="money w-[6.75rem]">Custo unit.</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="preco" class="money w-[8.25rem]">Preço de venda</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="prejuizo" class="money w-[6.75rem]">Prejuízo</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="responsavel" class="w-[7rem]">Responsável</x-ui.sort-header>
                             <x-ui.sort-header :sort="$sort" column="motivo">Motivo e observação</x-ui.sort-header>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($movements as $movement)
                             <tr>
-                                <td class="whitespace-nowrap">{{ $movement->created_at->format('d/m/Y H:i') }}</td>
+                                <td class="tabular-nums" title="Data em que o estoque foi atualizado">
+                                    {{ $movement->created_at->format('d/m/Y') }}
+                                    <span class="block text-xs text-slate-600">{{ $movement->created_at->format('H:i') }}</span>
+                                </td>
                                 <td>{{ $movement->quantity_delta > 0 ? 'Entrada' : 'Saída' }}</td>
                                 <td>
                                     {{ $movement->typeLabel() }}
                                     @if ($movement->purchaseItem)
                                         <a class="text-link whitespace-nowrap" href="{{ route('purchases.show', $movement->purchaseItem->purchase_id) }}"
                                             aria-label="Abrir compra {{ $movement->purchaseItem->purchase_id }}">#{{ $movement->purchaseItem->purchase_id }}</a>
+                                        <span class="block text-xs text-slate-600" title="Data da compra">de {{ $movement->purchaseItem->purchase->purchased_on->format('d/m/Y') }}</span>
                                     @elseif ($movement->saleItem)
                                         <a class="text-link whitespace-nowrap" href="{{ route('sales.show', $movement->saleItem->sale_id) }}"
                                             aria-label="Abrir venda {{ $movement->saleItem->sale_id }}">#{{ $movement->saleItem->sale_id }}</a>
+                                        <span class="block text-xs text-slate-600" title="Data da venda">de {{ $movement->saleItem->sale->sold_on->format('d/m/Y') }}</span>
                                     @endif
                                 </td>
                                 <td class="numeric">
