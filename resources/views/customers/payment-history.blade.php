@@ -29,7 +29,7 @@
                         @endforeach
                     </ul>
                 </td>
-                <td class="wrap-anywhere">{{ $payment->notes ?: '—' }}</td>
+                <td class="wrap-anywhere">@if ($payment->notes){{ $payment->notes }}@else<x-ui.blank />@endif</td>
             </tr>
         @empty
             <x-ui.empty :columns="6">{{ request()->filled('q_pagamentos') ? 'Nenhum resultado para esta busca.' : 'Nenhum pagamento registrado para este cliente.' }}</x-ui.empty>

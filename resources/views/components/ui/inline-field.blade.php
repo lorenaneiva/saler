@@ -1,6 +1,6 @@
 @props(['form', 'name', 'label', 'value' => '', 'type' => 'text', 'options' => null, 'required' => false])
 
-<span data-inline-display>{{ $slot->isEmpty() ? ($value === null || $value === '' ? '—' : $value) : $slot }}</span>
+<span data-inline-display>@if ($slot->isNotEmpty()){{ $slot }}@elseif ($value === null || $value === '')<x-ui.blank />@else{{ $value }}@endif</span>
 <div data-inline-input hidden class="min-w-32 text-left font-normal">
     <label for="{{ $form }}-{{ $name }}" class="block text-xs font-medium">{{ $label }} @if ($required)<x-required-mark />@endif</label>
     @if ($options !== null)

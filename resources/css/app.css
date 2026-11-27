@@ -163,6 +163,7 @@
     .data-table .row-actions { @apply flex flex-wrap items-center justify-end gap-1; }
     .data-table .row-actions .button-small { min-width: 5.75rem; justify-content: center; }
     .data-table a:not([class*="button"]) { color: inherit; font-weight: inherit; text-decoration: none; }
+    .data-table .cell-blank { display: block; text-align: center; }
     .data-table .cell-link:is(:hover, :focus-visible) { @apply underline underline-offset-2; }
     .data-table a.text-link { color: var(--color-brand); }
     .empty-state, .data-table .empty-state { @apply px-6 py-8 text-center text-sm; color: var(--muted); }

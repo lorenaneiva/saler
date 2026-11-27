@@ -118,7 +118,7 @@
                                 <td class="money"><x-ui.money :value="$movement->unit_cost" /></td>
                                 <td class="money">
                                     @if (($salePrice = $movement->salePrice()) === null)
-                                        —
+                                        <x-ui.blank />
                                     @else
                                         <x-ui.money :value="$salePrice" />
                                     @endif
@@ -126,7 +126,7 @@
                                 @php($loss = $movement->lossValue())
                                 <td class="money">
                                     @if ($loss === null)
-                                        —
+                                        <x-ui.blank />
                                     @else
                                         <x-ui.money :value="$loss" />
                                     @endif
@@ -139,7 +139,7 @@
                                     @if ($movement->justification)
                                         <div>{{ $movement->justification }}</div>
                                     @elseif (! $movement->adjustment)
-                                        —
+                                        <x-ui.blank />
                                     @endif
                                 </td>
                             </tr>

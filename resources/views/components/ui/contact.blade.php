@@ -7,4 +7,8 @@
         default => $value,
     };
 @endphp
-{{ $formatted ?: '—' }}
+@if ($formatted)
+{{ $formatted }}
+@else
+<x-ui.blank />
+@endif
