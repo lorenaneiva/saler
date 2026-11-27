@@ -11,7 +11,7 @@
             <a href="{{ route('sales.create') }}" class="button-primary">Nova venda</a>
             <a href="{{ route('purchases.create') }}" class="button-secondary">Nova compra</a>
             <a href="{{ route('customers.create') }}" class="button-secondary">Novo cliente</a>
-            <a href="{{ route('products.create') }}" class="button-secondary">Novo produto</a>
+            <a href="{{ route('products.index') }}#novo-produto" class="button-secondary">Novo produto</a>
         </div>
     </section>
 

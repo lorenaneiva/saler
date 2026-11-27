@@ -238,12 +238,23 @@ export function initializeProductEditor(closeDialog) {
         focusFormControl(form.querySelector('[aria-invalid]') ?? form.querySelector('[data-product-error]'));
     }
 
-    document.addEventListener('click', async (event) => {
+    document.addEventListener('click', (event) => {
         const opener = event.target.closest('[data-product-open]');
         if (!opener || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) {
             return;
         }
         event.preventDefault();
+        openEditor(opener);
+    });
+
+    /** Links elsewhere (e.g. the dashboard quick action) reach the listing at #novo-produto to start a new product. */
+    const creator = document.querySelector('[data-product-create]');
+    if (window.location.hash === '#novo-produto' && creator) {
+        window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
+        openEditor(creator);
+    }
+
+    async function openEditor(opener) {
         if (drawer.open) {
             return;
         }
@@ -292,7 +303,7 @@ export function initializeProductEditor(closeDialog) {
         } finally {
             content.removeAttribute('aria-busy');
         }
-    });
+    }
 
     drawer.addEventListener('dialog:before-close', (event) => {
         if (saving) {

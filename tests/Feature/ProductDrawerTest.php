@@ -32,6 +32,17 @@ class ProductDrawerTest extends TestCase
         $this->assertStringNotContainsString('name="is_active"', $html);
     }
 
+    public function test_dashboard_quick_action_opens_the_new_product_drawer_on_the_listing(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->get(route('dashboard'))->assertOk()
+            ->assertSee('href="'.route('products.index').'#novo-produto"', false)
+            ->assertDontSee('href="'.route('products.create').'"', false);
+        $this->get(route('products.index'))->assertOk()
+            ->assertSee('href="'.route('products.create').'" data-product-open data-product-create', false);
+    }
+
     public function test_new_product_drawer_uses_the_same_form_and_explains_missing_categories(): void
     {
         $this->actingAs(User::factory()->create());

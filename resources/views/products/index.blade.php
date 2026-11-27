@@ -5,7 +5,7 @@
 @section('content')
     <x-ui.page-header title="Produtos" description="Consulte preços, fornecedores e disponibilidade.">
         <x-slot:actions>
-            <a href="{{ route('products.create') }}" data-product-open class="button-primary"><span aria-hidden="true">＋</span> Novo produto</a>
+            <a href="{{ route('products.create') }}" data-product-open data-product-create class="button-primary"><span aria-hidden="true">＋</span> Novo produto</a>
         </x-slot:actions>
     </x-ui.page-header>
 
