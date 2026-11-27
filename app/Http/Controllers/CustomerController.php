@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CustomerRequest;
 use App\Http\Requests\ListSearchRequest;
+use App\Http\TableSort;
 use App\Models\Customer;
 use App\Models\Payment;
 use App\Models\PaymentAllocation;
@@ -19,9 +20,12 @@ class CustomerController extends Controller
 {
     public function index(ListSearchRequest $request): View
     {
+        $sort = $request->sorting(['nome' => 'name', 'telefone' => 'phone', 'email' => 'email'], text: ['nome', 'telefone', 'email'], default: 'nome');
+
         return view('customers.index', [
-            'customers' => $request->filter(Customer::query(), ['name', 'phone', 'email', 'cpf'])
-                ->orderBy('name')->orderBy('id')->paginate(self::PerPage)->withQueryString(),
+            'customers' => $sort->apply($request->filter(Customer::query(), ['name', 'phone', 'email', 'cpf']))
+                ->paginate(self::PerPage)->withQueryString(),
+            'sort' => $sort,
         ]);
     }
 
@@ -53,8 +57,23 @@ class CustomerController extends Controller
             ->selectRaw('COUNT(CASE WHEN total > COALESCE(paid_total, 0) THEN 1 END) as open_sales')
             ->first();
 
-        $sales = $request->filter($customer->sales(), ['id', 'items.product.name'], 'q_compras')
-            ->withPaidTotal()->orderByDesc('sold_on')->orderByDesc('id');
+        $salesSort = $request->sorting([
+            'numero' => 'id',
+            'data' => 'sold_on',
+            'total' => 'total',
+            'pago' => Sale::paidColumn(),
+            'aberto' => Sale::outstandingColumn(),
+            'situacao' => Sale::paymentStatusColumn(),
+        ], default: '-data', key: 'ordem_compras');
+        $paymentsSort = $request->sorting([
+            'numero' => 'id',
+            'data' => 'paid_on',
+            'forma' => TableSort::labels('payments.method', Payment::Methods),
+            'valor' => 'amount',
+            'observacao' => 'notes',
+        ], text: ['forma', 'observacao'], default: '-data', key: 'ordem_pagamentos', pageName: 'pagamentos');
+
+        $sales = $salesSort->apply($request->filter($customer->sales(), ['id', 'items.product.name'], 'q_compras')->withPaidTotal());
         if ($section === 'aberto') {
             $sales->where('status', Sale::Completed)
                 ->where('sales.total', '>', PaymentAllocation::query()->selectRaw('COALESCE(SUM(amount), 0)')
@@ -66,10 +85,11 @@ class CustomerController extends Controller
             'section' => $section,
             'sales' => in_array($section, ['compras', 'aberto'], true) ? $sales->paginate(self::PerPage)->withQueryString() : null,
             'payments' => $section === 'pagamentos'
-                ? $request->filter($customer->payments(), ['id', 'notes'], 'q_pagamentos', ['method' => Payment::Methods])
-                    ->with('allocations')->orderByDesc('paid_on')->orderByDesc('id')
-                    ->paginate(self::PerPage, pageName: 'pagamentos')->withQueryString()
+                ? $paymentsSort->apply($request->filter($customer->payments(), ['id', 'notes'], 'q_pagamentos', ['method' => Payment::Methods]))
+                    ->with('allocations')->paginate(self::PerPage, pageName: 'pagamentos')->withQueryString()
                 : null,
+            'salesSort' => $salesSort,
+            'paymentsSort' => $paymentsSort,
             'paymentToken' => (string) Str::uuid(),
             'purchasedTotal' => (string) BigDecimal::of($summary->purchased)->toScale(2),
             'paidTotal' => (string) BigDecimal::of($summary->received)->toScale(2),

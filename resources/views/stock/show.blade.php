@@ -27,9 +27,14 @@
             </x-slot:filters>
                     <thead>
                         <tr>
-                            @foreach (['Data', 'Tipo', 'Origem', 'Quantidade', 'Custo unitário', 'Prejuízo', 'Responsável', 'Motivo e observação'] as $heading)
-                                <th scope="col" @class(['numeric' => $heading === 'Quantidade', 'money' => in_array($heading, ['Custo unitário', 'Prejuízo'], true)])>{{ $heading }}</th>
-                            @endforeach
+                            <x-ui.sort-header :sort="$sort" column="data">Data</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="tipo">Tipo</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="origem">Origem</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="quantidade" class="numeric">Quantidade</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="custo" class="money">Custo unitário</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="prejuizo" class="money">Prejuízo</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="responsavel">Responsável</x-ui.sort-header>
+                            <x-ui.sort-header :sort="$sort" column="motivo">Motivo e observação</x-ui.sort-header>
                         </tr>
                     </thead>
                     <tbody>

@@ -69,7 +69,7 @@ class DataTableTest extends TestCase
         Sale::factory()->create(['subtotal' => '15.00', 'total' => '15.00']);
 
         $this->actingAs(User::factory()->create())->get(route('sales.index'))->assertOk()
-            ->assertSee('<th scope="col" class="money">Total</th>', false)
+            ->assertSee('<th scope="col" class="sortable money">', false)
             ->assertSee('<td class="money">R$ 15,00', false)
             ->assertSee('<span class="badge badge-danger">Pendente</span>', false);
     }

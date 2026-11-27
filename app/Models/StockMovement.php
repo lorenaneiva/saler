@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Query\Expression;
 
 #[Fillable(['product_id', 'purchase_item_id', 'sale_item_id', 'user_id', 'quantity_delta', 'unit_cost', 'type', 'justification'])]
 class StockMovement extends Model
@@ -23,6 +24,15 @@ class StockMovement extends Model
     public const ManualExit = 'manual_exit';
 
     public const Adjustment = 'adjustment';
+
+    public const TypeLabels = [
+        self::PurchaseEntry => 'Entrada de compra',
+        self::PurchaseReversal => 'Estorno de compra',
+        self::SaleExit => 'Venda',
+        self::ManualEntry => 'Entrada manual',
+        self::ManualExit => 'Perda de estoque',
+        self::Adjustment => 'Ajuste manual',
+    ];
 
     /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
@@ -50,14 +60,13 @@ class StockMovement extends Model
 
     public function typeLabel(): string
     {
-        return match ($this->type) {
-            self::PurchaseEntry => 'Entrada de compra',
-            self::PurchaseReversal => 'Estorno de compra',
-            self::SaleExit => 'Venda',
-            self::ManualEntry => 'Entrada manual',
-            self::ManualExit => 'Perda de estoque',
-            self::Adjustment => 'Ajuste manual',
-        };
+        return self::TypeLabels[$this->type];
+    }
+
+    /** Sortable {@see lossValue()}: null for every movement that is not a stock loss. */
+    public static function lossColumn(): Expression
+    {
+        return new Expression("CASE WHEN stock_movements.type = '".self::ManualExit."' THEN stock_movements.unit_cost * -stock_movements.quantity_delta END");
     }
 
     public function lossValue(): ?string

@@ -1,7 +1,9 @@
 @props(['label', 'placeholder', 'name' => 'q', 'keep' => [], 'active' => null, 'disabled' => false])
 
+{{-- Column orderings ("ordem", "ordem_itens"...) survive every search, so filtering never resets how the user sorted the tables. --}}
 @php
-    $parameters = array_filter(request()->only($keep), 'is_string');
+    $sortings = array_filter(request()->query(), fn ($value, $key) => is_string($value) && preg_match('/^ordem(_|$)/', $key), ARRAY_FILTER_USE_BOTH);
+    $parameters = array_filter(request()->only($keep), 'is_string') + $sortings;
     $value = request()->query()[$name] ?? '';
     $value = is_string($value) ? mb_substr(trim($value), 0, 100) : '';
     $clearUrl = route(request()->route()->getName(), array_merge(request()->route()->parameters(), $parameters));

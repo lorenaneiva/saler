@@ -4,9 +4,12 @@
     </x-slot:filters>
             <thead>
                 <tr>
-                    @foreach (['Compra', 'Data', 'Total', 'Pago', 'Em aberto', 'Situação'] as $heading)
-                        <th scope="col" @class(['money' => in_array($heading, ['Total', 'Pago', 'Em aberto'], true)])>{{ $heading }}</th>
-                    @endforeach
+                    <x-ui.sort-header :sort="$salesSort" column="numero">Compra</x-ui.sort-header>
+                    <x-ui.sort-header :sort="$salesSort" column="data">Data</x-ui.sort-header>
+                    <x-ui.sort-header :sort="$salesSort" column="total" class="money">Total</x-ui.sort-header>
+                    <x-ui.sort-header :sort="$salesSort" column="pago" class="money">Pago</x-ui.sort-header>
+                    <x-ui.sort-header :sort="$salesSort" column="aberto" class="money">Em aberto</x-ui.sort-header>
+                    <x-ui.sort-header :sort="$salesSort" column="situacao">Situação</x-ui.sort-header>
                 </tr>
             </thead>
             <tbody>

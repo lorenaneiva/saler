@@ -3,16 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoryRequest;
+use App\Http\Requests\ListSearchRequest;
+use App\Http\TableSort;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CategoryController extends Controller
 {
-    public function index(Request $request): View
+    public function index(ListSearchRequest $request): View
     {
         $query = $request->query('q');
         $search = is_string($query) ? mb_substr(trim($query), 0, 100) : '';
@@ -21,13 +23,19 @@ class CategoryController extends Controller
         if (! in_array($status, ['ativas', 'inativas', 'todas'], true)) {
             $status = 'ativas';
         }
+        $sort = $request->sorting([
+            'nome' => 'name',
+            'produtos' => Product::query()->selectRaw('COUNT(*)')->whereColumn('products.category_id', 'categories.id'),
+            'situacao' => TableSort::labels('categories.is_active', [1 => 'Ativa', 0 => 'Inativa']),
+        ], text: ['nome', 'situacao'], default: 'nome');
 
         return view('categories.index', [
-            'categories' => Category::query()
+            'categories' => $sort->apply(Category::query())
                 ->withCount(['products', 'products as active_products_count' => fn ($products) => $products->where('is_active', true)])
                 ->when($search !== '', fn ($categories) => $categories->whereLike('name', $pattern))
                 ->when($status !== 'todas', fn ($categories) => $categories->where('is_active', $status === 'ativas'))
-                ->orderBy('name')->orderBy('id')->paginate(self::PerPage)->withQueryString(),
+                ->paginate(self::PerPage)->withQueryString(),
+            'sort' => $sort,
             'registeredCount' => Category::query()->count(),
             'search' => $search,
             'status' => $status,

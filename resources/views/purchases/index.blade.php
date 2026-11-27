@@ -16,10 +16,10 @@
 
         <thead>
             <tr>
-                <th scope="col">Compra</th>
-                <th scope="col">Fornecedor</th>
-                <th scope="col">Data</th>
-                <th scope="col" class="money">Total</th>
+                <x-ui.sort-header :sort="$sort" column="numero">Compra</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="fornecedor">Fornecedor</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="data">Data</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="total" class="money">Total</x-ui.sort-header>
             </tr>
         </thead>
         <tbody>

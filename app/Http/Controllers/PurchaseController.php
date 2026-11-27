@@ -20,9 +20,17 @@ class PurchaseController extends Controller
 {
     public function index(ListSearchRequest $request): View
     {
+        $sort = $request->sorting([
+            'numero' => 'id',
+            'fornecedor' => Supplier::query()->select('name')->whereColumn('suppliers.id', 'purchases.supplier_id'),
+            'data' => 'purchased_on',
+            'total' => 'total',
+        ], text: ['fornecedor'], default: '-data');
+
         return view('purchases.index', [
-            'purchases' => $request->filter(Purchase::query(), ['id', 'supplier.name', 'items.product.name'])
-                ->with('supplier:id,name')->orderByDesc('purchased_on')->orderByDesc('id')->paginate(self::PerPage)->withQueryString(),
+            'purchases' => $sort->apply($request->filter(Purchase::query(), ['id', 'supplier.name', 'items.product.name']))
+                ->with('supplier:id,name')->paginate(self::PerPage)->withQueryString(),
+            'sort' => $sort,
         ]);
     }
 
@@ -47,9 +55,17 @@ class PurchaseController extends Controller
 
     public function show(ListSearchRequest $request, Purchase $purchase): View
     {
-        return view('purchases.show', ['purchase' => $purchase->load([
+        $itemsSort = $request->sorting([
+            'produto' => Product::query()->select('name')->whereColumn('products.id', 'purchase_items.product_id'),
+            'quantidade' => 'quantity',
+            'custo' => 'unit_cost',
+            'desconto' => 'discount',
+            'total' => 'total',
+        ], text: ['produto'], key: 'ordem_itens', pageName: null);
+
+        return view('purchases.show', ['itemsSort' => $itemsSort, 'purchase' => $purchase->load([
             'supplier:id,name',
-            'items' => fn ($items) => $request->filter($items, ['product.name', 'product.barcode'], 'q_itens')
+            'items' => fn ($items) => $itemsSort->apply($request->filter($items, ['product.name', 'product.barcode'], 'q_itens'))
                 ->with('product:id,name'),
         ])->loadCount('items')]);
     }

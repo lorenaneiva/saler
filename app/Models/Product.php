@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\Expression;
 
 #[Fillable(['name', 'category_id', 'supplier_id', 'sale_price', 'barcode', 'submission_token'])]
 class Product extends Model
@@ -68,6 +69,24 @@ class Product extends Model
     protected function withRegisteredCost(Builder $query): void
     {
         $query->withExists(['stockMovements as has_registered_cost' => fn (Builder $movements) => $movements->where('type', StockMovement::PurchaseEntry)]);
+    }
+
+    /** Sortable average cost: null while no purchase was recorded, so unknown costs sort last instead of as zero. */
+    public static function registeredCostColumn(): Expression
+    {
+        return new Expression(self::registeredCostSql());
+    }
+
+    /** Sortable profit margin, null whenever {@see profitMargin()} cannot be computed. */
+    public static function profitMarginColumn(): Expression
+    {
+        return new Expression('(products.sale_price - ('.self::registeredCostSql().')) * 100 / NULLIF(products.sale_price, 0)');
+    }
+
+    private static function registeredCostSql(): string
+    {
+        return "CASE WHEN EXISTS (SELECT 1 FROM stock_movements WHERE stock_movements.product_id = products.id AND stock_movements.type = '"
+            .StockMovement::PurchaseEntry."') THEN products.average_cost END";
     }
 
     /** The average cost is only known once a purchase was recorded; before that it is unknown, not zero. */

@@ -188,6 +188,17 @@ export function initializeLiveSearch() {
             return;
         }
 
+        const sortLink = event.target.closest('[data-live-table] a[data-sort-link]');
+        if (sortLink) {
+            event.preventDefault();
+            const table = sortLink.closest('[data-live-table]');
+            const selector = `a[data-sort-link="${CSS.escape(sortLink.dataset.sortLink)}"]`;
+            if (await navigateLiveTable(new URL(sortLink.href), table)) {
+                document.getElementById(table.id)?.querySelector(selector)?.focus({ preventScroll: true });
+            }
+            return;
+        }
+
         const step = event.target.closest('[data-live-table] a.pagination-step');
         if (step) {
             event.preventDefault();

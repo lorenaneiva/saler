@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Actions\CreateProduct;
+use App\Http\Requests\ListSearchRequest;
 use App\Http\Requests\ProductRequest;
+use App\Http\TableSort;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Supplier;
@@ -19,7 +21,7 @@ use Illuminate\View\View;
 
 class ProductController extends Controller
 {
-    public function index(Request $request): View
+    public function index(ListSearchRequest $request): View
     {
         $query = $request->query('q');
         $search = is_string($query) ? mb_substr(trim($query), 0, 100) : '';
@@ -27,16 +29,26 @@ class ProductController extends Controller
         $category = filter_var($request->query('categoria'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
         $supplier = filter_var($request->query('fornecedor'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
         $status = $request->query('situacao');
+        $sort = $request->sorting([
+            'nome' => 'name',
+            'categoria' => Category::query()->select('name')->whereColumn('categories.id', 'products.category_id'),
+            'preco' => 'sale_price',
+            'custo' => Product::registeredCostColumn(),
+            'margem' => Product::profitMarginColumn(),
+            'estoque' => 'stock_quantity',
+            'situacao' => TableSort::labels('products.is_active', [1 => 'Ativo', 0 => 'Inativo']),
+        ], text: ['nome', 'categoria', 'situacao'], default: 'nome');
 
         return view('products.index', [
-            'products' => Product::query()->with(['category:id,name', 'supplier:id,name'])->withRegisteredCost()
+            'products' => $sort->apply(Product::query())->with(['category:id,name', 'supplier:id,name'])->withRegisteredCost()
                 ->when($search !== '', fn (Builder $products) => $products->where(
                     fn (Builder $matches) => $matches->whereLike('name', $pattern)->orWhereLike('barcode', $pattern),
                 ))
                 ->when($category, fn (Builder $products) => $products->where('category_id', $category))
                 ->when($supplier, fn (Builder $products) => $products->where('supplier_id', $supplier))
                 ->when(in_array($status, ['ativos', 'inativos'], true), fn (Builder $products) => $products->where('is_active', $status === 'ativos'))
-                ->orderBy('name')->orderBy('id')->paginate(self::PerPage)->withQueryString(),
+                ->paginate(self::PerPage)->withQueryString(),
+            'sort' => $sort,
             'categories' => Category::query()->orderBy('name')->get(['id', 'name']),
             'suppliers' => Supplier::query()->orderBy('name')->get(['id', 'name']),
             'filters' => ['search' => $search, 'category' => $category, 'supplier' => $supplier, 'status' => $status],

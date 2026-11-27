@@ -4,12 +4,12 @@
     </x-slot:filters>
     <thead>
         <tr>
-            <th scope="col">Pagamento</th>
-            <th scope="col">Data</th>
-            <th scope="col">Forma de pagamento</th>
-            <th scope="col" class="money">Valor</th>
+            <x-ui.sort-header :sort="$paymentsSort" column="numero">Pagamento</x-ui.sort-header>
+            <x-ui.sort-header :sort="$paymentsSort" column="data">Data</x-ui.sort-header>
+            <x-ui.sort-header :sort="$paymentsSort" column="forma">Forma de pagamento</x-ui.sort-header>
+            <x-ui.sort-header :sort="$paymentsSort" column="valor" class="money">Valor</x-ui.sort-header>
             <th scope="col">Abatido em</th>
-            <th scope="col">Observação</th>
+            <x-ui.sort-header :sort="$paymentsSort" column="observacao">Observação</x-ui.sort-header>
         </tr>
     </thead>
     <tbody>

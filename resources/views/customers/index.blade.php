@@ -16,9 +16,9 @@
 
         <thead>
             <tr>
-                <th scope="col">Nome</th>
-                <th scope="col">Telefone</th>
-                <th scope="col">E-mail</th>
+                <x-ui.sort-header :sort="$sort" column="nome">Nome</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="telefone">Telefone</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="email">E-mail</x-ui.sort-header>
                 <th scope="col" class="text-right">Ações</th>
             </tr>
         </thead>

@@ -27,7 +27,12 @@
         </x-slot:filters>
 
         <thead>
-            <tr><th scope="col">Categoria</th><th scope="col" class="numeric">Produtos</th><th scope="col">Situação</th><th scope="col" class="text-right">Ações</th></tr>
+            <tr>
+                <x-ui.sort-header :sort="$sort" column="nome">Categoria</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="produtos" class="numeric">Produtos</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="situacao">Situação</x-ui.sort-header>
+                <th scope="col" class="text-right">Ações</th>
+            </tr>
         </thead>
         <tbody>
             @forelse ($categories as $category)

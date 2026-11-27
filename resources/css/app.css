@@ -141,6 +141,18 @@
     .data-table tr:has([data-row-link]) :is(a:not([data-row-link]), button, input, select, textarea) { position: relative; z-index: 2; }
     .data-table tbody.table-fillers tr, .data-table tbody.table-fillers tr:hover { background: transparent; border: 0; }
     .data-table tbody.table-fillers td { height: var(--table-row-height, 2.5625rem); padding: 0; }
+    .data-table th.sortable { @apply p-0 sm:p-0; transition: color var(--duration) ease-in-out, box-shadow var(--duration) ease-in-out; }
+    .data-table .sort-link { @apply flex w-full min-h-10 items-center gap-1 px-3 py-2.5 select-none sm:px-4; transition: background-color var(--duration) ease-in-out, color var(--duration) ease-in-out; }
+    .data-table .sort-link:hover { background: #e2e9f4; color: var(--ink); }
+    .data-table .sort-link:focus-visible { outline-offset: -2px; }
+    .data-table th.sortable.money .sort-link { @apply flex-row-reverse justify-start; }
+    .data-table th.is-sorted { color: var(--color-brand); box-shadow: inset 0 -2px var(--color-brand); }
+    .data-table th.is-sorted .sort-link:hover { color: var(--brand-hover); }
+    .sort-icon { @apply h-4 w-3 shrink-0; }
+    .sort-icon path { opacity: .35; transition: opacity var(--duration) ease-in-out; }
+    .sort-link:is(:hover, :focus-visible) .sort-icon:not([data-direction]) path { opacity: .7; }
+    .sort-icon[data-direction] path { opacity: .2; }
+    .sort-icon[data-direction="asc"] .sort-icon-asc, .sort-icon[data-direction="desc"] .sort-icon-desc { opacity: 1; }
     .data-table .numeric { @apply whitespace-nowrap tabular-nums; }
     .data-table .money { @apply text-right whitespace-nowrap tabular-nums; }
     .data-table .row-actions { @apply flex flex-wrap items-center justify-end gap-1; }

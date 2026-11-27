@@ -33,9 +33,11 @@
             </x-slot:filters>
                 <thead>
                     <tr>
-                        @foreach (['Produto', 'Quantidade', 'Custo unitário', 'Desconto', 'Total do item'] as $heading)
-                            <th scope="col" @class(['money' => $loop->index >= 2])>{{ $heading }}</th>
-                        @endforeach
+                        <x-ui.sort-header :sort="$itemsSort" column="produto">Produto</x-ui.sort-header>
+                        <x-ui.sort-header :sort="$itemsSort" column="quantidade">Quantidade</x-ui.sort-header>
+                        <x-ui.sort-header :sort="$itemsSort" column="custo" class="money">Custo unitário</x-ui.sort-header>
+                        <x-ui.sort-header :sort="$itemsSort" column="desconto" class="money">Desconto</x-ui.sort-header>
+                        <x-ui.sort-header :sort="$itemsSort" column="total" class="money">Total do item</x-ui.sort-header>
                     </tr>
                 </thead>
                 <tbody>

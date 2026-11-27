@@ -16,9 +16,9 @@
 
         <thead>
             <tr>
-                <th scope="col">Produto</th>
-                <th scope="col" class="numeric">Saldo atual</th>
-                <th scope="col" class="money">Custo médio</th>
+                <x-ui.sort-header :sort="$sort" column="nome">Produto</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="saldo" class="numeric">Saldo atual</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="custo" class="money">Custo médio</x-ui.sort-header>
             </tr>
         </thead>
         <tbody>

@@ -13,9 +13,12 @@ class StockAdjustmentReasonController extends Controller
 {
     public function index(ListSearchRequest $request): View
     {
+        $sort = $request->sorting(['motivo' => 'name'], text: ['motivo'], default: 'motivo');
+
         return view('stock.reasons', [
-            'reasons' => $request->filter(StockAdjustmentReason::query(), ['name'])
-                ->orderBy('name')->paginate(self::PerPage)->withQueryString(),
+            'reasons' => $sort->apply($request->filter(StockAdjustmentReason::query(), ['name']))
+                ->paginate(self::PerPage)->withQueryString(),
+            'sort' => $sort,
         ]);
     }
 

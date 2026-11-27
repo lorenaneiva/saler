@@ -16,9 +16,11 @@
 
         <thead>
             <tr>
-                @foreach (['Venda', 'Cliente', 'Data', 'Total', 'Situação financeira'] as $heading)
-                    <th scope="col" @class(['money' => $heading === 'Total'])>{{ $heading }}</th>
-                @endforeach
+                <x-ui.sort-header :sort="$sort" column="numero">Venda</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="cliente">Cliente</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="data">Data</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="total" class="money">Total</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="situacao">Situação financeira</x-ui.sort-header>
             </tr>
         </thead>
         <tbody>

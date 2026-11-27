@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ListSearchRequest;
 use App\Http\Requests\SupplierRequest;
+use App\Http\TableSort;
 use App\Models\Supplier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -13,9 +14,17 @@ class SupplierController extends Controller
 {
     public function index(ListSearchRequest $request): View
     {
+        $sort = $request->sorting([
+            'nome' => 'name',
+            'contato' => 'contact',
+            'representante' => 'representative',
+            'situacao' => TableSort::labels('suppliers.is_active', [1 => 'Ativo', 0 => 'Inativo']),
+        ], text: ['nome', 'contato', 'representante', 'situacao'], default: 'nome');
+
         return view('suppliers.index', [
-            'suppliers' => $request->filter(Supplier::query(), ['name', 'contact', 'representative'])
-                ->orderBy('name')->orderBy('id')->paginate(self::PerPage)->withQueryString(),
+            'suppliers' => $sort->apply($request->filter(Supplier::query(), ['name', 'contact', 'representative']))
+                ->paginate(self::PerPage)->withQueryString(),
+            'sort' => $sort,
         ]);
     }
 

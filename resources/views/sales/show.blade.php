@@ -70,9 +70,11 @@
             </x-slot:filters>
             <thead>
                 <tr>
-                    @foreach (['Produto', 'Quantidade', 'Preço unitário', 'Custo unitário da venda', 'Subtotal'] as $heading)
-                        <th scope="col" @class(['money' => $loop->index >= 2])>{{ $heading }}</th>
-                    @endforeach
+                    <x-ui.sort-header :sort="$itemsSort" column="produto">Produto</x-ui.sort-header>
+                    <x-ui.sort-header :sort="$itemsSort" column="quantidade">Quantidade</x-ui.sort-header>
+                    <x-ui.sort-header :sort="$itemsSort" column="preco" class="money">Preço unitário</x-ui.sort-header>
+                    <x-ui.sort-header :sort="$itemsSort" column="custo" class="money">Custo unitário da venda</x-ui.sort-header>
+                    <x-ui.sort-header :sort="$itemsSort" column="subtotal" class="money">Subtotal</x-ui.sort-header>
                 </tr>
             </thead>
             <tbody>
@@ -118,10 +120,10 @@
             </x-slot:actions>
             <thead>
                 <tr>
-                    <th scope="col">Pagamento</th>
-                    <th scope="col">Data</th>
-                    <th scope="col">Forma de pagamento</th>
-                    <th scope="col" class="money">Valor abatido nesta venda</th>
+                    <x-ui.sort-header :sort="$paymentsSort" column="numero">Pagamento</x-ui.sort-header>
+                    <x-ui.sort-header :sort="$paymentsSort" column="data">Data</x-ui.sort-header>
+                    <x-ui.sort-header :sort="$paymentsSort" column="forma">Forma de pagamento</x-ui.sort-header>
+                    <x-ui.sort-header :sort="$paymentsSort" column="valor" class="money">Valor abatido nesta venda</x-ui.sort-header>
                 </tr>
             </thead>
             <tbody>

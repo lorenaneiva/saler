@@ -39,13 +39,13 @@
         </x-slot:filters>
         <thead>
             <tr>
-                <th scope="col">Produto</th>
-                <th scope="col">Categoria / fornecedor</th>
-                <th scope="col" class="money">Preço</th>
-                <th scope="col" class="money">Custo médio</th>
-                <th scope="col" class="numeric">Margem</th>
-                <th scope="col">Estoque</th>
-                <th scope="col">Situação</th>
+                <x-ui.sort-header :sort="$sort" column="nome">Produto</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="categoria">Categoria / fornecedor</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="preco" class="money">Preço</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="custo" class="money">Custo médio</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="margem" class="numeric">Margem</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="estoque">Estoque</x-ui.sort-header>
+                <x-ui.sort-header :sort="$sort" column="situacao">Situação</x-ui.sort-header>
                 <th scope="col" class="text-right">Ações</th>
             </tr>
         </thead>

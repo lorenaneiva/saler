@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Http\TableSort;
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ListSearchRequest extends FormRequest
@@ -13,6 +16,19 @@ class ListSearchRequest extends FormRequest
         $value = $this->query()[$key] ?? '';
 
         return is_string($value) ? mb_substr(trim($value), 0, 100) : '';
+    }
+
+    /**
+     * Reads the ordering a user picked by clicking a column header of one table.
+     *
+     * @param  array<string, string|Expression|Builder<*>|QueryBuilder>  $columns  Column, expression or subquery by sort key.
+     * @param  list<string>  $text  Keys sorted alphabetically.
+     * @param  ?string  $default  Current ordering of the table (e.g. "nome" or "-data"), kept until the user picks another.
+     * @param  ?string  $pageName  Page parameter of the table, or null when it is not paginated.
+     */
+    public function sorting(array $columns, array $text = [], ?string $default = null, string $key = 'ordem', ?string $pageName = 'page'): TableSort
+    {
+        return new TableSort($key, $columns, $text, $this->url(), $this->query(), $default, $pageName);
     }
 
     /**

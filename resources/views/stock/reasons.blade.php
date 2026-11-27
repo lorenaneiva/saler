@@ -14,7 +14,7 @@
             <x-ui.list-search label="Buscar motivo" placeholder="Nome do motivo" />
         </x-slot:filters>
         <thead>
-            <tr><th scope="col">Motivo</th></tr>
+            <tr><x-ui.sort-header :sort="$sort" column="motivo">Motivo</x-ui.sort-header></tr>
         </thead>
         <tbody>
             @forelse ($reasons as $reason)
