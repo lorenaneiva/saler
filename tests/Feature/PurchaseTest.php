@@ -123,7 +123,7 @@ class PurchaseTest extends TestCase
             'quantity_delta' => -3, 'unit_cost' => '16.0000',
         ]);
         $this->assertDatabaseCount('stock_movements', 2);
-        $this->get(route('stock.show', $product))->assertOk()->assertSee('Estorno de compra');
+        $this->get(route('products.show', $product))->assertOk()->assertSee('Estorno de compra');
     }
 
     public function test_reversal_without_enough_stock_preserves_the_entire_purchase_and_all_balances(): void
@@ -143,12 +143,12 @@ class PurchaseTest extends TestCase
 
         $purchase = Purchase::query()->sole();
 
-        $this->post(route('stock.store', $secondProduct), [
+        $this->post(route('products.movements.store', $secondProduct), [
             'type' => StockMovement::ManualExit,
             'quantity' => 1,
             'reason_id' => StockAdjustmentReason::factory()->create()->id,
         ])
-            ->assertRedirectToRoute('stock.show', $secondProduct);
+            ->assertRedirectToRoute('products.show', $secondProduct);
         $this->from(route('purchases.show', $purchase))
             ->post(route('purchases.cancel', $purchase))
             ->assertRedirectToRoute('purchases.show', $purchase)

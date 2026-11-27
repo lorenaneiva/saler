@@ -15,7 +15,7 @@ class StockAdjustmentReasonController extends Controller
     {
         $sort = $request->sorting(['motivo' => 'name'], text: ['motivo'], default: 'motivo');
 
-        return view('stock.reasons', [
+        return view('products.reasons', [
             'reasons' => $sort->apply($request->filter(StockAdjustmentReason::query(), ['name']))
                 ->paginate(self::PerPage)->withQueryString(),
             'sort' => $sort,
@@ -39,6 +39,6 @@ class StockAdjustmentReasonController extends Controller
             throw ValidationException::withMessages(['name' => 'Este motivo já está cadastrado.']);
         }
 
-        return to_route('stock.reasons.index')->with('status', 'Motivo cadastrado.');
+        return to_route('products.reasons.index')->with('status', 'Motivo cadastrado.');
     }
 }

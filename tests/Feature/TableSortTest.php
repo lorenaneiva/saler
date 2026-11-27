@@ -60,7 +60,7 @@ class TableSortTest extends TestCase
             Product::factory()->create(['name' => $name, 'stock_quantity' => $quantity]);
         }
 
-        $this->get(route('stock.index', ['ordem' => 'saldo']))->assertOk()->assertSeeTextInOrder(['Dois', 'Nove', 'Dez']);
+        $this->get(route('products.index', ['ordem' => 'estoque']))->assertOk()->assertSeeTextInOrder(['Dois', 'Nove', 'Dez']);
     }
 
     public function test_unknown_values_stay_at_the_end_in_both_directions(): void
@@ -70,7 +70,7 @@ class TableSortTest extends TestCase
         Product::factory()->create(['name' => 'Sem custo', 'average_cost' => '0.0000']);
 
         foreach (['custo', '-custo'] as $ordering) {
-            $this->get(route('stock.index', ['ordem' => $ordering]))->assertOk()->assertSeeTextInOrder(['Com custo', 'Sem custo']);
+            $this->get(route('products.index', ['ordem' => $ordering]))->assertOk()->assertSeeTextInOrder(['Com custo', 'Sem custo']);
         }
     }
 
@@ -169,9 +169,8 @@ class TableSortTest extends TestCase
             [route('sales.show', $sale), 'ordem_pagamentos', ['numero', 'data', 'forma', 'valor']],
             [route('customers.show', $sale->customer_id), 'ordem_compras', ['numero', 'data', 'total', 'pago', 'aberto', 'situacao']],
             [route('customers.show', [$sale->customer_id, 'secao' => 'pagamentos']), 'ordem_pagamentos', ['numero', 'data', 'forma', 'valor', 'observacao']],
-            [route('stock.index'), 'ordem', ['nome', 'saldo', 'custo']],
-            [route('stock.show', $product), 'ordem', ['data', 'tipo', 'origem', 'quantidade', 'custo', 'prejuizo', 'responsavel', 'motivo']],
-            [route('stock.reasons.index'), 'ordem', ['motivo']],
+            [route('products.show', $product), 'ordem', ['data', 'tipo', 'origem', 'quantidade', 'custo', 'prejuizo', 'responsavel', 'motivo']],
+            [route('products.reasons.index'), 'ordem', ['motivo']],
         ];
 
         foreach ($tables as [$url, $parameter, $columns]) {

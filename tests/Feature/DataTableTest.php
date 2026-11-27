@@ -16,7 +16,7 @@ class DataTableTest extends TestCase
     {
         $this->actingAs(User::factory()->create());
 
-        foreach (['sales.index', 'purchases.index', 'customers.index', 'suppliers.index', 'products.index', 'categories.index', 'stock.index', 'stock.reasons.index'] as $routeName) {
+        foreach (['sales.index', 'purchases.index', 'customers.index', 'suppliers.index', 'products.index', 'categories.index', 'products.reasons.index'] as $routeName) {
             $this->get(route($routeName))->assertOk()
                 ->assertSee('panel table-section', false)->assertSee('data-live-table', false)
                 ->assertSee('data-live-search', false)

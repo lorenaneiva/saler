@@ -134,12 +134,12 @@ export function initializeProductEditor(closeDialog) {
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'button-secondary button-small';
-            button.textContent = 'Atualizar listagem';
+            button.textContent = 'Atualizar dados';
             button.addEventListener('click', async () => {
                 button.disabled = true;
                 try {
                     await refreshList();
-                    showFeedback('Listagem atualizada.');
+                    showFeedback('Dados atualizados.');
                 } catch {
                     button.disabled = false;
                 }
@@ -152,24 +152,28 @@ export function initializeProductEditor(closeDialog) {
     async function refreshList() {
         const response = await fetch(window.location.href, { headers: { Accept: 'text/html' }, cache: 'no-store' });
         if (!response.ok || response.redirected) {
-            throw new Error('Não foi possível atualizar a listagem.');
+            throw new Error('Não foi possível atualizar os dados.');
         }
         const page = new DOMParser().parseFromString(await response.text(), 'text/html');
-        const replacement = page.querySelector('[data-product-list]');
-        if (!replacement) {
-            throw new Error('Listagem indisponível.');
+        const regions = [...document.querySelectorAll('[data-product-refresh][id]')];
+        const replacements = regions.map((current) => page.getElementById(current.id));
+        if (!regions.length || replacements.includes(null)) {
+            throw new Error('Conteúdo indisponível.');
         }
 
-        const current = document.querySelector('[data-product-list]');
-        const horizontalScroll = current.querySelector('.table-region')?.scrollLeft ?? 0;
         const position = { left: window.scrollX, top: window.scrollY };
-        replacement.style.minHeight = `${current.getBoundingClientRect().height}px`;
-        current.replaceWith(replacement);
-        syncTableFillers(replacement);
-        const table = replacement.querySelector('.table-region');
-        if (table) {
-            table.scrollLeft = horizontalScroll;
-        }
+        regions.forEach((current, index) => {
+            const replacement = replacements[index];
+            const horizontalScroll = current.querySelector('.table-region')?.scrollLeft ?? 0;
+            replacement.style.minHeight = `${current.getBoundingClientRect().height}px`;
+            current.replaceWith(replacement);
+            syncTableFillers(replacement);
+            const table = replacement.querySelector('.table-region');
+            if (table) {
+                table.scrollLeft = horizontalScroll;
+            }
+        });
+        document.title = page.title;
         window.scrollTo({ ...position, behavior: 'instant' });
     }
 
@@ -220,7 +224,7 @@ export function initializeProductEditor(closeDialog) {
                     await refreshList();
                     showFeedback(result.message);
                 } catch {
-                    showFeedback(`${result.message} Não foi possível atualizar a listagem.`, true);
+                    showFeedback(`${result.message} Não foi possível atualizar os dados exibidos.`, true);
                 }
                 saving = false;
                 closeDialog(drawer);
@@ -266,7 +270,7 @@ export function initializeProductEditor(closeDialog) {
         form = null;
         original = '';
         feedback.hidden = true;
-        title.textContent = opener.closest('[data-product-list]') ? 'Editar produto' : 'Novo produto';
+        title.textContent = opener.hasAttribute('data-product-create') ? 'Novo produto' : 'Editar produto';
         const loading = document.createElement('p');
         loading.className = 'p-5 text-sm';
         loading.setAttribute('role', 'status');

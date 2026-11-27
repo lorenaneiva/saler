@@ -8,7 +8,7 @@
     $type = old('type', \App\Models\StockMovement::ManualEntry);
 @endphp
 
-<form method="POST" action="{{ route('stock.store', $product) }}" class="grid gap-4 sm:grid-cols-2">
+<form method="POST" action="{{ route('products.movements.store', $product) }}" class="grid gap-4 sm:grid-cols-2">
     @csrf
     <x-ui.errors class="sm:col-span-2" />
 
@@ -36,7 +36,7 @@
         @if ($reasons->isEmpty())
             <p class="text-sm text-slate-600">Cadastre um motivo para registrar a movimentação.</p>
         @endif
-        <a href="{{ route('stock.reasons.index') }}" class="w-fit text-sm text-brand underline">Motivos de ajuste</a>
+        <a href="{{ route('products.reasons.index') }}" class="w-fit text-sm text-brand underline">Motivos de ajuste</a>
     </div>
     <label class="grid content-start gap-2 font-medium">
         <span>Observação (opcional)</span>

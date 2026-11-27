@@ -10,7 +10,7 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SalePaymentController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\StockAdjustmentReasonController;
-use App\Http\Controllers\StockController;
+use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,10 +28,12 @@ Route::middleware('auth')->group(function (): void {
         ->parameters(['categorias' => 'category'])
         ->names('categories')
         ->except(['show', 'create']);
+    Route::get('/produtos/motivos-de-ajuste', [StockAdjustmentReasonController::class, 'index'])->name('products.reasons.index');
+    Route::post('/produtos/motivos-de-ajuste', [StockAdjustmentReasonController::class, 'store'])->name('products.reasons.store');
+    Route::post('/produtos/{product}/movimentacoes', [StockMovementController::class, 'store'])->name('products.movements.store');
     Route::resource('produtos', ProductController::class)
         ->parameters(['produtos' => 'product'])
-        ->names('products')
-        ->except('show');
+        ->names('products');
     Route::get('/clientes/{customer}/pagamentos/previa', [CustomerPaymentController::class, 'preview'])->name('customers.payments.preview');
     Route::post('/clientes/{customer}/pagamentos', [CustomerPaymentController::class, 'store'])->name('customers.payments.store');
     Route::resource('clientes', CustomerController::class)
@@ -49,11 +51,9 @@ Route::middleware('auth')->group(function (): void {
         ->parameters(['compras' => 'purchase'])
         ->names('purchases')
         ->only(['index', 'create', 'store', 'show']);
-    Route::get('/estoque', [StockController::class, 'index'])->name('stock.index');
-    Route::get('/estoque/motivos', [StockAdjustmentReasonController::class, 'index'])->name('stock.reasons.index');
-    Route::post('/estoque/motivos', [StockAdjustmentReasonController::class, 'store'])->name('stock.reasons.store');
-    Route::get('/estoque/{product}', [StockController::class, 'show'])->name('stock.show');
-    Route::post('/estoque/{product}/movimentacoes', [StockController::class, 'store'])->name('stock.store');
+    Route::permanentRedirect('/estoque', '/produtos');
+    Route::permanentRedirect('/estoque/motivos', '/produtos/motivos-de-ajuste');
+    Route::permanentRedirect('/estoque/{product}', '/produtos/{product}')->whereNumber('product');
     Route::post('/vendas/{sale}/pagamentos', [SalePaymentController::class, 'store'])->name('sales.payments.store');
     Route::resource('vendas', SaleController::class)
         ->parameters(['vendas' => 'sale'])

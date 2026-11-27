@@ -44,7 +44,7 @@
                     @forelse ($purchase->items as $item)
                         <tr>
                             <th scope="row" class="min-w-36 font-semibold">
-                                <a data-row-link href="{{ route('stock.show', $item->product_id) }}">{{ $item->product->name }}</a>
+                                <a data-row-link href="{{ route('products.show', $item->product_id) }}">{{ $item->product->name }}</a>
                             </th>
                             <td>{{ $item->quantity }}</td>
                             @foreach ([$item->unit_cost, $item->discount, $item->total] as $amount)

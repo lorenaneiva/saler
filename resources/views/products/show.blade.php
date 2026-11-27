@@ -1,25 +1,72 @@
 @extends('layout')
 
-@section('title', 'Movimentações de estoque | Saler')
+@section('title', 'Detalhes do produto | Saler')
 
 @section('content')
     <div class="grid gap-4">
-        <x-ui.page-header :title="$product->name" :back="route('stock.index')" back-label="Estoque">
-            <x-slot:actions>
-                <button type="button" class="button-primary" data-dialog-open="stock-movement">Registrar movimentação</button>
-            </x-slot:actions>
-        </x-ui.page-header>
+        <div id="product-overview" class="grid gap-4" data-product-refresh>
+            <x-ui.page-header :title="$product->name" :back="route('products.index')" back-label="Produtos">
+                <x-slot:actions>
+                    <a href="{{ route('products.edit', $product) }}" data-product-open class="button-secondary">Editar produto</a>
+                    <button type="button" class="button-primary" data-dialog-open="stock-movement">Registrar movimentação</button>
+                </x-slot:actions>
+            </x-ui.page-header>
 
-        <dl class="panel grid gap-4 p-5 sm:grid-cols-2">
-            <div>
-                <dt class="text-sm text-slate-600">Saldo atual</dt>
-                <dd class="text-xl font-semibold">{{ $product->stock_quantity }}</dd>
-            </div>
-            <div>
-                <dt class="text-sm text-slate-600">Custo médio</dt>
-                <dd class="text-xl font-semibold"><x-ui.product-cost :product="$product" class="text-base" /></dd>
-            </div>
-        </dl>
+            <section class="panel product-summary" aria-label="Resumo do produto">
+                <dl class="product-facts">
+                    <div>
+                        <dt>Categoria</dt>
+                        <dd><a class="text-link" href="{{ route('products.index', ['categoria' => $product->category_id]) }}">{{ $product->category->name }}</a></dd>
+                    </div>
+                    <div>
+                        <dt>Fornecedor</dt>
+                        <dd>{{ $product->supplier?->name ?? $product->supplier_name ?? '—' }}</dd>
+                    </div>
+                    <div>
+                        <dt>Código de barras</dt>
+                        <dd class="tabular-nums">{{ $product->barcode ?: '—' }}</dd>
+                    </div>
+                    <div>
+                        <dt>Situação</dt>
+                        <dd><x-ui.badge :tone="$product->is_active ? 'success' : 'neutral'">{{ $product->is_active ? 'Ativo' : 'Inativo' }}</x-ui.badge></dd>
+                    </div>
+                </dl>
+                <dl class="product-figures">
+                    <div>
+                        <dt>Preço de venda</dt>
+                        <dd><x-ui.money :value="$product->sale_price" /></dd>
+                    </div>
+                    <div>
+                        <dt>Custo médio</dt>
+                        <dd><x-ui.product-cost :product="$product" /></dd>
+                    </div>
+                    <div>
+                        <dt>Margem de lucro</dt>
+                        <dd><x-ui.profit-margin :product="$product" /></dd>
+                    </div>
+                    <div>
+                        <dt>Saldo em estoque</dt>
+                        <dd>
+                            @if ($product->stock_quantity <= 0)
+                                <x-ui.badge tone="danger">Sem estoque</x-ui.badge>
+                            @else
+                                {{ $product->stock_quantity }} un.
+                            @endif
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Valor em estoque (custo)</dt>
+                        <dd>
+                            @if (($stockValue = $product->stockValue()) === null)
+                                <span class="text-unknown">Sem custo registrado</span>
+                            @else
+                                <x-ui.money :value="$stockValue" />
+                            @endif
+                        </dd>
+                    </div>
+                </dl>
+            </section>
+        </div>
 
         <x-ui.data-table id="stock-movements" title="Histórico de movimentações" label="Histórico de movimentações de estoque" :paginator="$movements" :unit="['movimentação', 'movimentações']">
             <x-slot:filters>
@@ -91,6 +138,8 @@
     </div>
 
     <x-ui.dialog id="stock-movement" title="Registrar movimentação" :auto-open="$errors->any()" inline-fallback>
-        @include('stock.movement-form')
+        @include('products.movement-form')
     </x-ui.dialog>
+
+    @include('products.editor-dialogs')
 @endsection

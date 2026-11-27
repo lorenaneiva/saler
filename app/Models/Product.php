@@ -109,6 +109,18 @@ class Product extends Model
     }
 
     /** Margin on the sale price, (price − cost) ÷ price × 100; not markup over cost. */
+    /** Stock on hand valued at the average cost; unknown while no purchase recorded the cost. */
+    public function stockValue(): ?string
+    {
+        if (! $this->hasRegisteredCost()) {
+            return null;
+        }
+
+        return (string) BigDecimal::of($this->average_cost)
+            ->multipliedBy(max($this->stock_quantity, 0))
+            ->toScale(2, RoundingMode::HalfUp);
+    }
+
     public function profitMargin(): ?string
     {
         $salePrice = BigDecimal::of($this->sale_price);

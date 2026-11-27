@@ -102,7 +102,7 @@ class ProductDrawerTest extends TestCase
 
         $this->get(route('products.index', ['q' => 'Arroz', 'categoria' => $category->id, 'situacao' => 'ativos', 'page' => 2]))
             ->assertOk()->assertSee('Arroz Z')->assertSee('R$ 15,50')->assertDontSee('Arroz A')
-            ->assertSee('data-product-list', false)
+            ->assertSee('data-product-refresh', false)
             ->assertViewHas('products', fn ($products): bool => $products->currentPage() === 2 && $products->total() === 16);
     }
 

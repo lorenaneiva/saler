@@ -197,6 +197,17 @@
     .section-tabs a { @apply border-b-2 border-transparent px-3 py-2 text-sm font-semibold hover:bg-blue-50; transition: background-color var(--duration); }
     .section-tabs [aria-current="page"] { border-color: var(--color-brand); color: var(--color-brand); }
 
+    .data-table a.row-title { text-decoration: underline transparent; text-underline-offset: 3px; transition: color var(--duration) ease-in-out, text-decoration-color var(--duration) ease-in-out; }
+    .data-table tr:is(:hover, :focus-within) .row-title { color: var(--color-brand); text-decoration-color: currentColor; }
+
+    .product-summary { @apply grid; }
+    .product-facts { @apply grid grid-cols-2 gap-x-6 gap-y-3 px-4 py-3 sm:flex sm:flex-wrap sm:gap-x-10 sm:px-5; }
+    .product-facts dt, .product-figures dt { @apply text-xs font-medium; color: var(--muted); }
+    .product-facts dd { @apply mt-0.5 text-sm font-semibold wrap-anywhere; }
+    .product-figures { @apply grid grid-cols-2 gap-x-6 gap-y-3 border-t px-4 py-3 sm:grid-cols-3 sm:px-5 lg:grid-cols-5; border-color: var(--line); background: #f8fafd; }
+    .product-figures dd { @apply mt-0.5 text-lg font-semibold tabular-nums wrap-anywhere; }
+    .product-figures dd .text-unknown { @apply text-sm; }
+
     .sale-summary { @apply grid; }
     .sale-summary-main { @apply flex flex-wrap items-end justify-between gap-x-8 gap-y-3 px-4 py-4 sm:px-5; }
     .sale-facts { @apply flex min-w-0 flex-wrap gap-x-8 gap-y-3; }

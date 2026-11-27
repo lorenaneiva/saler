@@ -8,9 +8,13 @@ use App\Http\Requests\ProductRequest;
 use App\Http\TableSort;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\StockAdjustmentReason;
+use App\Models\StockMovement;
 use App\Models\Supplier;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -29,6 +33,10 @@ class ProductController extends Controller
         $category = filter_var($request->query('categoria'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
         $supplier = filter_var($request->query('fornecedor'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
         $status = $request->query('situacao');
+        $availability = $request->query('estoque');
+        if (! in_array($availability, ['com', 'sem'], true)) {
+            $availability = null;
+        }
         $sort = $request->sorting([
             'nome' => 'name',
             'categoria' => Category::query()->select('name')->whereColumn('categories.id', 'products.category_id'),
@@ -46,12 +54,13 @@ class ProductController extends Controller
                 ))
                 ->when($category, fn (Builder $products) => $products->where('category_id', $category))
                 ->when($supplier, fn (Builder $products) => $products->where('supplier_id', $supplier))
+                ->when($availability, fn (Builder $products) => $products->where('stock_quantity', $availability === 'com' ? '>' : '<=', 0))
                 ->when(in_array($status, ['ativos', 'inativos'], true), fn (Builder $products) => $products->where('is_active', $status === 'ativos'))
                 ->paginate(self::PerPage)->withQueryString(),
             'sort' => $sort,
             'categories' => Category::query()->orderBy('name')->get(['id', 'name']),
             'suppliers' => Supplier::query()->orderBy('name')->get(['id', 'name']),
-            'filters' => ['search' => $search, 'category' => $category, 'supplier' => $supplier, 'status' => $status],
+            'filters' => ['search' => $search, 'category' => $category, 'supplier' => $supplier, 'status' => $status, 'availability' => $availability],
         ]);
     }
 
@@ -85,6 +94,31 @@ class ProductController extends Controller
         }
 
         return to_route('products.index')->with('status', $message);
+    }
+
+    public function show(ListSearchRequest $request, Product $product): View
+    {
+        $sort = $request->sorting([
+            'data' => 'created_at',
+            'tipo' => new Expression("CASE WHEN stock_movements.quantity_delta > 0 THEN 'Entrada' ELSE 'Saída' END"),
+            'origem' => TableSort::labels('stock_movements.type', StockMovement::TypeLabels),
+            'quantidade' => 'quantity_delta',
+            'custo' => 'unit_cost',
+            'prejuizo' => StockMovement::lossColumn(),
+            'responsavel' => User::query()->select('name')->whereColumn('users.id', 'stock_movements.user_id'),
+            'motivo' => new Expression('COALESCE(('.StockAdjustmentReason::query()->select('motivos.name')
+                ->join('ajustes_estoque', 'ajustes_estoque.reason_id', '=', 'motivos.id')
+                ->whereColumn('ajustes_estoque.stock_movement_id', 'stock_movements.id')->toSql().'), stock_movements.justification)'),
+        ], text: ['tipo', 'origem', 'responsavel', 'motivo'], default: '-data');
+
+        return view('products.show', [
+            'sort' => $sort,
+            'product' => $product->load(['category:id,name', 'supplier:id,name']),
+            'reasons' => StockAdjustmentReason::query()->orderBy('name')->get(['id', 'name']),
+            'movements' => $sort->apply($request->filter($product->stockMovements(), ['justification', 'user.name', 'adjustment.reason.name']))
+                ->with(['user:id,name', 'purchaseItem:id,purchase_id', 'saleItem:id,sale_id', 'adjustment.reason'])
+                ->paginate(self::PerPage)->withQueryString(),
+        ]);
     }
 
     public function edit(Request $request, Product $product): View|JsonResponse

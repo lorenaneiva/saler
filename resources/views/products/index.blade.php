@@ -3,13 +3,14 @@
 @section('title', 'Produtos | Saler')
 
 @section('content')
-    <x-ui.page-header title="Produtos" description="Consulte preços, fornecedores e disponibilidade.">
+    <x-ui.page-header title="Produtos" description="Consulte preços, custos, estoque e movimentações.">
         <x-slot:actions>
+            <a href="{{ route('products.reasons.index') }}" class="button-secondary">Motivos de ajuste</a>
             <a href="{{ route('products.create') }}" data-product-open data-product-create class="button-primary"><span aria-hidden="true">＋</span> Novo produto</a>
         </x-slot:actions>
     </x-ui.page-header>
 
-    <x-ui.data-table id="products" title="Catálogo de produtos" :paginator="$products" :unit="['produto', 'produtos']" data-product-list>
+    <x-ui.data-table id="products" title="Catálogo de produtos" :paginator="$products" :unit="['produto', 'produtos']" data-product-refresh>
         <x-slot:filters>
             <x-ui.list-search label="Buscar produto" placeholder="Nome ou código de barras" :active="(bool) array_filter($filters)" autocapitalize="none" spellcheck="false">
                 <x-ui.table-filter label="Categoria">
@@ -26,6 +27,13 @@
                         @foreach ($suppliers as $supplier)
                             <option value="{{ $supplier->id }}" @selected($filters['supplier'] === $supplier->id)>{{ $supplier->name }}</option>
                         @endforeach
+                    </select>
+                </x-ui.table-filter>
+                <x-ui.table-filter label="Estoque">
+                    <select name="estoque" class="field">
+                        <option value="">Todos</option>
+                        <option value="com" @selected($filters['availability'] === 'com')>Com estoque</option>
+                        <option value="sem" @selected($filters['availability'] === 'sem')>Sem estoque</option>
                     </select>
                 </x-ui.table-filter>
                 <x-ui.table-filter label="Situação">
@@ -51,10 +59,9 @@
         </thead>
         <tbody>
             @forelse ($products as $product)
-                @php($margin = $product->profitMargin())
                 <tr>
                     <th scope="row" class="min-w-36 wrap-anywhere font-semibold">
-                        {{ $product->name }}
+                        <a data-row-link class="row-title" href="{{ route('products.show', $product) }}">{{ $product->name }}</a>
                         @if ($product->barcode)
                             <span class="block text-xs font-normal text-slate-600">{{ $product->barcode }}</span>
                         @endif
@@ -65,7 +72,7 @@
                     </td>
                     <td class="money font-semibold"><x-ui.money :value="$product->sale_price" /></td>
                     <td class="money"><x-ui.product-cost :product="$product" /></td>
-                    <td class="numeric">{{ $margin === null ? '—' : number_format((float) $margin, 2, ',', '.').'%' }}</td>
+                    <td class="numeric"><x-ui.profit-margin :product="$product" /></td>
                     <td class="whitespace-nowrap">
                         @if ($product->stock_quantity <= 0)
                             <x-ui.badge tone="danger">Sem estoque</x-ui.badge>
@@ -95,17 +102,5 @@
         </tbody>
     </x-ui.data-table>
 
-    <div data-product-feedback class="product-feedback notice notice-success" role="status" aria-live="polite" hidden></div>
-
-    <x-ui.dialog id="product-editor" title="Editar produto" drawer class="product-editor">
-        <div data-product-editor-content></div>
-    </x-ui.dialog>
-
-    <x-ui.dialog id="discard-product-changes" title="Descartar alterações?">
-        <p class="text-sm">As alterações deste produto ainda não foram salvas.</p>
-        <div class="flex flex-wrap gap-2">
-            <button type="button" class="button-secondary" data-dialog-close autofocus>Continuar editando</button>
-            <button type="button" class="button-danger" data-product-discard>Descartar alterações</button>
-        </div>
-    </x-ui.dialog>
+    @include('products.editor-dialogs')
 @endsection

@@ -20,11 +20,10 @@
         'Operações' => [
             ['Vendas', 'Consulte as vendas registradas.', 'sales.index'],
             ['Compras', 'Consulte as entradas de mercadoria.', 'purchases.index'],
-            ['Estoque', 'Acompanhe saldos, movimentações e perdas.', 'stock.index'],
         ],
         'Cadastros' => [
             ['Clientes', 'Acesse compras, saldos e pagamentos.', 'customers.index'],
-            ['Produtos', 'Consulte preços e disponibilidade.', 'products.index'],
+            ['Produtos', 'Consulte preços, estoque e movimentações.', 'products.index'],
             ['Categorias', 'Organize os grupos de produtos.', 'categories.index'],
             ['Fornecedores', 'Consulte fornecedores e contatos.', 'suppliers.index'],
         ],

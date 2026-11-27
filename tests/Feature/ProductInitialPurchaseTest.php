@@ -195,8 +195,8 @@ class ProductInitialPurchaseTest extends TestCase
         $product = Product::factory()->for($this->category)->create(['name' => 'Sem compra', 'sale_price' => '50.00']);
 
         $this->get(route('products.index'))->assertOk()->assertSeeText('Sem custo registrado')->assertDontSeeText('100,00%');
-        $this->get(route('stock.index'))->assertOk()->assertSeeText('Sem custo registrado');
-        $this->get(route('stock.show', $product))->assertOk()->assertSeeText('Sem custo registrado');
+        $this->get(route('products.index'))->assertOk()->assertSeeText('Sem custo registrado');
+        $this->get(route('products.show', $product))->assertOk()->assertSeeText('Sem custo registrado');
         $html = $this->editorHtml(route('products.edit', $product));
         $this->assertStringContainsString('data-average-cost=""', $html);
         $this->assertStringContainsString('Sem custo registrado', $html);

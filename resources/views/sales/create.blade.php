@@ -41,7 +41,7 @@
                 <legend class="mb-3 text-lg font-semibold">Itens da venda</legend>
                 @if ($products->isEmpty())
                     <p class="text-sm text-slate-600">Nenhum produto ativo com saldo disponível.</p>
-                    <a href="{{ route('stock.index') }}" class="w-fit text-sm text-brand underline">Consultar estoque</a>
+                    <a href="{{ route('products.index') }}" class="w-fit text-sm text-brand underline">Consultar estoque</a>
                 @endif
                 <div data-line-items class="grid gap-3">
                     @foreach ($rows as $index => $item)

@@ -3,7 +3,7 @@
 @section('title', 'Motivos de ajuste | Saler')
 
 @section('content')
-    <x-ui.page-header title="Motivos de ajuste" :back="route('stock.index')" back-label="Estoque">
+    <x-ui.page-header title="Motivos de ajuste" :back="route('products.index')" back-label="Produtos">
         <x-slot:actions>
             <button type="button" class="button-primary" data-dialog-open="stock-reason">Novo motivo</button>
         </x-slot:actions>
@@ -26,7 +26,7 @@
     </x-ui.data-table>
 
     <x-ui.dialog id="stock-reason" title="Novo motivo" :auto-open="$errors->has('name')" inline-fallback>
-        <form method="POST" action="{{ route('stock.reasons.store') }}" class="grid gap-3">
+        <form method="POST" action="{{ route('products.reasons.store') }}" class="grid gap-3">
             @csrf
             @php($reasonName = old('name'))
             <label for="reason-name" class="font-medium">Nome do motivo <x-required-mark /></label>

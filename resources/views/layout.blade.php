@@ -15,7 +15,6 @@
                 ['dashboard', 'dashboard', 'Painel', 'dashboard'],
                 ['sales.index', 'sales.*', 'Vendas', 'point_of_sale'],
                 ['purchases.index', 'purchases.*', 'Compras', 'shopping_cart'],
-                ['stock.index', 'stock.*', 'Estoque', 'inventory_2'],
             ],
             'Cadastros' => [
                 ['customers.index', 'customers.*', 'Clientes', 'people'],
