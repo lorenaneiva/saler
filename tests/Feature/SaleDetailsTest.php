@@ -30,6 +30,19 @@ class SaleDetailsTest extends TestCase
             ->assertDontSee('>Buscar</button>', false);
     }
 
+    public function test_items_table_hides_the_unit_cost_but_the_sale_keeps_storing_it(): void
+    {
+        $sale = Sale::factory()->create();
+        $sale->items()->create(['product_id' => Product::factory()->create()->id, 'quantity' => 1, 'unit_price' => '15.00', 'unit_cost' => '7.3200', 'subtotal' => '15.00']);
+
+        $this->actingAs(User::factory()->create())->get(route('sales.show', $sale))->assertOk()
+            ->assertSeeTextInOrder(['Produto', 'Quantidade', 'Preço unitário', 'Subtotal'])
+            ->assertDontSeeText('Custo unitário')->assertDontSeeText('R$ 7,32')
+            ->assertSee('<th scope="row" colspan="3">Subtotal</th>', false);
+
+        $this->assertDatabaseHas('sale_items', ['sale_id' => $sale->id, 'unit_cost' => '7.3200']);
+    }
+
     public function test_summary_keeps_only_customer_date_and_total_and_highlights_outstanding_balance(): void
     {
         $sale = Sale::factory()->create(['subtotal' => '30.00', 'discount' => '5.00', 'total' => '25.00']);

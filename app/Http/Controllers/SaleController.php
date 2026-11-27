@@ -60,7 +60,6 @@ class SaleController extends Controller
             'produto' => Product::query()->select('name')->whereColumn('products.id', 'sale_items.product_id'),
             'quantidade' => 'quantity',
             'preco' => 'unit_price',
-            'custo' => 'unit_cost',
             'subtotal' => 'subtotal',
         ], text: ['produto'], key: 'ordem_itens', pageName: null);
         $paymentsSort = $request->sorting([

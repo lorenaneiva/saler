@@ -64,7 +64,7 @@ class SaleTest extends TestCase
 
         $this->get(route('sales.index'))->assertOk()->assertSee('Maria Silva');
         $this->get(route('sales.show', $sale))->assertOk()
-            ->assertSee('R$ 31,75')->assertSee('R$ 12,50')->assertSee('R$ 8,13')->assertDontSee('R$ 8,1250')
+            ->assertSee('R$ 31,75')->assertSee('R$ 12,50')->assertDontSee('R$ 8,13')
             ->assertSee('Retirada no balcão');
         $this->get(route('products.show', $rice))->assertOk()
             ->assertSee(route('sales.show', $sale))->assertDontSee('Perda de estoque');

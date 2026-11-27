@@ -70,10 +70,9 @@
             </x-slot:filters>
             <thead>
                 <tr>
-                    <x-ui.sort-header :sort="$itemsSort" column="produto">Produto</x-ui.sort-header>
+                    <x-ui.sort-header :sort="$itemsSort" column="produto" class="w-2/5">Produto</x-ui.sort-header>
                     <x-ui.sort-header :sort="$itemsSort" column="quantidade">Quantidade</x-ui.sort-header>
                     <x-ui.sort-header :sort="$itemsSort" column="preco" class="money">Preço unitário</x-ui.sort-header>
-                    <x-ui.sort-header :sort="$itemsSort" column="custo" class="money">Custo unitário da venda</x-ui.sort-header>
                     <x-ui.sort-header :sort="$itemsSort" column="subtotal" class="money">Subtotal</x-ui.sort-header>
                 </tr>
             </thead>
@@ -84,25 +83,25 @@
                             <a data-row-link href="{{ route('products.show', $item->product_id) }}">{{ $item->product->name }}</a>
                         </th>
                         <td>{{ $item->quantity }}</td>
-                        @foreach ([$item->unit_price, $item->unit_cost, $item->subtotal] as $amount)
+                        @foreach ([$item->unit_price, $item->subtotal] as $amount)
                             <td class="money"><x-ui.money :value="$amount" /></td>
                         @endforeach
                     </tr>
                 @empty
-                    <x-ui.empty :columns="5">{{ request()->filled('q_itens') ? 'Nenhum produto desta venda corresponde à busca.' : 'Nenhum item registrado nesta venda.' }}</x-ui.empty>
+                    <x-ui.empty :columns="4">{{ request()->filled('q_itens') ? 'Nenhum produto desta venda corresponde à busca.' : 'Nenhum item registrado nesta venda.' }}</x-ui.empty>
                 @endforelse
             </tbody>
             <tfoot class="table-totals">
                 <tr>
-                    <th scope="row" colspan="4">Subtotal</th>
+                    <th scope="row" colspan="3">Subtotal</th>
                     <td class="money"><x-ui.money :value="$sale->subtotal" /></td>
                 </tr>
                 <tr>
-                    <th scope="row" colspan="4">Desconto</th>
+                    <th scope="row" colspan="3">Desconto</th>
                     <td class="money">{{ $hasDiscount ? '− ' : '' }}<x-ui.money :value="$sale->discount" /></td>
                 </tr>
                 <tr class="table-grand-total">
-                    <th scope="row" colspan="4">Total da venda</th>
+                    <th scope="row" colspan="3">Total da venda</th>
                     <td class="money"><x-ui.money :value="$sale->total" /></td>
                 </tr>
             </tfoot>
