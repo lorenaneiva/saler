@@ -136,6 +136,25 @@ function closeDialog(dialog) {
 
 initializeProductEditor(closeDialog);
 
+/** Security > Users: one password reset drawer, pointed at the user whose button was clicked. */
+document.addEventListener('click', (event) => {
+    const trigger = event.target.closest?.('[data-reset-password]');
+    const form = document.querySelector('[data-reset-password-form]');
+    if (!trigger || !form) {
+        return;
+    }
+
+    form.action = trigger.dataset.resetPassword;
+    form.elements.namedItem('reset_user_id').value = trigger.dataset.userId;
+    form.elements.namedItem('reset_user_name').value = trigger.dataset.userName;
+    form.querySelector('[data-reset-password-user]').textContent = trigger.dataset.userName;
+    form.querySelectorAll('input[type="password"]').forEach((field) => {
+        field.value = '';
+        field.removeAttribute('aria-invalid');
+    });
+    form.querySelectorAll('[role="alert"]').forEach((error) => error.remove());
+});
+
 document.querySelectorAll('dialog').forEach((dialog) => {
     dialog.addEventListener('cancel', (event) => {
         event.preventDefault();

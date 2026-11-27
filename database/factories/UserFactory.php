@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Cargo;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -30,7 +31,25 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'cargo_id' => fn (): int => Cargo::idFor(Cargo::Administrador),
         ];
+    }
+
+    /** The single Root account. */
+    public function root(): static
+    {
+        return $this->state(fn (): array => ['cargo_id' => Cargo::idFor(Cargo::Root)]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn (): array => ['ativo' => false]);
+    }
+
+    /** Signed in with a password chosen by someone else (initial or reset), which must be replaced first. */
+    public function mustChangePassword(): static
+    {
+        return $this->state(fn (): array => ['must_change_password' => true]);
     }
 
     /**

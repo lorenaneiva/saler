@@ -18,7 +18,7 @@ vendor/bin/sail npm install
 vendor/bin/sail npm run dev
 ```
 
-Configure o ambiente local a partir de `.env.example`; não compartilhe nem versione `.env`. O usuário inicial depende dos seeders/configuração local — não há credenciais padrão documentadas aqui.
+Configure o ambiente local a partir de `.env.example`; não compartilhe nem versione `.env`. Não há credenciais padrão: crie a conta Root com `vendor/bin/sail artisan app:create-user --role=root` (a senha é pedida de forma oculta) e cadastre as administradoras em Segurança › Usuários.
 
 ## Documentação para agentes e contribuidores
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -30,11 +31,19 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        if (! Auth::attempt($credentials)) {
+        $inactive = false;
+        $signedIn = Auth::attemptWhen($credentials, function (User $user) use (&$inactive): bool {
+            $inactive = ! $user->ativo;
+
+            return ! $inactive;
+        });
+
+        if (! $signedIn) {
             RateLimiter::hit($key, 60);
 
             throw ValidationException::withMessages([
-                'email' => 'E-mail ou senha inválidos.',
+                // Only someone who typed the right password learns that the account exists but is disabled.
+                'email' => $inactive ? 'Sua conta está desativada. Procure a pessoa responsável pelo sistema.' : 'E-mail ou senha inválidos.',
             ]);
         }
 

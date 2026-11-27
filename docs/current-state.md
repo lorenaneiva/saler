@@ -4,7 +4,8 @@ Revisão documental do código, testes, migrations, requisitos e histórico Git 
 
 ## Implementado com cobertura identificada
 
-- Login/logout por sessão, proteção de rotas e bloqueio após cinco tentativas de login inválidas (`AuthenticationTest`). Não há matriz de papéis/permissões.
+- Login/logout por sessão, proteção de rotas e bloqueio após cinco tentativas de login inválidas (`AuthenticationTest`).
+- Segurança (27/11/2026): cargos Root/Administrador, módulo Segurança › Usuários exclusivo do Root (listagem com busca, filtros e ordenação; cadastro em drawer; edição na linha; desativação/reativação; redefinição de senha), troca da própria senha, troca obrigatória de senha temporária, bloqueio de inativas, revogação de sessões, último acesso e `app:create-user --role` com Root único (`SecurityUsersTest`, `PasswordChangeTest`, `CargoMigrationTest`, `CreateUserCommandTest`). Matriz em [regras de negócio](business-rules.md#segurança-cargos-e-acesso-implementado-em-27112026).
 - Cadastros de categoria, produto, cliente e fornecedor; busca/paginação; desativação de produtos, fornecedores e categorias já usadas (categoria só sem produtos ativos); reativação de fornecedor e categoria; filtro de situação em categorias (ativas por padrão); edição contextual de categoria/fornecedor/cliente e drawer de produto (`CategoryTest`, `ProductTest`, `CustomerTest`, `SupplierTest`, `InlineEditingTest`, `ProductDrawerTest`). `CustomerTest` cobre acesso de visitante, criação/listagem/consulta, edição, validação, resumo financeiro e histórico de compras exibido por padrão ao abrir o perfil (aba Compras).
 - Compra com múltiplos itens, cadastro de produto pela compra, desconto, atualização imediata de estoque/custo médio e cancelamento com reversão condicionada a saldo (`PurchaseTest`). Há estados pending/confirmed/cancelled, embora o fluxo de criação confirme imediatamente.
 - Consulta de estoque, histórico de movimentos, motivos e entradas/saídas manuais com auditoria (`StockTest`).
@@ -36,6 +37,8 @@ Revisão documental do código, testes, migrations, requisitos e histórico Git 
 - Testes cobrem controllers/HTML/ações e utilitários, mas não foi identificado teste automatizado real de navegador para foco, leitor de tela, posicionamento/responsividade do drawer e autocomplete. Acessibilidade visual precisa de verificação manual.
 
 Em 26/11/2026 a suíte PHPUnit completa (90 testes) e os testes JS de `tests/Unit/*.test.js` (8 testes) foram executados e aprovados. Não há bug de interface assumido sem evidência; itens acima são lacunas ou riscos a validar.
+
+- Segurança: não há auditoria de quem confirmou/cancelou compras, editou preços/cadastros ou executou ações de Segurança (proposta em [regras de negócio](business-rules.md#histórico-de-operações-e-proposta-de-auditoria-planejado-não-implementado)). Não há recuperação de senha por e-mail: se a conta Root perder a senha, a recuperação exige acesso ao banco (ex.: rodar `app:create-user` não resolve, pois o Root já existe). A revogação imediata de sessões depende do driver `database` (usado em desenvolvimento e no Render); em outros drivers a sessão cai na requisição seguinte.
 
 ## Próximos passos recomendados
 

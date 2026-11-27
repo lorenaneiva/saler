@@ -4,6 +4,7 @@ use App\Http\Controllers\AutocompleteController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPaymentController;
+use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SaleController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\StockAdjustmentReasonController;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function (): void {
@@ -19,7 +21,19 @@ Route::middleware('guest')->group(function (): void {
     Route::post('/entrar', [SessionController::class, 'store'])->name('login.store');
 });
 
-Route::middleware('auth')->group(function (): void {
+Route::middleware(['auth', 'auth.session', 'active', 'password.changed'])->group(function (): void {
+    Route::get('/minha-senha', [PasswordController::class, 'edit'])->name('password.edit');
+    Route::put('/minha-senha', [PasswordController::class, 'update'])->name('password.update');
+
+    Route::middleware('can:manage-users')->prefix('seguranca/usuarios')->name('security.users.')->group(function (): void {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::post('/', [UserController::class, 'store'])->name('store');
+        Route::patch('/{user}', [UserController::class, 'update'])->name('update');
+        Route::patch('/{user}/desativar', [UserController::class, 'deactivate'])->name('deactivate');
+        Route::patch('/{user}/ativar', [UserController::class, 'activate'])->name('activate');
+        Route::put('/{user}/senha', [UserController::class, 'resetPassword'])->name('password');
+    });
+
     Route::get('/opcoes/{source}', AutocompleteController::class)->name('autocomplete.options');
     Route::view('/', 'dashboard')->name('dashboard');
     Route::patch('/categorias/{category}/ativar', [CategoryController::class, 'activate'])->name('categories.activate');

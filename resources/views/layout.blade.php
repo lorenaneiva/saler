@@ -23,6 +23,9 @@
                 ['suppliers.index', 'suppliers.*', 'Fornecedores', 'local_shipping'],
             ],
         ];
+        if (auth()->user()?->can('manage-users')) {
+            $groups['Segurança'] = [['security.users.index', 'security.users.*', 'Usuários', 'lock']];
+        }
     @endphp
     <aside class="app-sidebar">
         <a href="{{ route('dashboard') }}" class="brand">

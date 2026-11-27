@@ -53,6 +53,39 @@ Este documento separa o que o código atual evidencia do que o requisito origina
 - Perfil do cliente mostra resumo de comprado/recebido/em aberto e organiza abas Compras, Contas em aberto, Pagamentos e Cadastro (`?secao=`). Ao abrir o perfil sem seção, a aba Compras já vem aberta com todas as compras do cliente; parâmetro ausente ou inválido cai em `compras`. Pagamentos com alocações ficam em `secao=pagamentos`. A busca por contas em aberto é no perfil, não há rota dedicada de clientes devedores.
 - Não existe fluxo de estorno de pagamento; não há flag/status de pagamento cancelado.
 
+## Segurança, cargos e acesso (implementado em 27/11/2026)
+
+Evidência: `app/Models/Cargo.php`, `app/Models/User.php`, `app/Actions/RegisterUser.php`, `app/Actions/RevokeUserSessions.php`, `app/Http/Controllers/UserController.php`, `PasswordController`, middlewares `EnsureUserIsActive`/`EnsurePasswordIsChanged`, gates em `AppServiceProvider`, migrations de 27/11/2026 e os testes `SecurityUsersTest`, `PasswordChangeTest`, `CargoMigrationTest` e `CreateUserCommandTest`.
+
+- **Cargos:** cada usuária tem exatamente um cargo (`users.cargo_id`, obrigatório). Existem dois, entregues pelas migrations (não por seeder): **Root** (`root`) e **Administrador** (`administrador`). O código identifica cargos pelo slug, nunca pelo ID. Não há tela de gestão de cargos, e um cargo em uso não pode ser excluído (FK `restrict`).
+- **Matriz de permissões:**
+
+  | Recurso | Root | Administrador |
+  | --- | --- | --- |
+  | Funcionalidades comerciais e operacionais (cadastros, compras, vendas, estoque, pagamentos, dashboard e futuros relatórios) | sim | sim |
+  | Módulo Segurança › Usuários (listar, cadastrar, editar nome/e-mail, desativar/reativar, redefinir senha) | sim | não (HTTP 403, menu oculto) |
+  | Alterar a própria senha (com a senha atual) | sim | sim |
+  | Alterar o próprio cargo/situação ou de outra conta | não | não |
+  | Alterar, desativar ou redefinir a senha da conta Root pela interface | não | não |
+  | Criar Root | só pelo comando `app:create-user --role=root` | não |
+
+- **Root único:** no máximo uma conta Root, garantido no banco pelo índice único parcial `users_single_root_unique` (vale também para execuções concorrentes) e verificado antes, com lock no cargo, por `RegisterUser`. O comando recusa um segundo Root antes de pedir a senha.
+- **Usuárias existentes antes do módulo:** a migration preservou todos os registros e atribuiu o cargo Administrador (nunca Root), mantendo o acesso operacional. `ativo = true` e sem troca obrigatória de senha.
+- **Cadastro pela interface (Root):** nome completo, e-mail único (gravado em minúsculas), cargo (apenas Administrador), situação e senha inicial com confirmação. Política de senha compartilhada com o comando (`PasswordRules`: mínimo de 10 caracteres, confirmação). Quem é cadastrada pela interface **deve trocar a senha no primeiro acesso** (`must_change_password`).
+- **Gerenciamento (Root):** editar nome/e-mail (edição na linha; campos de cargo, situação ou senha enviados junto são ignorados), desativar/reativar, redefinir senha (ação independente, em drawer próprio) e consultar o último acesso. Não há exclusão definitiva de usuárias, para preservar os históricos (vendas, compras, pagamentos e movimentações referenciam `user_id`).
+- **Desativação:** impede novos logins (mensagem específica só para quem digitou a senha correta; senha errada recebe a mensagem genérica) e encerra as sessões: apaga as linhas da usuária em `sessions` (driver `database`), troca o `remember_token` e `EnsureUserIsActive` derruba qualquer sessão restante na requisição seguinte, em qualquer driver.
+- **Redefinição administrativa de senha:** grava a nova senha, exige a troca no próximo acesso e encerra as sessões da usuária. Sessões em outros drivers são invalidadas pelo `AuthenticateSession` (hash da senha mudou).
+- **Troca da própria senha:** exige a senha atual, a nova deve ser diferente da atual e seguir a política. Encerra as sessões de outros aparelhos e mantém a sessão atual. Enquanto a troca obrigatória estiver pendente, qualquer rota autenticada redireciona para `/minha-senha` (JSON recebe 403).
+- **Último acesso:** `users.last_login_at` é gravado a cada login bem-sucedido.
+- **Cadastro público:** não existe rota de registro.
+- **Autorização:** sempre no backend. As rotas `security.users.*` passam pelo gate `manage-users` (Root ativo), e cada ação sobre uma conta pelo gate `manage-user` (alvo não pode ser Root). Respostas não expõem senha nem hash (`#[Hidden]`).
+
+### Histórico de operações e proposta de auditoria (planejado, não implementado)
+
+Já registram a responsável: `sales.user_id`, `purchases.user_id`, `payments.user_id` e `stock_movements.user_id` (entradas e estornos de compra, saídas por venda e movimentações manuais com motivo). Não registram quem fez: confirmação de compra (só `confirmed_at`), cancelamento de compra (pendente não deixa rastro; confirmada deixa as movimentações de estorno), edições de cadastro e preço (produtos, clientes, fornecedores, categorias), ativações/desativações e as ações do módulo Segurança.
+
+Proposta para uma etapa futura: tabela `auditoria` (append-only) com `user_id`, ação (`purchase.cancelled`, `product.price_changed`, `user.deactivated`, `user.password_reset` etc.), entidade (`tipo` + `id`), valores anteriores e novos em JSON (sem senhas ou hashes), IP e data. A gravação ficaria nas Actions e nos controllers, dentro da mesma transação da operação. Para compras, acrescentar `confirmed_by`/`cancelled_by` e `cancelled_at`. Exibir no módulo Segurança com filtros por pessoa, ação e período, e definir uma política de retenção.
+
 ## Requisitos ainda planejados ou incompletos
 
 Os itens abaixo constam no PDF, mas não têm implementação completa evidenciada pelo conjunto atual de migrations, rotas, Actions e testes:
